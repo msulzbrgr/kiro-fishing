@@ -23,6 +23,7 @@ import {
   getRegulationChangeReason,
   getRegulationStateAfterConfirmation,
 } from '../utils/regulations';
+import { getSafeExternalUrl } from '../utils/urls';
 import CatchLog from './CatchLog';
 import ConditionsForm from './ConditionsForm';
 import MapView from './MapView';
@@ -48,15 +49,6 @@ function getPendingCheckpoint(session: FishingSession): RegulationCheckpoint | u
   return [...(session.regulationCheckpoints ?? [])].reverse().find((checkpoint) => !checkpoint.userConfirmed);
 }
 
-function getSafeSourceUrl(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
-  } catch {
-    return null;
-  }
-}
-
 function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -70,7 +62,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     : session.regulationState ?? getRegulationStateAfterConfirmation(regulationSnapshot);
   const regulationSources = regulationSnapshot.sourceUrls.map((url, index) => ({
     key: `${index}-${url}`,
-    safeUrl: getSafeSourceUrl(url),
+    safeUrl: getSafeExternalUrl(url),
     title: regulationSnapshot.sourceTitles[index] ?? url,
   }));
 

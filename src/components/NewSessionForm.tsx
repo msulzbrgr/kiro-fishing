@@ -7,6 +7,7 @@ import {
   createRegulationSnapshot,
   getRegulationStateAfterConfirmation,
 } from '../utils/regulations';
+import { getSafeExternalUrl } from '../utils/urls';
 import MapView from './MapView';
 
 interface NewSessionFormProps {
@@ -29,6 +30,11 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
     ? createRegulationSnapshot(location, regulationConfirmed)
     : null;
   const canCreateSession = Boolean(location && regulationConfirmed && regulationSnapshot);
+  const regulationSources = regulationSnapshot?.sourceUrls.map((url, index) => ({
+    key: `${index}-${url}`,
+    safeUrl: getSafeExternalUrl(url),
+    title: regulationSnapshot.sourceTitles[index] ?? url,
+  })) ?? [];
 
   const handleCreate = () => {
     if (!location || !regulationSnapshot || !canCreateSession) return;
@@ -130,13 +136,17 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
         )}
         <div className="source-list">
           <strong>{t('regulation.source_links')}:</strong>
-          {regulationSnapshot && regulationSnapshot.sourceUrls.length > 0 ? (
+          {regulationSources.length > 0 ? (
             <ul>
-              {regulationSnapshot.sourceUrls.map((url, index) => (
-                <li key={url}>
-                  <a href={url} target="_blank" rel="noopener noreferrer">
-                    {regulationSnapshot.sourceTitles[index] ?? url}
-                  </a>
+              {regulationSources.map((source) => (
+                <li key={source.key}>
+                  {source.safeUrl ? (
+                    <a href={source.safeUrl} target="_blank" rel="noopener noreferrer">
+                      {source.title}
+                    </a>
+                  ) : (
+                    <span>{source.title || t('regulation.invalid_source')}</span>
+                  )}
                 </li>
               ))}
             </ul>
