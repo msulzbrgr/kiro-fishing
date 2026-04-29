@@ -17,6 +17,7 @@ test.describe('Export / Import Data', () => {
   test('export triggers a file download', async ({ page }) => {
     // Create a session first so there's data to export
     await page.getByTestId('nav-new').click();
+    await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
     await page.goto('/');
 

@@ -136,5 +136,25 @@
     "import_confirm": "This will replace all current data. Are you sure?",
     "export_tooltip": "Download all your fishing data as JSON",
     "import_tooltip": "Restore data from a previous export"
+  },
+  "regulation": {
+    "review_required_title": "Regulation review required",
+    "start_review_desc": "A fishing session is only valid for the regulation context you reviewed. Check the official source links before starting.",
+    "status_label": "Regulation data",
+    "status_available": "Available",
+    "status_missing": "Missing or outside Switzerland",
+    "status_stale": "Needs official source check",
+    "status_conflicting": "Conflicting sources",
+    "jurisdiction": "Jurisdiction",
+    "source_links": "Official source links",
+    "no_sources": "No cantonal source links are available for this position.",
+    "confirm_label": "I understand and have checked the official source before continuing.",
+    "session_needs_review": "Review needed",
+    "change_notification_title": "Regulation area may have changed",
+    "change_notification_desc": "You may have entered a different regulation area. Current session rules may no longer apply. Review the new source-backed information before continuing.",
+    "confirmed_uncertain_title": "Uncertain regulation confirmed",
+    "confirmed_uncertain_desc": "This session was started after you confirmed that you checked the official source despite incomplete or stale in-app data.",
+    "changed_from_to": "Detected change: {{from}} → {{to}}",
+    "confirm_change": "I reviewed the new rules"
   }
 }

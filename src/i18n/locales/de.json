@@ -136,5 +136,25 @@
     "import_confirm": "Dies ersetzt alle aktuellen Daten. Sind Sie sicher?",
     "export_tooltip": "Alle Angeldaten als JSON herunterladen",
     "import_tooltip": "Daten aus einem früheren Export wiederherstellen"
+  },
+  "regulation": {
+    "review_required_title": "Prüfung der Vorschriften erforderlich",
+    "start_review_desc": "Eine Angelausfahrt ist nur für den geprüften Regelungskontext gültig. Prüfen Sie vor dem Start die offiziellen Quellen.",
+    "status_label": "Vorschriftsdaten",
+    "status_available": "Verfügbar",
+    "status_missing": "Fehlt oder ausserhalb der Schweiz",
+    "status_stale": "Offizielle Quelle prüfen",
+    "status_conflicting": "Widersprüchliche Quellen",
+    "jurisdiction": "Zuständigkeit",
+    "source_links": "Offizielle Quellen",
+    "no_sources": "Für diese Position sind keine kantonalen Quellen verfügbar.",
+    "confirm_label": "Ich verstehe und habe die offizielle Quelle vor dem Fortfahren geprüft.",
+    "session_needs_review": "Prüfung nötig",
+    "change_notification_title": "Regelungsgebiet könnte sich geändert haben",
+    "change_notification_desc": "Sie könnten ein anderes Regelungsgebiet betreten haben. Die bisherigen Regeln gelten möglicherweise nicht mehr. Prüfen Sie die neuen Quellen vor dem Fortfahren.",
+    "confirmed_uncertain_title": "Unsichere Vorschriften bestätigt",
+    "confirmed_uncertain_desc": "Diese Ausfahrt wurde gestartet, nachdem Sie trotz unvollständiger oder veralteter App-Daten die Prüfung der offiziellen Quelle bestätigt haben.",
+    "changed_from_to": "Erkannte Änderung: {{from}} → {{to}}",
+    "confirm_change": "Ich habe die neuen Regeln geprüft"
   }
 }
