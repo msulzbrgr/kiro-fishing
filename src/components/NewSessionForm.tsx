@@ -3,6 +3,10 @@ import { Play, Square, MapPin, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingSession, FishingLocation } from '../types';
 import { generateId, saveSession } from '../utils/storage';
+import {
+  createRegulationSnapshot,
+  getRegulationStateAfterConfirmation,
+} from '../utils/regulations';
 import MapView from './MapView';
 
 interface NewSessionFormProps {
@@ -20,8 +24,15 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
   const [notes, setNotes] = useState('');
   const [location, setLocation] = useState<FishingLocation | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [regulationConfirmed, setRegulationConfirmed] = useState(false);
+  const regulationSnapshot = createRegulationSnapshot(
+    location ?? { lat: 0, lng: 0 },
+    regulationConfirmed,
+  );
 
   const handleCreate = () => {
+    if (!regulationConfirmed) return;
+
     const session: FishingSession = {
       id: generateId(),
       date,
@@ -31,6 +42,9 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
       water: {},
       catches: [],
       notes: notes.trim() || undefined,
+      regulationSnapshot,
+      regulationState: getRegulationStateAfterConfirmation(regulationSnapshot),
+      regulationCheckpoints: [],
     };
     saveSession(session);
     onSessionCreated(session);
@@ -93,13 +107,53 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
         )}
       </div>
 
-      {showMap && (
+        {showMap && (
         <MapView
           onLocationSelect={(loc) => {
             setLocation(loc);
+            setRegulationConfirmed(false);
           }}
         />
       )}
+
+      <div className="regulation-review" data-testid="regulation-review">
+        <h3>{t('regulation.review_required_title')}</h3>
+        <p>{t('regulation.start_review_desc')}</p>
+        <div className="regulation-status">
+          <strong>{t('regulation.status_label')}:</strong>{' '}
+          {t(`regulation.status_${regulationSnapshot.status}`)}
+        </div>
+        {regulationSnapshot.jurisdiction && (
+          <div className="regulation-status">
+            <strong>{t('regulation.jurisdiction')}:</strong> {regulationSnapshot.jurisdiction}
+          </div>
+        )}
+        <div className="source-list">
+          <strong>{t('regulation.source_links')}:</strong>
+          {regulationSnapshot.sourceUrls.length > 0 ? (
+            <ul>
+              {regulationSnapshot.sourceUrls.map((url, index) => (
+                <li key={url}>
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    {regulationSnapshot.sourceTitles[index] ?? url}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>{t('regulation.no_sources')}</p>
+          )}
+        </div>
+        <label className="checkbox-label regulation-confirm">
+          <input
+            type="checkbox"
+            checked={regulationConfirmed}
+            onChange={(e) => setRegulationConfirmed(e.target.checked)}
+            data-testid="regulation-confirm-checkbox"
+          />
+          {t('regulation.confirm_label')}
+        </label>
+      </div>
 
       <div className="form-actions">
         <button className="btn btn-secondary" onClick={onCancel} data-testid="cancel-session-btn">
@@ -108,6 +162,7 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
         <button
           className="btn btn-primary"
           onClick={handleCreate}
+          disabled={!regulationConfirmed}
           data-testid="create-session-btn"
         >
           <Play size={16} /> {t('new_session.create')}
