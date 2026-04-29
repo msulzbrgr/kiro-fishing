@@ -1,4 +1,25 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+async function selectSwissLocation(page: Page) {
+  await page.route('https://nominatim.openstreetmap.org/reverse**', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        display_name: 'Zürich, Schweiz',
+        address: {
+          state: 'Zürich',
+          city: 'Zürich',
+          country_code: 'ch',
+        },
+      }),
+    });
+  });
+  await page.getByTestId('select-location-btn').click();
+  await expect(page.getByTestId('map-container')).toBeVisible();
+  await page.getByTestId('map-container').click({ position: { x: 240, y: 200 } });
+  await expect(page.locator('.canton-badge').first()).toContainText('Zürich');
+}
 
 test.describe('Session Management', () => {
   test.beforeEach(async ({ page }) => {
@@ -20,11 +41,15 @@ test.describe('Session Management', () => {
 
   test('requires regulation confirmation before creating a session', async ({ page }) => {
     await expect(page.getByTestId('create-session-btn')).toBeDisabled();
+    await expect(page.getByTestId('regulation-confirm-checkbox')).toBeDisabled();
+    await selectSwissLocation(page);
+    await expect(page.getByTestId('regulation-confirm-checkbox')).toBeEnabled();
     await page.getByTestId('regulation-confirm-checkbox').check();
     await expect(page.getByTestId('create-session-btn')).toBeEnabled();
   });
 
   test('can create a session and see it in session list', async ({ page }) => {
+    await selectSwissLocation(page);
     await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
 
@@ -56,6 +81,7 @@ test.describe('Catch Log', () => {
     await page.goto('/');
     // Create a session first
     await page.getByTestId('nav-new').click();
+    await selectSwissLocation(page);
     await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
     // Expand the session card

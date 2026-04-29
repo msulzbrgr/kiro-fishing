@@ -155,6 +155,8 @@
     "confirmed_uncertain_title": "Unsichere Vorschriften bestätigt",
     "confirmed_uncertain_desc": "Diese Ausfahrt wurde gestartet, nachdem Sie trotz unvollständiger oder veralteter App-Daten die Prüfung der offiziellen Quelle bestätigt haben.",
     "changed_from_to": "Erkannte Änderung: {{from}} → {{to}}",
-    "confirm_change": "Ich habe die neuen Regeln geprüft"
+    "confirm_change": "Ich habe die neuen Regeln geprüft",
+    "select_location_first": "Wählen Sie zuerst Ihren Angelort. Die Ausfahrt kann erst starten, wenn der geprüfte Regelungskontext mit einem realen Ort verbunden ist.",
+    "invalid_source": "Ungültiger Quellenlink"
   }
 }

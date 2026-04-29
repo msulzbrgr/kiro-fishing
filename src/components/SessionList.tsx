@@ -44,17 +44,35 @@ function weatherEmoji(condition?: string) {
   }
 }
 
+function getPendingCheckpoint(session: FishingSession): RegulationCheckpoint | undefined {
+  return [...(session.regulationCheckpoints ?? [])].reverse().find((checkpoint) => !checkpoint.userConfirmed);
+}
+
+function getSafeSourceUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
-  const pendingCheckpoint = session.regulationCheckpoints?.findLast((checkpoint) => !checkpoint.userConfirmed);
+  const pendingCheckpoint = getPendingCheckpoint(session);
   const regulationSnapshot = pendingCheckpoint?.newSnapshot
     ?? session.regulationSnapshot
     ?? createRegulationSnapshot(session.location);
   const regulationState = pendingCheckpoint
     ? 'paused_due_to_regulation_change'
     : session.regulationState ?? getRegulationStateAfterConfirmation(regulationSnapshot);
+  const regulationSources = regulationSnapshot.sourceUrls.map((url, index) => ({
+    key: `${index}-${url}`,
+    safeUrl: getSafeSourceUrl(url),
+    title: regulationSnapshot.sourceTitles[index] ?? url,
+  }));
 
   const duration = session.endTime
     ? (() => {
@@ -186,13 +204,17 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               )}
               <div className="source-list">
                 <strong>{t('regulation.source_links')}:</strong>
-                {regulationSnapshot.sourceUrls.length > 0 ? (
+                {regulationSources.length > 0 ? (
                   <ul>
-                    {regulationSnapshot.sourceUrls.map((url, index) => (
-                      <li key={url}>
-                        <a href={url} target="_blank" rel="noopener noreferrer">
-                          {regulationSnapshot.sourceTitles[index] ?? url}
-                        </a>
+                    {regulationSources.map((source) => (
+                      <li key={source.key}>
+                        {source.safeUrl ? (
+                          <a href={source.safeUrl} target="_blank" rel="noopener noreferrer">
+                            {source.title}
+                          </a>
+                        ) : (
+                          <span>{source.title || t('regulation.invalid_source')}</span>
+                        )}
                       </li>
                     ))}
                   </ul>

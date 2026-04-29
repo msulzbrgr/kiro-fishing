@@ -155,6 +155,8 @@
     "confirmed_uncertain_title": "Uncertain regulation confirmed",
     "confirmed_uncertain_desc": "This session was started after you confirmed that you checked the official source despite incomplete or stale in-app data.",
     "changed_from_to": "Detected change: {{from}} → {{to}}",
-    "confirm_change": "I reviewed the new rules"
+    "confirm_change": "I reviewed the new rules",
+    "select_location_first": "Select your fishing position first. The session cannot start until the reviewed regulation context is tied to a real location.",
+    "invalid_source": "Invalid source link"
   }
 }

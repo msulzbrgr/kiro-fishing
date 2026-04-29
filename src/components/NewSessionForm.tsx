@@ -25,19 +25,19 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
   const [location, setLocation] = useState<FishingLocation | null>(null);
   const [showMap, setShowMap] = useState(false);
   const [regulationConfirmed, setRegulationConfirmed] = useState(false);
-  const regulationSnapshot = createRegulationSnapshot(
-    location ?? { lat: 0, lng: 0 },
-    regulationConfirmed,
-  );
+  const regulationSnapshot = location
+    ? createRegulationSnapshot(location, regulationConfirmed)
+    : null;
+  const canCreateSession = Boolean(location && regulationConfirmed && regulationSnapshot);
 
   const handleCreate = () => {
-    if (!regulationConfirmed) return;
+    if (!location || !regulationSnapshot || !canCreateSession) return;
 
     const session: FishingSession = {
       id: generateId(),
       date,
       startTime,
-      location: location ?? { lat: 0, lng: 0 },
+      location,
       weather: {},
       water: {},
       catches: [],
@@ -107,7 +107,7 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
         )}
       </div>
 
-        {showMap && (
+      {showMap && (
         <MapView
           onLocationSelect={(loc) => {
             setLocation(loc);
@@ -118,19 +118,19 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
 
       <div className="regulation-review" data-testid="regulation-review">
         <h3>{t('regulation.review_required_title')}</h3>
-        <p>{t('regulation.start_review_desc')}</p>
+        <p>{location ? t('regulation.start_review_desc') : t('regulation.select_location_first')}</p>
         <div className="regulation-status">
           <strong>{t('regulation.status_label')}:</strong>{' '}
-          {t(`regulation.status_${regulationSnapshot.status}`)}
+          {t(`regulation.status_${regulationSnapshot?.status ?? 'missing'}`)}
         </div>
-        {regulationSnapshot.jurisdiction && (
+        {regulationSnapshot?.jurisdiction && (
           <div className="regulation-status">
             <strong>{t('regulation.jurisdiction')}:</strong> {regulationSnapshot.jurisdiction}
           </div>
         )}
         <div className="source-list">
           <strong>{t('regulation.source_links')}:</strong>
-          {regulationSnapshot.sourceUrls.length > 0 ? (
+          {regulationSnapshot && regulationSnapshot.sourceUrls.length > 0 ? (
             <ul>
               {regulationSnapshot.sourceUrls.map((url, index) => (
                 <li key={url}>
@@ -148,6 +148,7 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
           <input
             type="checkbox"
             checked={regulationConfirmed}
+            disabled={!location}
             onChange={(e) => setRegulationConfirmed(e.target.checked)}
             data-testid="regulation-confirm-checkbox"
           />
@@ -162,7 +163,7 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
         <button
           className="btn btn-primary"
           onClick={handleCreate}
-          disabled={!regulationConfirmed}
+          disabled={!canCreateSession}
           data-testid="create-session-btn"
         >
           <Play size={16} /> {t('new_session.create')}
