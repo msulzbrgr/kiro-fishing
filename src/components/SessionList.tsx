@@ -7,12 +7,12 @@ import {
   ChevronDown,
   ChevronUp,
   Trash2,
-  Edit3,
   Cloud,
   Waves,
   CheckCircle,
   Circle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { FishingSession } from '../types';
 import { deleteSession } from '../utils/storage';
 import CatchLog from './CatchLog';
@@ -37,6 +37,7 @@ function weatherEmoji(condition?: string) {
 }
 
 function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
 
@@ -52,6 +53,9 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
       })()
     : null;
 
+  const catchCount = session.catches.length;
+  const catchLabel = `${catchCount} ${catchCount === 1 ? t('sessions.catches_one') : t('sessions.catches_other')}`;
+
   return (
     <div className={`session-card card ${expanded ? 'expanded' : ''}`}>
       <div className="session-header" onClick={() => setExpanded(!expanded)}>
@@ -61,11 +65,11 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
             <strong>{session.date}</strong>
             {session.endTime ? (
               <span className="badge badge-complete">
-                <CheckCircle size={12} /> Complete
+                <CheckCircle size={12} /> {t('sessions.complete')}
               </span>
             ) : (
               <span className="badge badge-active">
-                <Circle size={12} /> Active
+                <Circle size={12} /> {t('sessions.active')}
               </span>
             )}
           </div>
@@ -82,7 +86,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               </span>
             )}
             <span>
-              <Fish size={14} /> {session.catches.length} catch{session.catches.length !== 1 ? 'es' : ''}
+              <Fish size={14} /> {catchLabel}
             </span>
             {session.weather.condition && (
               <span>{weatherEmoji(session.weather.condition)} {session.weather.temperature}°C</span>
@@ -101,19 +105,19 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               className={`tab ${activeTab === 'catches' ? 'active' : ''}`}
               onClick={() => setActiveTab('catches')}
             >
-              <Fish size={15} /> Catches
+              <Fish size={15} /> {t('sessions.tab_catches')}
             </button>
             <button
               className={`tab ${activeTab === 'conditions' ? 'active' : ''}`}
               onClick={() => setActiveTab('conditions')}
             >
-              <Cloud size={15} /> Conditions
+              <Cloud size={15} /> {t('sessions.tab_conditions')}
             </button>
             <button
               className={`tab ${activeTab === 'map' ? 'active' : ''}`}
               onClick={() => setActiveTab('map')}
             >
-              <MapPin size={15} /> Map
+              <MapPin size={15} /> {t('sessions.tab_map')}
             </button>
           </div>
 
@@ -137,13 +141,13 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
             <button
               className="btn btn-danger btn-sm"
               onClick={() => {
-                if (confirm('Delete this session?')) {
+                if (confirm(t('sessions.delete_confirm'))) {
                   deleteSession(session.id);
                   onDelete(session.id);
                 }
               }}
             >
-              <Trash2 size={14} /> Delete Session
+              <Trash2 size={14} /> {t('sessions.delete')}
             </button>
           </div>
         </div>
@@ -163,12 +167,14 @@ export default function SessionList({
   onSessionUpdate,
   onSessionDelete,
 }: SessionListProps) {
+  const { t } = useTranslation();
+
   if (sessions.length === 0) {
     return (
       <div className="empty-state-large">
         <Fish size={48} className="empty-icon" />
-        <h3>No fishing sessions yet</h3>
-        <p>Start a new session to begin tracking your fishing adventures!</p>
+        <h3>{t('sessions.no_sessions')}</h3>
+        <p>{t('sessions.no_sessions_desc')}</p>
       </div>
     );
   }
@@ -187,5 +193,5 @@ export default function SessionList({
   );
 }
 
-// Also export the edit icon for potential use
-export { Edit3, Waves };
+// Also export the icons for potential use
+export { Waves };

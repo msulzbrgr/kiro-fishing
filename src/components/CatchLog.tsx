@@ -10,6 +10,7 @@ import {
   Clock,
   RefreshCw,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Catch, FishingSession } from '../types';
 import { COMMON_FISH_SPECIES } from '../data/cantonLaws';
 import { generateId, saveSession } from '../utils/storage';
@@ -36,6 +37,7 @@ const EMPTY_FORM: CatchFormState = {
 };
 
 export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CatchFormState>(EMPTY_FORM);
   const [expandedCatch, setExpandedCatch] = useState<string | null>(null);
@@ -80,24 +82,29 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     <div className="catch-log">
       <div className="section-header">
         <h3>
-          <Fish size={18} /> Catches ({session.catches.length})
+          <Fish size={18} /> {t('catch.title')} ({session.catches.length})
         </h3>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowForm(!showForm)}>
-          <Plus size={16} /> Log Catch
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={() => setShowForm(!showForm)}
+          data-testid="log-catch-btn"
+        >
+          <Plus size={16} /> {t('catch.log_catch')}
         </button>
       </div>
 
       {showForm && (
         <div className="catch-form card">
-          <h4>New Catch</h4>
+          <h4>{t('catch.new_catch')}</h4>
           <div className="form-grid">
             <div className="form-group">
-              <label>Species *</label>
+              <label>{t('catch.species')}</label>
               <select
                 value={form.species}
                 onChange={(e) => setForm({ ...form, species: e.target.value })}
+                data-testid="species-select"
               >
-                <option value="">— Select species —</option>
+                <option value="">{t('catch.select_species')}</option>
                 {COMMON_FISH_SPECIES.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -108,13 +115,13 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
 
             <div className="form-group">
               <label>
-                <Ruler size={14} /> Length (cm)
+                <Ruler size={14} /> {t('catch.length_label')}
               </label>
               <input
                 type="number"
                 min="0"
                 step="0.1"
-                placeholder="e.g. 42"
+                placeholder={t('catch.length_placeholder')}
                 value={form.length}
                 onChange={(e) => setForm({ ...form, length: e.target.value })}
               />
@@ -122,13 +129,13 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
 
             <div className="form-group">
               <label>
-                <Weight size={14} /> Weight (g)
+                <Weight size={14} /> {t('catch.weight_label')}
               </label>
               <input
                 type="number"
                 min="0"
                 step="1"
-                placeholder="e.g. 850"
+                placeholder={t('catch.weight_placeholder')}
                 value={form.weight}
                 onChange={(e) => setForm({ ...form, weight: e.target.value })}
               />
@@ -141,14 +148,14 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   checked={form.released}
                   onChange={(e) => setForm({ ...form, released: e.target.checked })}
                 />
-                <RefreshCw size={14} /> Released
+                <RefreshCw size={14} /> {t('catch.released')}
               </label>
             </div>
 
             <div className="form-group form-group-full">
-              <label>Notes</label>
+              <label>{t('catch.notes')}</label>
               <textarea
-                placeholder="Optional notes about the catch…"
+                placeholder={t('catch.notes_placeholder')}
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={2}
@@ -164,21 +171,22 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                 setForm(EMPTY_FORM);
               }}
             >
-              Cancel
+              {t('catch.cancel')}
             </button>
             <button
               className="btn btn-primary"
               onClick={handleAddCatch}
               disabled={!form.species}
+              data-testid="add-catch-btn"
             >
-              Add Catch
+              {t('catch.add')}
             </button>
           </div>
         </div>
       )}
 
       {session.catches.length === 0 && !showForm && (
-        <p className="empty-state">No catches logged yet. Click "Log Catch" to add one.</p>
+        <p className="empty-state">{t('catch.no_catches')}</p>
       )}
 
       <div className="catches-list">
@@ -206,7 +214,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   </span>
                   {c.released && (
                     <span className="badge badge-released">
-                      <RefreshCw size={11} /> Released
+                      <RefreshCw size={11} /> {t('catch.released')}
                     </span>
                   )}
                 </div>
@@ -218,7 +226,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                     e.stopPropagation();
                     handleDeleteCatch(c.id);
                   }}
-                  title="Delete catch"
+                  title={t('catch.delete_title')}
                 >
                   <X size={14} />
                 </button>

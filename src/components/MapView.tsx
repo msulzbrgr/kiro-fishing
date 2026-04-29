@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { CANTON_LAWS, STATE_TO_CANTON_CODE } from '../data/cantonLaws';
 import type { CantonLaw, FishingLocation } from '../types';
 
@@ -40,7 +41,6 @@ function detectCanton(result: NominatimResult): { code: string; name: string } |
   const state = result.address.state ?? '';
   const code = STATE_TO_CANTON_CODE[state];
   if (code) return { code, name: state };
-  // Try partial matches
   for (const [key, val] of Object.entries(STATE_TO_CANTON_CODE)) {
     if (state.includes(key) || key.includes(state)) {
       return { code: val, name: state };
@@ -50,6 +50,7 @@ function detectCanton(result: NominatimResult): { code: string; name: string } |
 }
 
 export default function MapView({ onLocationSelect, initialLocation, compact = false }: MapViewProps) {
+  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leafletMapRef = useRef<any>(null);
@@ -65,9 +66,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return;
 
-    // Dynamically import Leaflet to avoid SSR issues
     import('leaflet').then((L) => {
-      // Fix default icon URLs broken by Vite/webpack bundling
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -78,7 +77,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
 
       const center: [number, number] = initialLocation
         ? [initialLocation.lat, initialLocation.lng]
-        : [46.8182, 8.2275]; // Center of Switzerland
+        : [46.8182, 8.2275];
 
       const map = L.map(mapRef.current!, {
         center,
@@ -146,7 +145,6 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // If initialLocation changes externally, update map
   useEffect(() => {
     if (!initialLocation || !leafletMapRef.current) return;
     import('leaflet').then((L) => {
@@ -171,7 +169,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
     <div className="map-view">
       <div className="map-header">
         <MapPin size={18} />
-        <span>Click on the map to select your fishing location</span>
+        <span>{t('map.click_instruction')}</span>
         {loading && <Loader2 size={16} className="spin" />}
       </div>
 
@@ -184,15 +182,15 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       {!mapReady && (
         <div className="map-placeholder">
           <Loader2 size={24} className="spin" />
-          <span>Loading map…</span>
+          <span>{t('map.loading')}</span>
         </div>
       )}
 
       {selectedLocation && (
         <div className="location-info">
           <div className="location-coords">
-            <strong>Location:</strong>{' '}
-            {selectedLocation.locationName ?? 'Unknown location'}
+            <strong>{t('map.location')}:</strong>{' '}
+            {selectedLocation.locationName ?? t('map.unknown_location')}
             {selectedLocation.canton && (
               <span className="canton-badge">{selectedLocation.canton}</span>
             )}
@@ -206,7 +204,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       {cantonLaw && !compact && (
         <div className="canton-laws">
           <h3 className="canton-laws-title">
-            🎣 Fishing Laws — {cantonLaw.canton} ({cantonLaw.cantonCode})
+            🎣 {t('map.laws_title')} — {cantonLaw.canton} ({cantonLaw.cantonCode})
           </h3>
 
           {cantonLaw.generalInfo && (
@@ -215,12 +213,12 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
 
           {cantonLaw.permitInfo && (
             <div className="permit-info">
-              <strong>📋 Permit:</strong> {cantonLaw.permitInfo}
+              <strong>📋 {t('map.permit')}:</strong> {cantonLaw.permitInfo}
             </div>
           )}
 
           <div className="laws-list">
-            <strong>📜 Legal Sources:</strong>
+            <strong>📜 {t('map.legal_sources')}:</strong>
             <ul>
               {cantonLaw.laws.map((law, i) => (
                 <li key={i}>
@@ -239,12 +237,12 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
 
           {cantonLaw.minimumSizes && cantonLaw.minimumSizes.length > 0 && (
             <div className="min-sizes">
-              <strong>📏 Minimum Catch Sizes:</strong>
+              <strong>📏 {t('map.min_sizes')}:</strong>
               <table>
                 <thead>
                   <tr>
-                    <th>Species</th>
-                    <th>Minimum Size</th>
+                    <th>{t('map.species_col')}</th>
+                    <th>{t('map.min_size_col')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -263,8 +261,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
 
       {selectedLocation && !selectedLocation.canton && !loading && (
         <div className="not-switzerland">
-          ⚠️ No Swiss canton detected at this location. Please select a location within
-          Switzerland.
+          ⚠️ {t('map.not_switzerland')}
         </div>
       )}
     </div>

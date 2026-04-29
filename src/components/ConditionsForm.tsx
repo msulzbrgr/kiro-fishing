@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Cloud, Thermometer, Wind, Droplets, Waves, ArrowDown, ArrowUp, Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { FishingSession, WeatherCondition, WaterClarity, WaterLevel, WaterCurrent } from '../types';
 import { saveSession } from '../utils/storage';
 
@@ -8,37 +9,38 @@ interface ConditionsFormProps {
   onSessionUpdate: (session: FishingSession) => void;
 }
 
-const WEATHER_CONDITIONS: { value: WeatherCondition; label: string; emoji: string }[] = [
-  { value: 'sunny', label: 'Sunny', emoji: '☀️' },
-  { value: 'partly-cloudy', label: 'Partly Cloudy', emoji: '⛅' },
-  { value: 'cloudy', label: 'Cloudy', emoji: '☁️' },
-  { value: 'rainy', label: 'Rainy', emoji: '🌧️' },
-  { value: 'stormy', label: 'Stormy', emoji: '⛈️' },
-];
-
-const WATER_CLARITY: { value: WaterClarity; label: string }[] = [
-  { value: 'clear', label: 'Clear' },
-  { value: 'slightly-murky', label: 'Slightly Murky' },
-  { value: 'murky', label: 'Murky' },
-];
-
-const WATER_LEVELS: { value: WaterLevel; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'normal', label: 'Normal' },
-  { value: 'high', label: 'High' },
-];
-
-const WATER_CURRENTS: { value: WaterCurrent; label: string }[] = [
-  { value: 'still', label: 'Still' },
-  { value: 'slow', label: 'Slow' },
-  { value: 'moderate', label: 'Moderate' },
-  { value: 'fast', label: 'Fast' },
-];
-
 export default function ConditionsForm({ session, onSessionUpdate }: ConditionsFormProps) {
+  const { t } = useTranslation();
   const [weather, setWeather] = useState({ ...session.weather });
   const [water, setWater] = useState({ ...session.water });
   const [saved, setSaved] = useState(false);
+
+  const WEATHER_CONDITIONS: { value: WeatherCondition; label: string; emoji: string }[] = [
+    { value: 'sunny', label: t('conditions.sunny'), emoji: '☀️' },
+    { value: 'partly-cloudy', label: t('conditions.partly_cloudy'), emoji: '⛅' },
+    { value: 'cloudy', label: t('conditions.cloudy'), emoji: '☁️' },
+    { value: 'rainy', label: t('conditions.rainy'), emoji: '🌧️' },
+    { value: 'stormy', label: t('conditions.stormy'), emoji: '⛈️' },
+  ];
+
+  const WATER_CLARITY: { value: WaterClarity; label: string }[] = [
+    { value: 'clear', label: t('conditions.clear') },
+    { value: 'slightly-murky', label: t('conditions.slightly_murky') },
+    { value: 'murky', label: t('conditions.murky') },
+  ];
+
+  const WATER_LEVELS: { value: WaterLevel; label: string }[] = [
+    { value: 'low', label: t('conditions.level_low') },
+    { value: 'normal', label: t('conditions.level_normal') },
+    { value: 'high', label: t('conditions.level_high') },
+  ];
+
+  const WATER_CURRENTS: { value: WaterCurrent; label: string }[] = [
+    { value: 'still', label: t('conditions.current_still') },
+    { value: 'slow', label: t('conditions.current_slow') },
+    { value: 'moderate', label: t('conditions.current_moderate') },
+    { value: 'fast', label: t('conditions.current_fast') },
+  ];
 
   const handleSave = () => {
     const updated: FishingSession = { ...session, weather, water };
@@ -52,17 +54,17 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
     <div className="conditions-form">
       <div className="conditions-section">
         <h4>
-          <Cloud size={16} /> Weather Conditions
+          <Cloud size={16} /> {t('conditions.weather_title')}
         </h4>
         <div className="form-grid">
           <div className="form-group">
             <label>
-              <Thermometer size={14} /> Air Temperature (°C)
+              <Thermometer size={14} /> {t('conditions.air_temp')}
             </label>
             <input
               type="number"
               step="0.5"
-              placeholder="e.g. 18"
+              placeholder={t('conditions.air_temp_placeholder')}
               value={weather.temperature ?? ''}
               onChange={(e) =>
                 setWeather({
@@ -75,13 +77,13 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
 
           <div className="form-group">
             <label>
-              <Wind size={14} /> Wind Speed (km/h)
+              <Wind size={14} /> {t('conditions.wind_speed')}
             </label>
             <input
               type="number"
               min="0"
               step="1"
-              placeholder="e.g. 12"
+              placeholder={t('conditions.wind_placeholder')}
               value={weather.windSpeed ?? ''}
               onChange={(e) =>
                 setWeather({
@@ -94,14 +96,14 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
 
           <div className="form-group">
             <label>
-              <Droplets size={14} /> Humidity (%)
+              <Droplets size={14} /> {t('conditions.humidity')}
             </label>
             <input
               type="number"
               min="0"
               max="100"
               step="1"
-              placeholder="e.g. 65"
+              placeholder={t('conditions.humidity_placeholder')}
               value={weather.humidity ?? ''}
               onChange={(e) =>
                 setWeather({
@@ -113,7 +115,7 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
           </div>
 
           <div className="form-group form-group-full">
-            <label>Weather Condition</label>
+            <label>{t('conditions.weather_condition')}</label>
             <div className="pill-group">
               {WEATHER_CONDITIONS.map((wc) => (
                 <button
@@ -136,17 +138,17 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
 
       <div className="conditions-section">
         <h4>
-          <Waves size={16} /> Water Conditions
+          <Waves size={16} /> {t('conditions.water_title')}
         </h4>
         <div className="form-grid">
           <div className="form-group">
             <label>
-              <Thermometer size={14} /> Water Temperature (°C)
+              <Thermometer size={14} /> {t('conditions.water_temp')}
             </label>
             <input
               type="number"
               step="0.5"
-              placeholder="e.g. 12"
+              placeholder={t('conditions.water_temp_placeholder')}
               value={water.temperature ?? ''}
               onChange={(e) =>
                 setWater({
@@ -158,7 +160,7 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
           </div>
 
           <div className="form-group">
-            <label>Water Clarity</label>
+            <label>{t('conditions.water_clarity')}</label>
             <div className="pill-group">
               {WATER_CLARITY.map((wc) => (
                 <button
@@ -179,7 +181,7 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
 
           <div className="form-group">
             <label>
-              <ArrowUp size={14} /> Water Level
+              <ArrowUp size={14} /> {t('conditions.water_level')}
             </label>
             <div className="pill-group">
               {WATER_LEVELS.map((wl) => (
@@ -201,7 +203,7 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
 
           <div className="form-group">
             <label>
-              <ArrowDown size={14} /> Current
+              <ArrowDown size={14} /> {t('conditions.current')}
             </label>
             <div className="pill-group">
               {WATER_CURRENTS.map((wc) => (
@@ -224,8 +226,12 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
       </div>
 
       <div className="form-actions">
-        <button className={`btn btn-primary ${saved ? 'btn-saved' : ''}`} onClick={handleSave}>
-          <Save size={16} /> {saved ? '✓ Saved!' : 'Save Conditions'}
+        <button
+          className={`btn btn-primary ${saved ? 'btn-saved' : ''}`}
+          onClick={handleSave}
+          data-testid="save-conditions-btn"
+        >
+          <Save size={16} /> {saved ? t('conditions.saved') : t('conditions.save')}
         </button>
       </div>
     </div>

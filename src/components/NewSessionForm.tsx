@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Play, Square, MapPin, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { FishingSession, FishingLocation } from '../types';
 import { generateId, saveSession } from '../utils/storage';
 import MapView from './MapView';
@@ -10,7 +11,8 @@ interface NewSessionFormProps {
 }
 
 export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessionFormProps) {
-  const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
+  const { t } = useTranslation();
+  const today = new Date().toLocaleDateString('sv-SE');
   const now = new Date().toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' });
 
   const [date, setDate] = useState(today);
@@ -37,34 +39,36 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
   return (
     <div className="new-session-form card">
       <h2>
-        <Play size={18} /> Start New Fishing Session
+        <Play size={18} /> {t('new_session.title')}
       </h2>
 
       <div className="form-grid">
         <div className="form-group">
-          <label>Date</label>
+          <label>{t('new_session.date')}</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            data-testid="session-date"
           />
         </div>
 
         <div className="form-group">
-          <label>Start Time</label>
+          <label>{t('new_session.start_time')}</label>
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
+            data-testid="session-time"
           />
         </div>
 
         <div className="form-group form-group-full">
           <label>
-            <FileText size={14} /> Notes (optional)
+            <FileText size={14} /> {t('new_session.notes')}
           </label>
           <textarea
-            placeholder="General notes about this fishing session…"
+            placeholder={t('new_session.notes_placeholder')}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
@@ -76,9 +80,12 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
         <button
           className="btn btn-secondary"
           onClick={() => setShowMap(!showMap)}
+          data-testid="select-location-btn"
         >
           <MapPin size={16} />
-          {location ? `📍 ${location.locationName ?? 'Location selected'}` : 'Select Location on Map'}
+          {location
+            ? `📍 ${location.locationName ?? t('new_session.location_selected')}`
+            : t('new_session.select_location')}
         </button>
 
         {location?.canton && (
@@ -95,11 +102,15 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
       )}
 
       <div className="form-actions">
-        <button className="btn btn-secondary" onClick={onCancel}>
-          <Square size={16} /> Cancel
+        <button className="btn btn-secondary" onClick={onCancel} data-testid="cancel-session-btn">
+          <Square size={16} /> {t('new_session.cancel')}
         </button>
-        <button className="btn btn-primary" onClick={handleCreate}>
-          <Play size={16} /> Create Session
+        <button
+          className="btn btn-primary"
+          onClick={handleCreate}
+          data-testid="create-session-btn"
+        >
+          <Play size={16} /> {t('new_session.create')}
         </button>
       </div>
     </div>
