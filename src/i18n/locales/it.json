@@ -155,6 +155,8 @@
     "confirmed_uncertain_title": "Normativa incerta confermata",
     "confirmed_uncertain_desc": "Questa uscita è stata avviata dopo la conferma della verifica della fonte ufficiale nonostante dati incompleti o datati nell’app.",
     "changed_from_to": "Cambio rilevato: {{from}} → {{to}}",
-    "confirm_change": "Ho verificato le nuove regole"
+    "confirm_change": "Ho verificato le nuove regole",
+    "select_location_first": "Seleziona prima la posizione di pesca. L’uscita non può iniziare finché il contesto normativo verificato non è collegato a un luogo reale.",
+    "invalid_source": "Link fonte non valido"
   }
 }

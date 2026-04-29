@@ -155,6 +155,8 @@
     "confirmed_uncertain_title": "Réglementation incertaine confirmée",
     "confirmed_uncertain_desc": "Cette sortie a été commencée après confirmation de votre vérification de la source officielle malgré des données incomplètes ou anciennes dans l’app.",
     "changed_from_to": "Changement détecté: {{from}} → {{to}}",
-    "confirm_change": "J’ai vérifié les nouvelles règles"
+    "confirm_change": "J’ai vérifié les nouvelles règles",
+    "select_location_first": "Sélectionnez d’abord votre position de pêche. La sortie ne peut pas commencer tant que le contexte réglementaire vérifié n’est pas lié à un lieu réel.",
+    "invalid_source": "Lien source invalide"
   }
 }
