@@ -1,16 +1,21 @@
 import { useState, useCallback } from 'react';
-import { Map, List, Plus, Fish } from 'lucide-react';
+import { Map, List, Plus, Home } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { FishingSession } from './types';
 import { loadSessions, saveSession } from './utils/storage';
 import MapView from './components/MapView';
 import SessionList from './components/SessionList';
 import NewSessionForm from './components/NewSessionForm';
+import LandingPage from './components/LandingPage';
+import LanguageSwitcher from './components/LanguageSwitcher';
+import DataManager from './components/DataManager';
 import './App.css';
 
-type Tab = 'map' | 'sessions' | 'new';
+type Tab = 'home' | 'map' | 'sessions' | 'new';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('sessions');
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<Tab>('home');
   const [sessions, setSessions] = useState<FishingSession[]>(loadSessions);
 
   const handleSessionCreated = useCallback((session: FishingSession) => {
@@ -27,26 +32,43 @@ function App() {
     setSessions((prev) => prev.filter((s) => s.id !== id));
   }, []);
 
+  const handleImportSuccess = useCallback(() => {
+    setSessions(loadSessions());
+    setActiveTab('sessions');
+  }, []);
+
   return (
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <div className="header-brand">
-            <Fish size={28} className="brand-icon" />
+          <button
+            className="header-brand"
+            onClick={() => setActiveTab('home')}
+            data-testid="header-brand"
+          >
+            <img src="/fishing-icon.svg" alt="KiroFishing" width="36" height="36" className="brand-img" />
             <div>
-              <h1>KiroFishing</h1>
-              <p>Your Swiss Fishing Companion</p>
+              <h1>{t('app.title')}</h1>
+              <p>{t('app.subtitle')}</p>
             </div>
+          </button>
+          <div className="header-right">
+            <DataManager onImportSuccess={handleImportSuccess} />
+            <LanguageSwitcher />
           </div>
         </div>
       </header>
 
       <main className="app-main">
+        {activeTab === 'home' && (
+          <LandingPage onGetStarted={() => setActiveTab('sessions')} />
+        )}
+
         {activeTab === 'map' && (
           <div className="page">
             <div className="page-header">
-              <h2>Fishing Laws by Location</h2>
-              <p>Click on the map to see the fishing laws for that Swiss canton.</p>
+              <h2>{t('map.laws_title')}</h2>
+              <p>{t('map.click_instruction')}</p>
             </div>
             <MapView />
           </div>
@@ -55,8 +77,8 @@ function App() {
         {activeTab === 'sessions' && (
           <div className="page">
             <div className="page-header">
-              <h2>Fishing Sessions</h2>
-              <p>Track your fishing trips, conditions, and catches.</p>
+              <h2>{t('sessions.title')}</h2>
+              <p>{t('sessions.subtitle')}</p>
             </div>
             <SessionList
               sessions={sessions}
@@ -78,25 +100,36 @@ function App() {
 
       <nav className="bottom-nav">
         <button
+          className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+          onClick={() => setActiveTab('home')}
+          data-testid="nav-home"
+        >
+          <Home size={22} />
+          <span>{t('nav.home')}</span>
+        </button>
+        <button
           className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`}
           onClick={() => setActiveTab('sessions')}
+          data-testid="nav-sessions"
         >
           <List size={22} />
-          <span>Sessions</span>
+          <span>{t('nav.sessions')}</span>
         </button>
         <button
           className={`nav-item nav-item-center ${activeTab === 'new' ? 'active' : ''}`}
           onClick={() => setActiveTab('new')}
+          data-testid="nav-new"
         >
           <Plus size={26} />
-          <span>New</span>
+          <span>{t('nav.new')}</span>
         </button>
         <button
           className={`nav-item ${activeTab === 'map' ? 'active' : ''}`}
           onClick={() => setActiveTab('map')}
+          data-testid="nav-laws"
         >
           <Map size={22} />
-          <span>Laws</span>
+          <span>{t('nav.laws')}</span>
         </button>
       </nav>
     </div>

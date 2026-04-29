@@ -1,6 +1,7 @@
 import type { FishingSession } from '../types';
 
 const STORAGE_KEY = 'kiro_fishing_sessions';
+const EXPORT_FORMAT_VERSION = '1.0';
 
 export function loadSessions(): FishingSession[] {
   try {
@@ -34,4 +35,85 @@ export function deleteSession(id: string): void {
 
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+// ─── Export / Import ────────────────────────────────────────────────────────
+
+export interface ExportPayload {
+  version: string;
+  app: string;
+  exportedAt: string;
+  sessions: FishingSession[];
+}
+
+/**
+ * Exports all sessions as a downloadable JSON file.
+ * Compatible with Chromium, Firefox, Vivaldi, Brave, and Safari (modern versions)
+ * by using a dynamically created <a> with a Blob object URL.
+ */
+export function exportData(): void {
+  const sessions = loadSessions();
+  const payload: ExportPayload = {
+    version: EXPORT_FORMAT_VERSION,
+    app: 'kiro-fishing',
+    exportedAt: new Date().toISOString(),
+    sessions,
+  };
+
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kiro-fishing-backup-${dateStr}.json`;
+
+  // Append to body for Firefox compatibility
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // Clean up the object URL after a short delay to allow the download to start
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * Imports sessions from a JSON file exported by exportData().
+ * Validates the payload before overwriting localStorage.
+ */
+export function importData(
+  file: File,
+): Promise<{ success: true; count: number } | { success: false; error: string }> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text !== 'string') {
+          resolve({ success: false, error: 'Failed to read file' });
+          return;
+        }
+
+        const payload = JSON.parse(text) as Partial<ExportPayload>;
+
+        if (
+          payload.app !== 'kiro-fishing' ||
+          !Array.isArray(payload.sessions)
+        ) {
+          resolve({ success: false, error: 'Invalid file format' });
+          return;
+        }
+
+        saveSessions(payload.sessions);
+        resolve({ success: true, count: payload.sessions.length });
+      } catch {
+        resolve({ success: false, error: 'Failed to parse file' });
+      }
+    };
+
+    reader.onerror = () => resolve({ success: false, error: 'Failed to read file' });
+    reader.readAsText(file, 'utf-8');
+  });
 }
