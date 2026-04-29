@@ -14,16 +14,28 @@ test.describe('Session Management', () => {
     await expect(page.getByTestId('session-time')).toBeVisible();
     await expect(page.getByTestId('create-session-btn')).toBeVisible();
     await expect(page.getByTestId('select-location-btn')).toBeVisible();
+    await expect(page.getByTestId('regulation-review')).toBeVisible();
+    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
+  });
+
+  test('requires regulation confirmation before creating a session', async ({ page }) => {
+    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
+    await page.getByTestId('regulation-confirm-checkbox').check();
+    await expect(page.getByTestId('create-session-btn')).toBeEnabled();
   });
 
   test('can create a session and see it in session list', async ({ page }) => {
-    // The date and time are pre-filled; just click create
+    await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
 
     // Should redirect to sessions tab
     await expect(page.locator('.session-list')).toBeVisible();
     // One session card should exist
     await expect(page.locator('.session-card')).toHaveCount(1);
+
+    const sessions = await page.evaluate(() => JSON.parse(localStorage.getItem('kiro_fishing_sessions') ?? '[]'));
+    expect(sessions[0].regulationSnapshot.userConfirmedUncertain).toBe(true);
+    expect(sessions[0].regulationState).toBe('active_confirmed_uncertain');
   });
 
   test('cancel returns to sessions tab', async ({ page }) => {
@@ -44,6 +56,7 @@ test.describe('Catch Log', () => {
     await page.goto('/');
     // Create a session first
     await page.getByTestId('nav-new').click();
+    await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
     // Expand the session card
     await page.locator('.session-card .session-header').click();

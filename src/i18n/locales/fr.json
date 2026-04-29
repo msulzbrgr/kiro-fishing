@@ -136,5 +136,25 @@
     "import_confirm": "Cela remplacera toutes les données actuelles. Continuer?",
     "export_tooltip": "Télécharger toutes vos données de pêche en JSON",
     "import_tooltip": "Restaurer les données d'un export précédent"
+  },
+  "regulation": {
+    "review_required_title": "Vérification réglementaire requise",
+    "start_review_desc": "Une sortie de pêche n’est valable que pour le contexte réglementaire vérifié. Consultez les sources officielles avant de commencer.",
+    "status_label": "Données réglementaires",
+    "status_available": "Disponibles",
+    "status_missing": "Manquantes ou hors de Suisse",
+    "status_stale": "Source officielle à vérifier",
+    "status_conflicting": "Sources contradictoires",
+    "jurisdiction": "Juridiction",
+    "source_links": "Sources officielles",
+    "no_sources": "Aucune source cantonale disponible pour cette position.",
+    "confirm_label": "Je comprends et j’ai vérifié la source officielle avant de continuer.",
+    "session_needs_review": "Vérification requise",
+    "change_notification_title": "La zone réglementaire a peut-être changé",
+    "change_notification_desc": "Vous êtes peut-être entré dans une autre zone réglementaire. Les règles actuelles peuvent ne plus s’appliquer. Vérifiez les nouvelles informations avant de continuer.",
+    "confirmed_uncertain_title": "Réglementation incertaine confirmée",
+    "confirmed_uncertain_desc": "Cette sortie a été commencée après confirmation de votre vérification de la source officielle malgré des données incomplètes ou anciennes dans l’app.",
+    "changed_from_to": "Changement détecté: {{from}} → {{to}}",
+    "confirm_change": "J’ai vérifié les nouvelles règles"
   }
 }

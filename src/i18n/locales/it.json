@@ -136,5 +136,25 @@
     "import_confirm": "Verranno sostituiti tutti i dati attuali. Continuare?",
     "export_tooltip": "Scarica tutti i tuoi dati di pesca in JSON",
     "import_tooltip": "Ripristina i dati da un export precedente"
+  },
+  "regulation": {
+    "review_required_title": "Verifica normativa richiesta",
+    "start_review_desc": "Un’uscita di pesca è valida solo per il contesto normativo verificato. Controlla le fonti ufficiali prima di iniziare.",
+    "status_label": "Dati normativi",
+    "status_available": "Disponibili",
+    "status_missing": "Mancanti o fuori dalla Svizzera",
+    "status_stale": "Fonte ufficiale da verificare",
+    "status_conflicting": "Fonti in conflitto",
+    "jurisdiction": "Giurisdizione",
+    "source_links": "Fonti ufficiali",
+    "no_sources": "Nessuna fonte cantonale disponibile per questa posizione.",
+    "confirm_label": "Comprendo e ho verificato la fonte ufficiale prima di continuare.",
+    "session_needs_review": "Verifica richiesta",
+    "change_notification_title": "L’area normativa potrebbe essere cambiata",
+    "change_notification_desc": "Potresti essere entrato in un’altra area normativa. Le regole attuali potrebbero non essere più valide. Verifica le nuove informazioni prima di continuare.",
+    "confirmed_uncertain_title": "Normativa incerta confermata",
+    "confirmed_uncertain_desc": "Questa uscita è stata avviata dopo la conferma della verifica della fonte ufficiale nonostante dati incompleti o datati nell’app.",
+    "changed_from_to": "Cambio rilevato: {{from}} → {{to}}",
+    "confirm_change": "Ho verificato le nuove regole"
   }
 }

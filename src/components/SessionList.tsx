@@ -11,10 +11,18 @@ import {
   Waves,
   CheckCircle,
   Circle,
+  AlertTriangle,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { FishingSession } from '../types';
+import type { FishingLocation, FishingSession, RegulationCheckpoint } from '../types';
 import { deleteSession } from '../utils/storage';
+import {
+  createRegulationCheckpoint,
+  createRegulationSnapshot,
+  getRegulationChangeReason,
+  getRegulationStateAfterConfirmation,
+} from '../utils/regulations';
 import CatchLog from './CatchLog';
 import ConditionsForm from './ConditionsForm';
 import MapView from './MapView';
@@ -40,6 +48,13 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
+  const pendingCheckpoint = session.regulationCheckpoints?.findLast((checkpoint) => !checkpoint.userConfirmed);
+  const regulationSnapshot = pendingCheckpoint?.newSnapshot
+    ?? session.regulationSnapshot
+    ?? createRegulationSnapshot(session.location);
+  const regulationState = pendingCheckpoint
+    ? 'paused_due_to_regulation_change'
+    : session.regulationState ?? getRegulationStateAfterConfirmation(regulationSnapshot);
 
   const duration = session.endTime
     ? (() => {
@@ -56,6 +71,47 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const catchCount = session.catches.length;
   const catchLabel = `${catchCount} ${catchCount === 1 ? t('sessions.catches_one') : t('sessions.catches_other')}`;
 
+  const handleLocationSelect = (nextLocation: FishingLocation) => {
+    if (session.endTime) return;
+
+    const previousSnapshot = session.regulationSnapshot ?? createRegulationSnapshot(session.location);
+    const newSnapshot = createRegulationSnapshot(nextLocation);
+    const reason = getRegulationChangeReason(previousSnapshot.location, nextLocation);
+
+    if (!reason) {
+      onUpdate({ ...session, location: nextLocation });
+      return;
+    }
+
+    const checkpoint = createRegulationCheckpoint(previousSnapshot, newSnapshot, reason);
+    onUpdate({
+      ...session,
+      location: nextLocation,
+      regulationState: 'paused_due_to_regulation_change',
+      regulationCheckpoints: [...(session.regulationCheckpoints ?? []), checkpoint],
+    });
+  };
+
+  const handleConfirmCheckpoint = (checkpoint: RegulationCheckpoint) => {
+    const confirmedSnapshot = {
+      ...checkpoint.newSnapshot,
+      userConfirmedUncertain: true,
+      capturedAt: new Date().toISOString(),
+    };
+    const regulationCheckpoints = (session.regulationCheckpoints ?? []).map((item) =>
+      item.id === checkpoint.id
+        ? { ...item, newSnapshot: confirmedSnapshot, userConfirmed: true }
+        : item,
+    );
+
+    onUpdate({
+      ...session,
+      regulationSnapshot: confirmedSnapshot,
+      regulationState: getRegulationStateAfterConfirmation(confirmedSnapshot),
+      regulationCheckpoints,
+    });
+  };
+
   return (
     <div className={`session-card card ${expanded ? 'expanded' : ''}`}>
       <div className="session-header" onClick={() => setExpanded(!expanded)}>
@@ -66,6 +122,10 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
             {session.endTime ? (
               <span className="badge badge-complete">
                 <CheckCircle size={12} /> {t('sessions.complete')}
+              </span>
+            ) : regulationState === 'paused_due_to_regulation_change' || regulationState === 'active_needs_review' ? (
+              <span className="badge badge-warning">
+                <AlertTriangle size={12} /> {t('regulation.session_needs_review')}
               </span>
             ) : (
               <span className="badge badge-active">
@@ -100,6 +160,58 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
       {expanded && (
         <div className="session-body">
+          {(pendingCheckpoint || regulationState === 'active_confirmed_uncertain') && (
+            <div
+              className={`regulation-alert ${pendingCheckpoint ? 'regulation-alert-warning' : ''}`}
+              data-testid="session-regulation-alert"
+            >
+              <h3>
+                {pendingCheckpoint ? <AlertTriangle size={16} /> : <ShieldCheck size={16} />}
+                {pendingCheckpoint
+                  ? t('regulation.change_notification_title')
+                  : t('regulation.confirmed_uncertain_title')}
+              </h3>
+              <p>
+                {pendingCheckpoint
+                  ? t('regulation.change_notification_desc')
+                  : t('regulation.confirmed_uncertain_desc')}
+              </p>
+              {pendingCheckpoint && (
+                <p className="regulation-change-meta">
+                  {t('regulation.changed_from_to', {
+                    from: pendingCheckpoint.previousJurisdiction ?? t('map.unknown_location'),
+                    to: pendingCheckpoint.newJurisdiction ?? t('map.unknown_location'),
+                  })}
+                </p>
+              )}
+              <div className="source-list">
+                <strong>{t('regulation.source_links')}:</strong>
+                {regulationSnapshot.sourceUrls.length > 0 ? (
+                  <ul>
+                    {regulationSnapshot.sourceUrls.map((url, index) => (
+                      <li key={url}>
+                        <a href={url} target="_blank" rel="noopener noreferrer">
+                          {regulationSnapshot.sourceTitles[index] ?? url}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>{t('regulation.no_sources')}</p>
+                )}
+              </div>
+              {pendingCheckpoint && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handleConfirmCheckpoint(pendingCheckpoint)}
+                  data-testid="confirm-regulation-change-btn"
+                >
+                  <ShieldCheck size={14} /> {t('regulation.confirm_change')}
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="tab-bar">
             <button
               className={`tab ${activeTab === 'catches' ? 'active' : ''}`}
@@ -132,6 +244,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               <MapView
                 compact
                 initialLocation={session.location}
+                onLocationSelect={handleLocationSelect}
               />
             )}
           </div>
