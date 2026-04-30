@@ -98,7 +98,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     const newSnapshot = createRegulationSnapshot(
       nextLocation,
       false,
-      previousSnapshot.reviewMode ?? 'strict',
+      previousSnapshot.reviewMode ?? 'information',
     );
     const reason = getRegulationChangeReason(previousSnapshot.location, nextLocation);
 
@@ -120,7 +120,6 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     const confirmedSnapshot = {
       ...checkpoint.newSnapshot,
       userConfirmedUncertain: true,
-      reviewMode: 'strict' as const,
       capturedAt: new Date().toISOString(),
     };
     const regulationCheckpoints = (session.regulationCheckpoints ?? []).map((item) =>
