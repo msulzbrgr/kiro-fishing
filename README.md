@@ -29,6 +29,10 @@ A Swiss fishing companion web app built with React + TypeScript + Vite.
 - **lucide-react** – Icons
 - **localStorage** – Client-side data persistence (no backend required)
 
+## Architecture
+
+Architecture Decision Records are maintained in [`docs/adr/`](docs/adr/).
+
 ## Getting Started
 
 ```bash
