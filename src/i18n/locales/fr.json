@@ -138,8 +138,8 @@
     "import_tooltip": "Restaurer les données d'un export précédent"
   },
   "regulation": {
-    "review_required_title": "Vérification réglementaire requise",
-    "start_review_desc": "Une sortie de pêche n’est valable que pour le contexte réglementaire vérifié. Consultez les sources officielles avant de commencer.",
+    "review_required_title": "Informations réglementaires",
+    "start_review_desc": "Les informations réglementaires sont enregistrées avec chaque sortie. Le mode information est utilisé par défaut; activez le mode strict si vous voulez une confirmation avant de commencer.",
     "status_label": "Données réglementaires",
     "status_available": "Disponibles",
     "status_missing": "Manquantes ou hors de Suisse",
@@ -156,7 +156,12 @@
     "confirmed_uncertain_desc": "Cette sortie a été commencée après confirmation de votre vérification de la source officielle malgré des données incomplètes ou anciennes dans l’app.",
     "changed_from_to": "Changement détecté: {{from}} → {{to}}",
     "confirm_change": "J’ai vérifié les nouvelles règles",
-    "select_location_first": "Sélectionnez d’abord votre position de pêche. La sortie ne peut pas commencer tant que le contexte réglementaire vérifié n’est pas lié à un lieu réel.",
-    "invalid_source": "Lien source invalide"
+    "select_location_first": "Sélectionnez d’abord votre position de pêche afin d’enregistrer les informations réglementaires avec la sortie.",
+    "invalid_source": "Lien source invalide",
+    "strict_mode_label": "Activer la confirmation réglementaire stricte",
+    "information_mode_desc": "Mode information: enregistrer le contexte réglementaire et me laisser décider comment l’utiliser.",
+    "strict_mode_desc": "Mode strict: exiger une confirmation explicite avant de commencer ou de continuer après un changement réglementaire.",
+    "info_notification_title": "Informations réglementaires mises à jour",
+    "info_notification_desc": "Votre position a peut-être changé de zone réglementaire. Les nouvelles informations sourcées ont été enregistrées comme checkpoint supplémentaire."
   }
 }

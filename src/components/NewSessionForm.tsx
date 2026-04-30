@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Play, Square, MapPin, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { FishingSession, FishingLocation } from '../types';
+import type { FishingSession, FishingLocation, RegulationReviewMode } from '../types';
 import { generateId, saveSession } from '../utils/storage';
 import {
   createRegulationSnapshot,
@@ -25,11 +25,15 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
   const [notes, setNotes] = useState('');
   const [location, setLocation] = useState<FishingLocation | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [reviewMode, setReviewMode] = useState<RegulationReviewMode>('information');
   const [regulationConfirmed, setRegulationConfirmed] = useState(false);
   const regulationSnapshot = location
-    ? createRegulationSnapshot(location, regulationConfirmed)
+    ? createRegulationSnapshot(location, regulationConfirmed, reviewMode)
     : null;
-  const canCreateSession = Boolean(location && regulationConfirmed && regulationSnapshot);
+  const strictMode = reviewMode === 'strict';
+  const canCreateSession = Boolean(
+    location && regulationSnapshot && (!strictMode || regulationConfirmed),
+  );
   const regulationSources = regulationSnapshot?.sourceUrls.map((url, index) => ({
     key: `${index}-${url}`,
     safeUrl: getSafeExternalUrl(url),
@@ -125,6 +129,21 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
       <div className="regulation-review" data-testid="regulation-review">
         <h3>{t('regulation.review_required_title')}</h3>
         <p>{location ? t('regulation.start_review_desc') : t('regulation.select_location_first')}</p>
+        <label className="checkbox-label regulation-mode">
+          <input
+            type="checkbox"
+            checked={strictMode}
+            onChange={(e) => {
+              setReviewMode(e.target.checked ? 'strict' : 'information');
+              setRegulationConfirmed(false);
+            }}
+            data-testid="regulation-strict-mode-checkbox"
+          />
+          {t('regulation.strict_mode_label')}
+        </label>
+        <p className="regulation-mode-help">
+          {strictMode ? t('regulation.strict_mode_desc') : t('regulation.information_mode_desc')}
+        </p>
         <div className="regulation-status">
           <strong>{t('regulation.status_label')}:</strong>{' '}
           {t(`regulation.status_${regulationSnapshot?.status ?? 'missing'}`)}
@@ -154,16 +173,18 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
             <p>{t('regulation.no_sources')}</p>
           )}
         </div>
-        <label className="checkbox-label regulation-confirm">
-          <input
-            type="checkbox"
-            checked={regulationConfirmed}
-            disabled={!location}
-            onChange={(e) => setRegulationConfirmed(e.target.checked)}
-            data-testid="regulation-confirm-checkbox"
-          />
-          {t('regulation.confirm_label')}
-        </label>
+        {strictMode && (
+          <label className="checkbox-label regulation-confirm">
+            <input
+              type="checkbox"
+              checked={regulationConfirmed}
+              disabled={!location}
+              onChange={(e) => setRegulationConfirmed(e.target.checked)}
+              data-testid="regulation-confirm-checkbox"
+            />
+            {t('regulation.confirm_label')}
+          </label>
+        )}
       </div>
 
       <div className="form-actions">

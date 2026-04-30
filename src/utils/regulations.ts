@@ -4,6 +4,7 @@ import type {
   RegulationCheckpoint,
   RegulationCheckpointReason,
   RegulationSnapshot,
+  RegulationReviewMode,
   SessionRegulationState,
 } from '../types';
 import { generateId } from './storage';
@@ -13,6 +14,7 @@ const REVALIDATION_DISTANCE_KM = 0.5;
 export function createRegulationSnapshot(
   location: FishingLocation,
   userConfirmedUncertain = false,
+  reviewMode: RegulationReviewMode = 'information',
 ): RegulationSnapshot {
   const cantonLaw = location.cantonCode ? CANTON_LAWS[location.cantonCode] : undefined;
   const status = cantonLaw ? 'stale' : 'missing';
@@ -26,6 +28,7 @@ export function createRegulationSnapshot(
     sourceTitles: cantonLaw?.laws.map((law) => law.title) ?? [],
     capturedAt: new Date().toISOString(),
     userConfirmedUncertain,
+    reviewMode,
   };
 }
 
@@ -36,7 +39,9 @@ export function isRegulationUncertain(snapshot: RegulationSnapshot): boolean {
 export function getRegulationStateAfterConfirmation(
   snapshot: RegulationSnapshot,
 ): SessionRegulationState {
-  return isRegulationUncertain(snapshot) ? 'active_confirmed_uncertain' : 'active_current';
+  return snapshot.reviewMode === 'strict' && isRegulationUncertain(snapshot)
+    ? 'active_confirmed_uncertain'
+    : 'active_current';
 }
 
 export function distanceKm(a: FishingLocation, b: FishingLocation): number {
@@ -70,6 +75,8 @@ export function createRegulationCheckpoint(
   newSnapshot: RegulationSnapshot,
   reason: RegulationCheckpointReason,
 ): RegulationCheckpoint {
+  const requiresConfirmation = newSnapshot.reviewMode === 'strict';
+
   return {
     id: generateId(),
     previousJurisdiction: previousSnapshot.jurisdiction,
@@ -79,6 +86,7 @@ export function createRegulationCheckpoint(
     previousSnapshot,
     newSnapshot,
     userConfirmed: false,
+    requiresConfirmation,
     reason,
   };
 }

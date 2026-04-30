@@ -37,6 +37,8 @@ export interface FishingLocation {
 
 export type RegulationDataStatus = 'available' | 'missing' | 'stale' | 'conflicting';
 
+export type RegulationReviewMode = 'information' | 'strict';
+
 export type SessionRegulationState =
   | 'active_current'
   | 'active_needs_review'
@@ -52,6 +54,7 @@ export interface RegulationSnapshot {
   sourceTitles: string[];
   capturedAt: string;
   userConfirmedUncertain: boolean;
+  reviewMode: RegulationReviewMode;
 }
 
 export type RegulationCheckpointReason =
@@ -68,6 +71,7 @@ export interface RegulationCheckpoint {
   previousSnapshot?: RegulationSnapshot;
   newSnapshot: RegulationSnapshot;
   userConfirmed: boolean;
+  requiresConfirmation: boolean;
   reason: RegulationCheckpointReason;
 }
 

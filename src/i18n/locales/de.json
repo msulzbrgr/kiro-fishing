@@ -138,8 +138,8 @@
     "import_tooltip": "Daten aus einem früheren Export wiederherstellen"
   },
   "regulation": {
-    "review_required_title": "Prüfung der Vorschriften erforderlich",
-    "start_review_desc": "Eine Angelausfahrt ist nur für den geprüften Regelungskontext gültig. Prüfen Sie vor dem Start die offiziellen Quellen.",
+    "review_required_title": "Informationen zu Vorschriften",
+    "start_review_desc": "Informationen zu Vorschriften werden mit jeder Ausfahrt gespeichert. Standard ist der Informationsmodus; aktivieren Sie den strikten Modus, wenn Sie eine Bestätigung vor dem Start wünschen.",
     "status_label": "Vorschriftsdaten",
     "status_available": "Verfügbar",
     "status_missing": "Fehlt oder ausserhalb der Schweiz",
@@ -156,7 +156,12 @@
     "confirmed_uncertain_desc": "Diese Ausfahrt wurde gestartet, nachdem Sie trotz unvollständiger oder veralteter App-Daten die Prüfung der offiziellen Quelle bestätigt haben.",
     "changed_from_to": "Erkannte Änderung: {{from}} → {{to}}",
     "confirm_change": "Ich habe die neuen Regeln geprüft",
-    "select_location_first": "Wählen Sie zuerst Ihren Angelort. Die Ausfahrt kann erst starten, wenn der geprüfte Regelungskontext mit einem realen Ort verbunden ist.",
-    "invalid_source": "Ungültiger Quellenlink"
+    "select_location_first": "Wählen Sie zuerst Ihren Angelort, damit die Informationen zu Vorschriften mit der Ausfahrt gespeichert werden können.",
+    "invalid_source": "Ungültiger Quellenlink",
+    "strict_mode_label": "Strikte Vorschriftsbestätigung aktivieren",
+    "information_mode_desc": "Informationsmodus: Regelungskontext speichern und selbst entscheiden, wie er genutzt wird.",
+    "strict_mode_desc": "Strikter Modus: ausdrückliche Bestätigung vor dem Start oder nach Regelungsänderungen verlangen.",
+    "info_notification_title": "Informationen zu Vorschriften aktualisiert",
+    "info_notification_desc": "Ihre Position könnte in ein anderes Regelungsgebiet gewechselt haben. Die neuen Quelleninformationen wurden als zusätzlicher Checkpoint gespeichert."
   }
 }

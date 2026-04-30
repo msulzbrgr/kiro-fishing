@@ -527,10 +527,15 @@ textarea {
   margin-top: 6px;
 }
 
+.regulation-mode,
 .regulation-confirm {
   margin-top: 10px;
   text-transform: none !important;
   letter-spacing: 0 !important;
+}
+
+.regulation-mode-help {
+  margin-top: 4px;
 }
 
 .regulation-alert {
