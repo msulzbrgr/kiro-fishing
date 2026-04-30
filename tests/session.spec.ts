@@ -17,20 +17,28 @@ test.describe('Session Management', () => {
     await expect(page.getByTestId('select-location-btn')).toBeVisible();
     await expect(page.getByTestId('regulation-review')).toBeVisible();
     await expect(page.getByTestId('create-session-btn')).toBeDisabled();
+    await expect(page.getByTestId('regulation-strict-mode-checkbox')).not.toBeChecked();
   });
 
-  test('requires regulation confirmation before creating a session', async ({ page }) => {
+  test('information mode allows session creation without regulation confirmation', async ({ page }) => {
     await expect(page.getByTestId('create-session-btn')).toBeDisabled();
-    await expect(page.getByTestId('regulation-confirm-checkbox')).toBeDisabled();
+    await selectSwissLocation(page);
+    await expect(page.getByTestId('regulation-confirm-checkbox')).toHaveCount(0);
+    await expect(page.getByTestId('create-session-btn')).toBeEnabled();
+  });
+
+  test('strict mode requires regulation confirmation before creating a session', async ({ page }) => {
+    await page.getByTestId('regulation-strict-mode-checkbox').check();
+    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
     await selectSwissLocation(page);
     await expect(page.getByTestId('regulation-confirm-checkbox')).toBeEnabled();
+    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
     await page.getByTestId('regulation-confirm-checkbox').check();
     await expect(page.getByTestId('create-session-btn')).toBeEnabled();
   });
 
   test('can create a session and see it in session list', async ({ page }) => {
     await selectSwissLocation(page);
-    await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
 
     // Should redirect to sessions tab
@@ -39,8 +47,9 @@ test.describe('Session Management', () => {
     await expect(page.locator('.session-card')).toHaveCount(1);
 
     const sessions = await page.evaluate(() => JSON.parse(localStorage.getItem('kiro_fishing_sessions') ?? '[]'));
-    expect(sessions[0].regulationSnapshot.userConfirmedUncertain).toBe(true);
-    expect(sessions[0].regulationState).toBe('active_confirmed_uncertain');
+    expect(sessions[0].regulationSnapshot.userConfirmedUncertain).toBe(false);
+    expect(sessions[0].regulationSnapshot.reviewMode).toBe('information');
+    expect(sessions[0].regulationState).toBe('active_current');
   });
 
   test('cancel returns to sessions tab', async ({ page }) => {
@@ -62,7 +71,6 @@ test.describe('Catch Log', () => {
     // Create a session first
     await page.getByTestId('nav-new').click();
     await selectSwissLocation(page);
-    await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
     // Expand the session card
     await page.locator('.session-card .session-header').click();

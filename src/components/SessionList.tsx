@@ -46,7 +46,15 @@ function weatherEmoji(condition?: string) {
 }
 
 function getPendingCheckpoint(session: FishingSession): RegulationCheckpoint | undefined {
-  return [...(session.regulationCheckpoints ?? [])].reverse().find((checkpoint) => !checkpoint.userConfirmed);
+  return [...(session.regulationCheckpoints ?? [])]
+    .reverse()
+    .find((checkpoint) => checkpoint.requiresConfirmation !== false && !checkpoint.userConfirmed);
+}
+
+function getLatestInfoCheckpoint(session: FishingSession): RegulationCheckpoint | undefined {
+  return [...(session.regulationCheckpoints ?? [])]
+    .reverse()
+    .find((checkpoint) => checkpoint.requiresConfirmation === false);
 }
 
 function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
@@ -54,7 +62,9 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
   const pendingCheckpoint = getPendingCheckpoint(session);
-  const regulationSnapshot = pendingCheckpoint?.newSnapshot
+  const latestInfoCheckpoint = getLatestInfoCheckpoint(session);
+  const displayedCheckpoint = pendingCheckpoint ?? latestInfoCheckpoint;
+  const regulationSnapshot = displayedCheckpoint?.newSnapshot
     ?? session.regulationSnapshot
     ?? createRegulationSnapshot(session.location);
   const regulationState = pendingCheckpoint
@@ -85,7 +95,11 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     if (session.endTime) return;
 
     const previousSnapshot = session.regulationSnapshot ?? createRegulationSnapshot(session.location);
-    const newSnapshot = createRegulationSnapshot(nextLocation);
+    const newSnapshot = createRegulationSnapshot(
+      nextLocation,
+      false,
+      previousSnapshot.reviewMode ?? 'strict',
+    );
     const reason = getRegulationChangeReason(previousSnapshot.location, nextLocation);
 
     if (!reason) {
@@ -97,7 +111,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     onUpdate({
       ...session,
       location: nextLocation,
-      regulationState: 'paused_due_to_regulation_change',
+      regulationState: checkpoint.requiresConfirmation ? 'paused_due_to_regulation_change' : 'active_current',
       regulationCheckpoints: [...(session.regulationCheckpoints ?? []), checkpoint],
     });
   };
@@ -106,6 +120,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     const confirmedSnapshot = {
       ...checkpoint.newSnapshot,
       userConfirmedUncertain: true,
+      reviewMode: 'strict' as const,
       capturedAt: new Date().toISOString(),
     };
     const regulationCheckpoints = (session.regulationCheckpoints ?? []).map((item) =>
@@ -170,7 +185,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
       {expanded && (
         <div className="session-body">
-          {(pendingCheckpoint || regulationState === 'active_confirmed_uncertain') && (
+          {(displayedCheckpoint || regulationState === 'active_confirmed_uncertain') && (
             <div
               className={`regulation-alert ${pendingCheckpoint ? 'regulation-alert-warning' : ''}`}
               data-testid="session-regulation-alert"
@@ -179,18 +194,22 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                 {pendingCheckpoint ? <AlertTriangle size={16} /> : <ShieldCheck size={16} />}
                 {pendingCheckpoint
                   ? t('regulation.change_notification_title')
+                  : latestInfoCheckpoint
+                    ? t('regulation.info_notification_title')
                   : t('regulation.confirmed_uncertain_title')}
               </h3>
               <p>
                 {pendingCheckpoint
                   ? t('regulation.change_notification_desc')
+                  : latestInfoCheckpoint
+                    ? t('regulation.info_notification_desc')
                   : t('regulation.confirmed_uncertain_desc')}
               </p>
-              {pendingCheckpoint && (
+              {displayedCheckpoint && (
                 <p className="regulation-change-meta">
                   {t('regulation.changed_from_to', {
-                    from: pendingCheckpoint.previousJurisdiction ?? t('map.unknown_location'),
-                    to: pendingCheckpoint.newJurisdiction ?? t('map.unknown_location'),
+                    from: displayedCheckpoint.previousJurisdiction ?? t('map.unknown_location'),
+                    to: displayedCheckpoint.newJurisdiction ?? t('map.unknown_location'),
                   })}
                 </p>
               )}

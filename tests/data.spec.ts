@@ -19,7 +19,6 @@ test.describe('Export / Import Data', () => {
     // Create a session first so there's data to export
     await page.getByTestId('nav-new').click();
     await selectSwissLocation(page);
-    await page.getByTestId('regulation-confirm-checkbox').check();
     await page.getByTestId('create-session-btn').click();
     await page.goto('/');
 

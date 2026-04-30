@@ -138,8 +138,8 @@
     "import_tooltip": "Ripristina i dati da un export precedente"
   },
   "regulation": {
-    "review_required_title": "Verifica normativa richiesta",
-    "start_review_desc": "Un’uscita di pesca è valida solo per il contesto normativo verificato. Controlla le fonti ufficiali prima di iniziare.",
+    "review_required_title": "Informazioni normative",
+    "start_review_desc": "Le informazioni normative vengono salvate con ogni uscita. La modalità predefinita è informativa; attiva la modalità rigida se vuoi una conferma prima di iniziare.",
     "status_label": "Dati normativi",
     "status_available": "Disponibili",
     "status_missing": "Mancanti o fuori dalla Svizzera",
@@ -156,7 +156,12 @@
     "confirmed_uncertain_desc": "Questa uscita è stata avviata dopo la conferma della verifica della fonte ufficiale nonostante dati incompleti o datati nell’app.",
     "changed_from_to": "Cambio rilevato: {{from}} → {{to}}",
     "confirm_change": "Ho verificato le nuove regole",
-    "select_location_first": "Seleziona prima la posizione di pesca. L’uscita non può iniziare finché il contesto normativo verificato non è collegato a un luogo reale.",
-    "invalid_source": "Link fonte non valido"
+    "select_location_first": "Seleziona prima la posizione di pesca per salvare le informazioni normative con l’uscita.",
+    "invalid_source": "Link fonte non valido",
+    "strict_mode_label": "Attiva conferma normativa rigida",
+    "information_mode_desc": "Modalità informativa: salva il contesto normativo e lascia decidere a me come usarlo.",
+    "strict_mode_desc": "Modalità rigida: richiede una conferma esplicita prima di iniziare o continuare dopo cambi normativi.",
+    "info_notification_title": "Informazioni normative aggiornate",
+    "info_notification_desc": "La tua posizione potrebbe essere entrata in un’altra area normativa. Le nuove informazioni con fonte sono state salvate come checkpoint aggiuntivo."
   }
 }

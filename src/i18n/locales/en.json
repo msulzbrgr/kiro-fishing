@@ -138,8 +138,8 @@
     "import_tooltip": "Restore data from a previous export"
   },
   "regulation": {
-    "review_required_title": "Regulation review required",
-    "start_review_desc": "A fishing session is only valid for the regulation context you reviewed. Check the official source links before starting.",
+    "review_required_title": "Regulation information",
+    "start_review_desc": "Regulation information is saved with every session. Use information mode by default, or enable strict mode if you want confirmation before starting.",
     "status_label": "Regulation data",
     "status_available": "Available",
     "status_missing": "Missing or outside Switzerland",
@@ -156,7 +156,12 @@
     "confirmed_uncertain_desc": "This session was started after you confirmed that you checked the official source despite incomplete or stale in-app data.",
     "changed_from_to": "Detected change: {{from}} → {{to}}",
     "confirm_change": "I reviewed the new rules",
-    "select_location_first": "Select your fishing position first. The session cannot start until the reviewed regulation context is tied to a real location.",
-    "invalid_source": "Invalid source link"
+    "select_location_first": "Select your fishing position first so the regulation information can be saved with the session.",
+    "invalid_source": "Invalid source link",
+    "strict_mode_label": "Enable strict regulation confirmation",
+    "information_mode_desc": "Information mode: save the regulation context and let me decide how to use it.",
+    "strict_mode_desc": "Strict mode: require explicit confirmation before starting or continuing after regulation changes.",
+    "info_notification_title": "Regulation information updated",
+    "info_notification_desc": "Your position may have entered a different regulation area. The new source-backed information was saved as an additional session checkpoint."
   }
 }
