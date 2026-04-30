@@ -48,7 +48,7 @@ function weatherEmoji(condition?: string) {
 function getPendingCheckpoint(session: FishingSession): RegulationCheckpoint | undefined {
   return [...(session.regulationCheckpoints ?? [])]
     .reverse()
-    .find((checkpoint) => checkpoint.requiresConfirmation !== false && !checkpoint.userConfirmed);
+    .find((checkpoint) => checkpoint.requiresConfirmation === true && !checkpoint.userConfirmed);
 }
 
 function getLatestInfoCheckpoint(session: FishingSession): RegulationCheckpoint | undefined {
@@ -95,6 +95,9 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     if (session.endTime) return;
 
     const previousSnapshot = session.regulationSnapshot ?? createRegulationSnapshot(session.location);
+    if (!previousSnapshot.reviewMode) {
+      console.warn('Regulation snapshot is missing reviewMode; defaulting to information mode.');
+    }
     const newSnapshot = createRegulationSnapshot(
       nextLocation,
       false,
