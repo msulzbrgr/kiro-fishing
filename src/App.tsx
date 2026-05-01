@@ -48,10 +48,6 @@ function App() {
             data-testid="header-brand"
           >
             <img src={logoApp} alt="KiroFishing" width="36" height="36" className="brand-img" />
-            <div>
-              <h1>{t('app.title')}</h1>
-              <p>{t('app.subtitle')}</p>
-            </div>
           </button>
           <div className="header-right">
             <DataManager onImportSuccess={handleImportSuccess} />
