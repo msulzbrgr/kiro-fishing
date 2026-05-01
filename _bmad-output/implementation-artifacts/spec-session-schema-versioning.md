@@ -2,7 +2,8 @@
 title: 'Session Schema Versioning'
 type: 'feature'
 created: '2026-05-01'
-status: 'draft'
+status: 'in-progress'
+baseline_commit: '8fc1bf5805756e2d186762bca6677909de62736c'
 context:
   - '_bmad-output/project-context.md'
 ---
