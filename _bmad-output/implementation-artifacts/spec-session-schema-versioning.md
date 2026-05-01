@@ -2,7 +2,7 @@
 title: 'Session Schema Versioning'
 type: 'feature'
 created: '2026-05-01'
-status: 'in-review'
+status: 'done'
 baseline_commit: '8fc1bf5805756e2d186762bca6677909de62736c'
 context:
   - '_bmad-output/project-context.md'
@@ -91,3 +91,36 @@ function isV0(raw: unknown): raw is FishingSessionV0 {
 **Commands:**
 - `npm run build` -- expected: exits 0, zero TypeScript errors
 - `npm run lint` -- expected: exits 0, zero new ESLint errors
+
+## Suggested Review Order
+
+**Migration pipeline (core contract)**
+
+- Entry point: `CURRENT_SESSION_SCHEMA_VERSION` constant and `schemaVersion` field added to `FishingSession`
+  [`index.ts:6`](../../src/types/index.ts#L6)
+
+- Top-level dispatcher: handles V0, V1, future versions, and malformed entries
+  [`sessionVersioning.ts:41`](../../src/utils/sessionVersioning.ts#L41)
+
+- V0 type guard: detects legacy sessions by absence of `schemaVersion`
+  [`sessionVersioning.ts:19`](../../src/utils/sessionVersioning.ts#L19)
+
+- V0→V1 migrator: additive spread — copies all fields, stamps `schemaVersion: 1`
+  [`sessionVersioning.ts:27`](../../src/utils/sessionVersioning.ts#L27)
+
+**Storage wiring**
+
+- `loadSessions`: per-entry migration with skip-on-error resilience
+  [`storage.ts:9`](../../src/utils/storage.ts#L9)
+
+- `saveSessions`: stamps every persisted session with current version
+  [`storage.ts:27`](../../src/utils/storage.ts#L27)
+
+- `importData`: runs migration before saving imported payload
+  [`storage.ts:125`](../../src/utils/storage.ts#L125)
+
+**Call-site update**
+
+- `NewSessionForm`: new sessions stamped with `CURRENT_SESSION_SCHEMA_VERSION` at creation
+  [`NewSessionForm.tsx:48`](../../src/components/NewSessionForm.tsx#L48)
+
