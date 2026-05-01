@@ -53,9 +53,7 @@ export function migrateSession(raw: unknown): FishingSession {
   if (typeof schemaVersion !== 'number') {
     // Malformed schemaVersion — treat defensively as V0
     console.warn('migrateSession: non-numeric schemaVersion, treating as V0', raw);
-    const { schemaVersion: _dropped, ...rest } = raw as Record<string, unknown>;
-    void _dropped;
-    return migrateV0toV1(rest as FishingSessionV0);
+    return migrateV0toV1(raw as FishingSessionV0);
   }
 
   if (schemaVersion > CURRENT_SESSION_SCHEMA_VERSION) {
