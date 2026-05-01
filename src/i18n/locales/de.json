@@ -137,6 +137,11 @@
     "export_tooltip": "Alle Angeldaten als JSON herunterladen",
     "import_tooltip": "Daten aus einem früheren Export wiederherstellen"
   },
+  "storage": {
+    "read_failed": "Datei konnte nicht gelesen werden.",
+    "invalid_format": "Ungültiges Dateiformat.",
+    "parse_failed": "Datei konnte nicht verarbeitet werden."
+  },
   "regulation": {
     "review_required_title": "Informationen zu Vorschriften",
     "start_review_desc": "Informationen zu Vorschriften werden mit jeder Ausfahrt gespeichert. Standard ist der Informationsmodus; aktivieren Sie den strikten Modus, wenn Sie eine Bestätigung vor dem Start wünschen.",

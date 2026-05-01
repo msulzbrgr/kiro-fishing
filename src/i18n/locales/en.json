@@ -137,6 +137,11 @@
     "export_tooltip": "Download all your fishing data as JSON",
     "import_tooltip": "Restore data from a previous export"
   },
+  "storage": {
+    "read_failed": "Could not read the file.",
+    "invalid_format": "Invalid file format.",
+    "parse_failed": "Could not parse the file."
+  },
   "regulation": {
     "review_required_title": "Regulation information",
     "start_review_desc": "Regulation information is saved with every session. Use information mode by default, or enable strict mode if you want confirmation before starting.",

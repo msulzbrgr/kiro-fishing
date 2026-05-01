@@ -137,6 +137,11 @@
     "export_tooltip": "Télécharger toutes vos données de pêche en JSON",
     "import_tooltip": "Restaurer les données d'un export précédent"
   },
+  "storage": {
+    "read_failed": "Impossible de lire le fichier.",
+    "invalid_format": "Format de fichier invalide.",
+    "parse_failed": "Impossible d'analyser le fichier."
+  },
   "regulation": {
     "review_required_title": "Informations réglementaires",
     "start_review_desc": "Les informations réglementaires sont enregistrées avec chaque sortie. Le mode information est utilisé par défaut; activez le mode strict si vous voulez une confirmation avant de commencer.",

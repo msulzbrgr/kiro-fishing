@@ -46,7 +46,10 @@ export default function DataManager({ onImportSuccess }: DataManagerProps) {
       });
       onImportSuccess();
     } else {
-      setStatus({ type: 'error', message: t('data.import_error') });
+      const translated = result.error.startsWith('storage.')
+        ? t(result.error)
+        : t('data.import_error');
+      setStatus({ type: 'error', message: translated });
     }
   };
 
