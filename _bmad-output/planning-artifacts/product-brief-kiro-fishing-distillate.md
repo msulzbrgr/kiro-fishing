@@ -37,17 +37,13 @@ purpose: "Token-efficient context for downstream PRD creation"
 
 ## Secondary Sources (lower trust)
 - fischen.ch/blog — 2026 legal changes aggregator (secondary, may lag): provided by user
-- (removed — unsecure) — forum, very low trust
-- (removed — unsecure) — permit sales aggregator (medium trust for purchase info, low for law detail)
 
 ## Source Trust Hierarchy (for data model)
 1. official_authority (canton website): HIGH
 2. official_law_text (lexfind.ch, admin.ch): HIGH
 3. official_pdf (annual regulation PDF from authority): HIGH
 4. permit_portal (online purchase portal): HIGH, isPatentPurchase: true
-5. aggregator ((removed — unsecure)): MEDIUM
 6. news_blog (fischen.ch): LOW
-7. forum ((removed — unsecure)): VERY LOW
 
 ## Data Model Requirements (derived from domain + technical research)
 - `RegulationSource`: canton, url, type (enum above), language, trustLevel, lastVerified (ISO date), effectiveYear, description, isPatentPurchase?
@@ -132,7 +128,6 @@ purpose: "Token-efficient context for downstream PRD creation"
 
 ## Competitive Differentiation
 - No Swiss fishing app has location-aware, canton-specific, grounded LLM regulation assistant
-- (removed — unsecure) is the closest competitor — focuses on permit sales, not regulation Q&A
 - Fishbrain has no regulation assistant (social/catch-log focus)
 - KiroFishing gap: only app combining map detection + structured regulation data + cited LLM Q&A
 

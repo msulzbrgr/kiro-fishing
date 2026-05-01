@@ -282,7 +282,7 @@ Swiss fishing regulation data is legally sensitive. The following requirements a
 
 ### Competitive Landscape
 
-No Swiss fishing app offers this combination. The closest competitor (permit sales aggregator; removed — unsecure) focuses on permit sales, not regulation Q&A. Global fishing apps (Fishbrain, Fishingpoints) have no regulation assistant. KiroFishing enters a clear blue ocean for this specific capability.
+No Swiss fishing app offers this combination. The closest competitor focuses on permit sales, not regulation Q&A. Global fishing apps (Fishbrain, Fishingpoints) have no regulation assistant. KiroFishing enters a clear blue ocean for this specific capability.
 
 ### Validation Approach
 
