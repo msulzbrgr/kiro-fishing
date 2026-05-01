@@ -435,6 +435,8 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
+  isolation: isolate;
 }
 
 .map-header {
@@ -454,6 +456,14 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.map-container {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .map-placeholder {
@@ -937,6 +947,7 @@ textarea {
   z-index: 0;
   border-radius: var(--radius);
   border: 1.5px solid var(--border);
+  overflow: hidden;
 }
 
 /* ===== Responsive ===== */

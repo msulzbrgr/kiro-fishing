@@ -176,7 +176,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       <div
         ref={mapRef}
         style={{ height: mapHeight, width: '100%', borderRadius: '8px', zIndex: 0 }}
-        className={!mapReady ? 'map-loading' : ''}
+        className={`map-container ${!mapReady ? 'map-loading' : ''}`}
         data-testid="map-container"
       />
 
