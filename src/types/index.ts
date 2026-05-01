@@ -3,6 +3,8 @@ export type WaterClarity = 'clear' | 'slightly-murky' | 'murky';
 export type WaterLevel = 'low' | 'normal' | 'high';
 export type WaterCurrent = 'still' | 'slow' | 'moderate' | 'fast';
 
+export const CURRENT_SESSION_SCHEMA_VERSION = 1;
+
 export interface WeatherConditions {
   temperature?: number;
   windSpeed?: number;
@@ -76,6 +78,7 @@ export interface RegulationCheckpoint {
 }
 
 export interface FishingSession {
+  schemaVersion: number;
   id: string;
   date: string;
   startTime: string;
