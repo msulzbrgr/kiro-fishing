@@ -9,6 +9,7 @@ import NewSessionForm from './components/NewSessionForm';
 import LandingPage from './components/LandingPage';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import DataManager from './components/DataManager';
+import logoApp from './assets/KiroFishingLogoApp.png';
 import './App.css';
 
 type Tab = 'home' | 'map' | 'sessions' | 'new';
@@ -46,7 +47,7 @@ function App() {
             onClick={() => setActiveTab('home')}
             data-testid="header-brand"
           >
-            <img src="/fishing-icon.svg" alt="KiroFishing" width="36" height="36" className="brand-img" />
+            <img src={logoApp} alt="KiroFishing" width="36" height="36" className="brand-img" />
             <div>
               <h1>{t('app.title')}</h1>
               <p>{t('app.subtitle')}</p>

@@ -1,5 +1,9 @@
 # KiroFishing 🎣
 
+<p align="center">
+  <img src="src/assets/KiroFishing.png" alt="KiroFishing Logo" width="160" />
+</p>
+
 A Swiss fishing companion web app built with React + TypeScript + Vite.
 
 ## Features
