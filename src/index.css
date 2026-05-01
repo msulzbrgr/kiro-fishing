@@ -11,6 +11,7 @@
   --primary-dark: #00303f;
   --secondary: #4bafe1;
   --accent: #f5a623;
+  --accent-dark: #e09400;
   --danger: #e74c3c;
   --success: #1e9e6b;
 
@@ -1151,7 +1152,7 @@ textarea {
 }
 
 .landing-cta:hover {
-  background: #e09400;
+  background: var(--accent-dark);
   color: var(--primary-dark);
 }
 
