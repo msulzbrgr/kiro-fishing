@@ -113,18 +113,20 @@ The LLM feature must:
 
 ### Provider Comparison Matrix
 
+_Note (2026-05-01): model lineups, context windows, and pricing change frequently. Treat the table below as a placeholder for architectural comparison only; before implementation, verify current specs and pricing from the official vendor pages._
+
 | Provider | Model | Pricing (input/output per 1M tokens) | Context Window | Structured Output | Browser-safe? |
 |---|---|---|---|---|---|
-| OpenAI | gpt-4o-mini | $0.15 / $0.60 | 128k | ✅ JSON mode | ❌ (need proxy) |
-| OpenAI | gpt-4o | $2.50 / $10.00 | 128k | ✅ JSON mode | ❌ |
-| Anthropic | claude-haiku-3.5 | $0.80 / $4.00 | 200k | ✅ | ❌ |
-| Anthropic | claude-sonnet-4.5 | $3.00 / $15.00 | 200k | ✅ | ❌ |
-| Google | gemini-1.5-flash | $0.075 / $0.30 | 1M | ✅ | ❌ |
-| Mistral | mistral-small | $0.10 / $0.30 | 32k | ✅ | ❌ |
+| OpenAI | gpt-4o-mini | (verify) | (verify) | ✅ | ❌ (need proxy) |
+| OpenAI | gpt-4o | (verify) | (verify) | ✅ | ❌ |
+| Anthropic | claude-haiku | (verify) | (verify) | ✅ | ❌ |
+| Anthropic | claude-sonnet | (verify) | (verify) | ✅ | ❌ |
+| Google | gemini-flash | (verify) | (verify) | ✅ | ❌ |
+| Mistral | mistral-small | (verify) | (verify) | ✅ | ❌ |
 | Ollama (local) | llama3.2, mistral | Free | 4k–32k | Partial | ✅ (localhost) |
 | WebLLM | Phi-3-mini (WASM) | Free | 4k | Partial | ✅ (in-browser) |
 
-_Sources: OpenAI pricing — https://openai.com/api/pricing; Anthropic — https://www.anthropic.com/pricing; Google — https://ai.google.dev/pricing; Mistral — https://mistral.ai/technology/#pricing_
+_Sources (verify at implementation time): OpenAI pricing; Anthropic pricing; Google Gemini pricing; Mistral pricing._
 
 ### Provider Analysis
 
@@ -132,32 +134,29 @@ _Sources: OpenAI pricing — https://openai.com/api/pricing; Anthropic — https
 
 **Why it fits KiroFishing:**
 - Best cost/quality ratio for structured, citation-grounded Q&A
-- Reliable JSON mode (`response_format: { type: "json_object" }`) ensures parseable output
-- 128k context window: can fit all 26 canton records simultaneously if ever needed
+- Reliable structured output (JSON mode / structured responses) keeps output parseable
+- Large context window (verify current limit) provides headroom
 - Large developer community; excellent TypeScript SDK (`openai` npm package v4+)
 - Hallucination rate on factual Q&A with grounded context: low when system prompt enforces citation-only answers
 
-**Cost estimate for KiroFishing:**
+**Cost estimate for KiroFishing (token-based; fill in current rates):**
 - Average canton regulation record set: ~2,000 tokens (Solothurn or Bern full details)
 - System prompt: ~500 tokens
 - User question + answer: ~500 tokens
-- Total per query: ~3,000 tokens = $0.0005 per query (gpt-4o-mini input rate)
-- At 100 queries/day: ~$0.05/day = ~$1.50/month
+- Total per query: ~3,000 tokens
+- Multiply by current model input/output rates (per 1M tokens) from the official pricing page.
 
-_Source: https://openai.com/api/pricing_
-
-#### Anthropic claude-haiku-3.5 — Recommended Fallback
+#### Anthropic Claude Haiku — Recommended Fallback
 
 **Why it fits:**
 - Excellent instruction-following and citation compliance
-- 200k context window (larger than needed)
+- Large context window (verify current limit)
 - Tool-use / function-calling support for structured extraction
 - Slightly higher cost than gpt-4o-mini but good quality on compliance-sensitive tasks
 
-#### Google Gemini 1.5 Flash — Cost-Optimized Alternative
+#### Google Gemini Flash — Cost-Optimized Alternative
 
-- Cheapest option by far ($0.075/1M input tokens)
-- Generous free tier (15 requests/minute free)
+- Often cost-optimized compared to flagship models (verify current pricing/free tier)
 - Good structured output support
 - Less proven on Swiss German legal terminology
 

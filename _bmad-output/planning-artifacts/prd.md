@@ -198,7 +198,7 @@ No Swiss fishing app today offers location-aware, canton-specific regulation loo
 
 **Opening:** Kevin types: "Was ist der beste Köder für Hecht?" (What is the best lure for pike?)
 
-**Rising action:** The AI assistant responds: "Ich bin spezialisiert auf Fischereivorschriften und Fischereipatente in der Schweiz. Für Angelratschläge zu Ködern empfehle ich ein lokales Angelgeschäft oder Foren wie anglerboard.ch."
+**Rising action:** The AI assistant responds: "Ich bin spezialisiert auf Fischereivorschriften und Fischereipatente in der Schweiz. Für Angelratschläge zu Ködern empfehle ich ein lokales Angelgeschäft oder vertrauenswürdige, offizielle Informationsquellen."
 
 **Resolution:** Kevin is redirected appropriately. The app does not produce fishing advice outside its regulatory scope. He then asks: "Wie kaufe ich ein Fischerpatent in Bern?" and gets a proper cited answer.
 
@@ -282,7 +282,7 @@ Swiss fishing regulation data is legally sensitive. The following requirements a
 
 ### Competitive Landscape
 
-No Swiss fishing app offers this combination. The closest competitor (fischerkarte.ch) focuses on permit sales, not regulation Q&A. Global fishing apps (Fishbrain, Fishingpoints) have no regulation assistant. KiroFishing enters a clear blue ocean for this specific capability.
+No Swiss fishing app offers this combination. The closest competitor (permit sales aggregator; removed — unsecure) focuses on permit sales, not regulation Q&A. Global fishing apps (Fishbrain, Fishingpoints) have no regulation assistant. KiroFishing enters a clear blue ocean for this specific capability.
 
 ### Validation Approach
 
