@@ -61,3 +61,7 @@ All 26 Swiss cantons have their own fishing laws based on the federal **Bundesge
 - General fishing guidance
 
 > **Note:** Always verify current regulations with the official cantonal authority before fishing. Laws can change.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
