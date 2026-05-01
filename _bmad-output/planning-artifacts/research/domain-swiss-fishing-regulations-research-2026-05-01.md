@@ -44,7 +44,7 @@ This research document examines the regulatory hierarchy, the Solothurn and Bern
 - **Fisher patents are canton-specific permits** sold annually, typically January–December. Prices, quotas, purchasing channels (online, postal, cantonal office, authorized resellers), and eligible water bodies vary per canton.
 - **Solothurn** issues fishing patents through its cantonal nature office (*Amt für Wald, Jagd und Fischerei*) with an online portal on so.ch. The 2026 revision introduced updated species minimums and seasonal windows.
 - **Bern** issues patents through its *Wirtschaft, Energie und Umwelt* directorate (weu.be.ch), with both cantonal and district-level (river zone) patents. Bern distinguishes between *Kantonalpatent* (broad) and zone-specific day/week passes.
-- **Official sources** (cantonal authority websites, law text on lexfind.ch and admin.ch) are authoritative but static HTML/PDF — no structured API. Third-party blogs (fischen.ch, angelwoche.ch) aggregate news but are secondary and may lag.
+- **Official sources** (cantonal authority websites, law text on lexfind.ch and admin.ch) are authoritative but static HTML/PDF — no structured API. Third-party blogs (e.g., fischen.ch) aggregate news but are secondary and may lag.
 - For an **LLM-assisted lookup feature**, a curated source registry with provenance tracking plus retrieval-augmented generation (RAG) is the safest and most accurate architecture. Prompt-only or browse-every-time approaches carry unacceptable legal risk for a compliance-sensitive domain.
 
 **Strategic Recommendations:**
@@ -85,7 +85,7 @@ The KiroFishing app already detects the user's canton via reverse geocoding and 
 ### Research Methodology
 
 - **Primary sources identified**: cantonal authority websites (so.ch, weu.be.ch), Swiss federal law repository (admin.ch), cantonal law finders (lexfind.ch), EJPD (federal justice portal)
-- **Secondary sources identified**: fischen.ch, angelwoche.ch, anglerboard.ch, fischerkarte.ch
+- **Secondary sources identified**: fischen.ch
 - **Domain knowledge coverage**: federal BGF structure, cantonal ordinance pattern, species minimum sizes, seasonal windows, patent purchasing mechanics
 - **Limitation**: Direct HTTP access to Swiss government domains is blocked in this sandbox. All source URLs are cited for manual verification and will need to be validated before publication.
 
@@ -157,9 +157,9 @@ Swiss cantonal fishing regulation data is delivered primarily via:
 | Source | Type | Coverage | Reliability |
 |---|---|---|---|
 | fischen.ch | Blog / news aggregator | All CH cantons (news only) | Medium — may lag official sources |
-| angelwoche.ch | Magazine / portal | CH + DACH | Medium |
-| anglerboard.ch | Forum | User-contributed | Low — opinion and anecdote |
-| fischerkarte.ch | Permit sales portal | Selected cantons | High for permit sales, low for law detail |
+| (removed — unsecure) | Magazine / portal | CH + DACH | Medium |
+| (removed — unsecure) | Forum | User-contributed | Low — opinion and anecdote |
+| (removed — unsecure) | Permit sales portal | Selected cantons | High for permit sales, low for law detail |
 | fishbase.org | Species biology database | Global species data | High for biology, none for CH law |
 
 ### LLM and Regulation Data
@@ -319,8 +319,8 @@ _Note: All 26 cantons should be verified individually. The above are examples._
 
 | App / Service | Regulation Info | Patent Info | Map | LLM/AI | Local-First |
 |---|---|---|---|---|---|
-| fischerkarte.ch | Partial (links) | ✅ (sales) | ❌ | ❌ | ❌ |
-| anglerboard.ch | Forum posts | Forum posts | ❌ | ❌ | ❌ |
+| (removed — unsecure) | Partial (links) | ✅ (sales) | ❌ | ❌ | ❌ |
+| (removed — unsecure) | Forum posts | Forum posts | ❌ | ❌ | ❌ |
 | fischen.ch | Blog articles | Blog links | ❌ | ❌ | ❌ |
 | KiroFishing (current) | ✅ 26 cantons, basic | Links only | ✅ Leaflet+OSM | ❌ | ✅ |
 
@@ -456,9 +456,9 @@ Response: structured answer with cited sources + freshness date + official link
 | Official authority website | so.ch/awjf, weu.be.ch | High | Low–Medium (updated annually) |
 | Official law text | lexfind.ch, admin.ch | High | Low (versioned) |
 | Official PDF (annual booklet) | AWJF Vorschriften PDF | High | Medium (must re-download yearly) |
-| Aggregator / portal | fischerkarte.ch | Medium | Medium |
+| Aggregator / portal | (removed — unsecure) | Medium | Medium |
 | News blog | fischen.ch | Low | High (opinion, may lag) |
-| Forum | anglerboard.ch | Very Low | Very High (unverified) |
+| Forum | (removed — unsecure) | Very Low | Very High (unverified) |
 
 ---
 
@@ -607,9 +607,9 @@ type RegulationSourceType =
   | 'official_law_text'         // admin.ch, lexfind.ch
   | 'official_pdf'              // Annual regulation PDF from authority
   | 'permit_portal'             // Online patent purchase portal
-  | 'aggregator'                // fischerkarte.ch, etc.
-  | 'news_blog'                 // fischen.ch, angelwoche.ch
-  | 'forum';                    // anglerboard.ch, etc.
+  | 'aggregator'                // (removed — unsecure)
+  | 'news_blog'                 // fischen.ch
+  | 'forum';                    // (removed — unsecure)
 ```
 
 ### B. Recommended RegulationRecord Data Model
