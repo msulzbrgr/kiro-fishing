@@ -319,8 +319,6 @@ _Note: All 26 cantons should be verified individually. The above are examples._
 
 | App / Service | Regulation Info | Patent Info | Map | LLM/AI | Local-First |
 |---|---|---|---|---|---|
-| (removed — unsecure) | Partial (links) | ✅ (sales) | ❌ | ❌ | ❌ |
-| (removed — unsecure) | Forum posts | Forum posts | ❌ | ❌ | ❌ |
 | fischen.ch | Blog articles | Blog links | ❌ | ❌ | ❌ |
 | KiroFishing (current) | ✅ 26 cantons, basic | Links only | ✅ Leaflet+OSM | ❌ | ✅ |
 
@@ -456,9 +454,7 @@ Response: structured answer with cited sources + freshness date + official link
 | Official authority website | so.ch/awjf, weu.be.ch | High | Low–Medium (updated annually) |
 | Official law text | lexfind.ch, admin.ch | High | Low (versioned) |
 | Official PDF (annual booklet) | AWJF Vorschriften PDF | High | Medium (must re-download yearly) |
-| Aggregator / portal | (removed — unsecure) | Medium | Medium |
 | News blog | fischen.ch | Low | High (opinion, may lag) |
-| Forum | (removed — unsecure) | Very Low | Very High (unverified) |
 
 ---
 
@@ -607,9 +603,8 @@ type RegulationSourceType =
   | 'official_law_text'         // admin.ch, lexfind.ch
   | 'official_pdf'              // Annual regulation PDF from authority
   | 'permit_portal'             // Online patent purchase portal
-  | 'aggregator'                // (removed — unsecure)
   | 'news_blog'                 // fischen.ch
-  | 'forum';                    // (removed — unsecure)
+  | 'forum';
 ```
 
 ### B. Recommended RegulationRecord Data Model
