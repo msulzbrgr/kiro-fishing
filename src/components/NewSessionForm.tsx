@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Play, Square, MapPin, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingSession, FishingLocation, RegulationReviewMode } from '../types';
+import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
 import { generateId, saveSession } from '../utils/storage';
 import {
   createRegulationSnapshot,
@@ -44,6 +45,7 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
     if (!location || !regulationSnapshot || !canCreateSession) return;
 
     const session: FishingSession = {
+      schemaVersion: CURRENT_SESSION_SCHEMA_VERSION,
       id: generateId(),
       date,
       startTime,

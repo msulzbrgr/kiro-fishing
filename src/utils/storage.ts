@@ -1,4 +1,6 @@
 import type { FishingSession } from '../types';
+import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
+import { migrateSession } from './sessionVersioning';
 
 const STORAGE_KEY = 'kiro_fishing_sessions';
 const EXPORT_FORMAT_VERSION = '1.0';
@@ -7,14 +9,28 @@ export function loadSessions(): FishingSession[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) return [];
-    return JSON.parse(data) as FishingSession[];
+    const raw: unknown = JSON.parse(data);
+    if (!Array.isArray(raw)) return [];
+    const result: FishingSession[] = [];
+    for (const entry of raw) {
+      try {
+        result.push(migrateSession(entry));
+      } catch {
+        console.warn('loadSessions: skipping invalid session entry', entry);
+      }
+    }
+    return result;
   } catch {
     return [];
   }
 }
 
 export function saveSessions(sessions: FishingSession[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+  const versioned = sessions.map((s) => ({
+    ...s,
+    schemaVersion: CURRENT_SESSION_SCHEMA_VERSION,
+  }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(versioned));
 }
 
 export function saveSession(session: FishingSession): void {
@@ -106,8 +122,16 @@ export function importData(
           return;
         }
 
-        saveSessions(payload.sessions);
-        resolve({ success: true, count: payload.sessions.length });
+        const migratedSessions: FishingSession[] = [];
+        for (const entry of payload.sessions) {
+          try {
+            migratedSessions.push(migrateSession(entry));
+          } catch {
+            console.warn('importData: skipping invalid session entry', entry);
+          }
+        }
+        saveSessions(migratedSessions);
+        resolve({ success: true, count: migratedSessions.length });
       } catch {
         resolve({ success: false, error: 'storage.parse_failed' });
       }

@@ -2,7 +2,7 @@
 title: 'Session Schema Versioning'
 type: 'feature'
 created: '2026-05-01'
-status: 'in-progress'
+status: 'in-review'
 baseline_commit: '8fc1bf5805756e2d186762bca6677909de62736c'
 context:
   - '_bmad-output/project-context.md'
@@ -59,10 +59,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/types/index.ts` -- add `schemaVersion: number` to `FishingSession`; add `export const CURRENT_SESSION_SCHEMA_VERSION = 1` -- establishes the versioning contract at the type layer
-- [ ] `src/utils/sessionVersioning.ts` -- create new file with: `FishingSessionV0` (all current fields minus `schemaVersion`), `FishingSessionV1 = FishingSessionV0 & { schemaVersion: 1 }`, type guard `isFishingSessionV0(raw)`, migrator `migrateV0toV1(v0: FishingSessionV0): FishingSessionV1`, and top-level `migrateSession(raw: unknown): FishingSession` that detects version and runs the appropriate chain -- implements full migration pipeline
-- [ ] `src/utils/storage.ts` -- update `loadSessions` to parse each array entry through `migrateSession`; update `saveSessions` to spread `schemaVersion: CURRENT_SESSION_SCHEMA_VERSION` onto every session before stringifying; update `importData` to call `migrateSession` on each session in the import payload before saving -- wires migration into all data ingestion paths
-- [ ] Trace all sites in `src/` that construct a `FishingSession` literal (e.g. `NewSessionForm.tsx`, any test fixture) -- add `schemaVersion: CURRENT_SESSION_SCHEMA_VERSION` to each literal so TypeScript strict mode is satisfied
+- [x] `src/types/index.ts` -- add `schemaVersion: number` to `FishingSession`; add `export const CURRENT_SESSION_SCHEMA_VERSION = 1` -- establishes the versioning contract at the type layer
+- [x] `src/utils/sessionVersioning.ts` -- create new file with: `FishingSessionV0` (all current fields minus `schemaVersion`), `FishingSessionV1 = FishingSessionV0 & { schemaVersion: 1 }`, type guard `isFishingSessionV0(raw)`, migrator `migrateV0toV1(v0: FishingSessionV0): FishingSessionV1`, and top-level `migrateSession(raw: unknown): FishingSession` that detects version and runs the appropriate chain -- implements full migration pipeline
+- [x] `src/utils/storage.ts` -- update `loadSessions` to parse each array entry through `migrateSession`; update `saveSessions` to spread `schemaVersion: CURRENT_SESSION_SCHEMA_VERSION` onto every session before stringifying; update `importData` to call `migrateSession` on each session in the import payload before saving -- wires migration into all data ingestion paths
+- [x] Trace all sites in `src/` that construct a `FishingSession` literal (e.g. `NewSessionForm.tsx`, any test fixture) -- add `schemaVersion: CURRENT_SESSION_SCHEMA_VERSION` to each literal so TypeScript strict mode is satisfied
 
 **Acceptance Criteria:**
 - Given an empty localStorage, when a new session is created and saved, then `localStorage.getItem('kiro_fishing_sessions')` contains entries where every object has `schemaVersion: 1`.
