@@ -13,10 +13,11 @@ import {
   Circle,
   AlertTriangle,
   ShieldCheck,
+  StopCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingLocation, FishingSession, RegulationCheckpoint } from '../types';
-import { deleteSession } from '../utils/storage';
+import { deleteSession, saveSession } from '../utils/storage';
 import {
   createRegulationCheckpoint,
   createRegulationSnapshot,
@@ -286,17 +287,36 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
           <div className="session-footer">
             {session.notes && <p className="session-notes">{session.notes}</p>}
-            <button
-              className="btn btn-danger btn-sm"
-              onClick={() => {
-                if (confirm(t('sessions.delete_confirm'))) {
-                  deleteSession(session.id);
-                  onDelete(session.id);
-                }
-              }}
-            >
-              <Trash2 size={14} /> {t('sessions.delete')}
-            </button>
+            <div className="session-footer-actions">
+              {!session.endTime && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => {
+                    const endTime = new Date().toLocaleTimeString('de-CH', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+                    const updated = { ...session, endTime };
+                    saveSession(updated);
+                    onUpdate(updated);
+                  }}
+                  data-testid="finish-session-btn"
+                >
+                  <StopCircle size={14} /> {t('sessions.finish')}
+                </button>
+              )}
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => {
+                  if (confirm(t('sessions.delete_confirm'))) {
+                    deleteSession(session.id);
+                    onDelete(session.id);
+                  }
+                }}
+              >
+                <Trash2 size={14} /> {t('sessions.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}

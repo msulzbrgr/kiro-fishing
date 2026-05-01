@@ -746,6 +746,13 @@ textarea {
   flex: 1;
 }
 
+.session-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* ===== Tabs ===== */
 .tab-bar {
   display: flex;
