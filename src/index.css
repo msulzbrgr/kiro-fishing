@@ -6,37 +6,38 @@
 }
 
 :root {
-  --primary: #1a6b3c;
-  --primary-light: #2a8c52;
-  --primary-dark: #0f4425;
-  --secondary: #4a90d9;
-  --accent: #f0a500;
+  --primary: #004b64;
+  --primary-light: #1a6b8a;
+  --primary-dark: #00303f;
+  --secondary: #4bafe1;
+  --accent: #f5a623;
   --danger: #e74c3c;
-  --success: #27ae60;
+  --success: #1e9e6b;
 
-  --bg: #f5f7f5;
+  --bg: #f3f8fc;
   --surface: #ffffff;
-  --border: #d4ddd4;
-  --text: #2c3e30;
-  --text-muted: #6b7c6e;
-  --text-light: #9aa89d;
+  --border: #c8dde8;
+  --text: #0f2230;
+  --text-muted: #5a7a8c;
+  --text-light: #8aabba;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+  --shadow-sm: 0 1px 4px rgba(0,48,63,0.08);
+  --shadow-md: 0 4px 14px rgba(0,48,63,0.13);
+  --shadow-lg: 0 8px 28px rgba(0,48,63,0.18);
 
-  --radius: 10px;
-  --radius-sm: 6px;
-  --radius-lg: 16px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
 
   --nav-height: 72px;
 
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01';
 }
 
 body {
@@ -92,9 +93,9 @@ textarea {
 }
 
 .app-header {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
   color: white;
-  padding: 16px 20px;
+  padding: 14px 20px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -413,7 +414,7 @@ textarea {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
-  background: rgba(26, 107, 60, 0.12);
+  background: rgba(0, 75, 100, 0.12);
   color: var(--primary-dark);
   border-radius: 20px;
   font-size: 12px;
@@ -446,7 +447,7 @@ textarea {
   font-size: 13px;
   color: var(--text-muted);
   padding: 8px 12px;
-  background: rgba(26, 107, 60, 0.06);
+  background: rgba(0, 75, 100, 0.06);
   border-radius: var(--radius-sm);
   border: 1.5px dashed var(--primary);
 }
@@ -598,7 +599,7 @@ textarea {
 .permit-info {
   font-size: 13px;
   padding: 10px 12px;
-  background: rgba(26, 107, 60, 0.06);
+  background: rgba(0, 75, 100, 0.06);
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--primary);
   margin-bottom: 12px;
@@ -997,9 +998,9 @@ textarea {
 }
 
 .brand-img {
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
-  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
 }
 
 .header-right {
@@ -1098,34 +1099,36 @@ textarea {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 40px 24px 32px;
-  background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 48px 24px 36px;
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 55%, var(--secondary) 100%);
   color: white;
 }
 
 .landing-hero-icon {
-  width: 96px;
-  height: 96px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  border: 3px solid rgba(255,255,255,0.2);
+  margin-bottom: 24px;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(8px);
 }
 
 .landing-hero-icon img {
-  border-radius: 50%;
+  border-radius: var(--radius);
 }
 
 .landing-hero-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
   color: white;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   line-height: 1.2;
+  letter-spacing: -0.5px;
 }
 
 .landing-hero-subtitle {
@@ -1138,16 +1141,17 @@ textarea {
 
 .landing-cta {
   font-size: 16px;
-  padding: 12px 28px;
-  border-radius: 28px;
+  padding: 13px 32px;
+  border-radius: 30px;
   font-weight: 700;
   background: var(--accent);
   color: var(--primary-dark);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  letter-spacing: 0.2px;
 }
 
 .landing-cta:hover {
-  background: #e09500;
+  background: #e09400;
   color: var(--primary-dark);
 }
 
@@ -1200,10 +1204,10 @@ textarea {
   justify-content: center;
 }
 
-.feature-icon--green { background: rgba(26, 107, 60, 0.1); color: var(--primary); }
-.feature-icon--blue  { background: rgba(74, 144, 217, 0.12); color: var(--secondary); }
-.feature-icon--teal  { background: rgba(0, 150, 130, 0.1); color: #00867a; }
-.feature-icon--amber { background: rgba(240, 165, 0, 0.12); color: #b07800; }
+.feature-icon--green { background: rgba(0, 75, 100, 0.1); color: var(--primary); }
+.feature-icon--blue  { background: rgba(75, 175, 225, 0.15); color: var(--secondary); }
+.feature-icon--teal  { background: rgba(0, 150, 180, 0.1); color: #008caa; }
+.feature-icon--amber { background: rgba(245, 166, 35, 0.15); color: #c07800; }
 
 /* Screenshots section */
 .landing-screenshots {
@@ -1292,9 +1296,9 @@ textarea {
   font-size: 11px;
   font-weight: 600;
 }
-.mockup-tag--green { background: rgba(26,107,60,0.1); color: var(--primary); }
-.mockup-tag--amber { background: rgba(240,165,0,0.12); color: #8a6000; }
-.mockup-tag--blue  { background: rgba(74,144,217,0.12); color: #1a5a98; }
+.mockup-tag--green { background: rgba(0,75,100,0.1); color: var(--primary); }
+.mockup-tag--amber { background: rgba(245,166,35,0.12); color: #8a6000; }
+.mockup-tag--blue  { background: rgba(75,175,225,0.15); color: #0a5d8a; }
 
 /* Sessions mockup */
 .mockup--sessions {
@@ -1382,7 +1386,7 @@ textarea {
 /* Canton chips */
 .landing-cantons {
   padding: 24px 20px;
-  background: linear-gradient(135deg, rgba(26,107,60,0.04), rgba(26,107,60,0.08));
+  background: linear-gradient(135deg, rgba(0,75,100,0.05), rgba(75,175,225,0.08));
   text-align: center;
   border-top: 1.5px solid var(--border);
   border-bottom: 1.5px solid var(--border);
@@ -1415,8 +1419,8 @@ textarea {
 
 .canton-chip {
   padding: 4px 10px;
-  background: rgba(26, 107, 60, 0.08);
-  border: 1.5px solid rgba(26, 107, 60, 0.2);
+  background: rgba(0, 75, 100, 0.08);
+  border: 1.5px solid rgba(0, 75, 100, 0.18);
   border-radius: 16px;
   font-size: 11px;
   font-weight: 700;

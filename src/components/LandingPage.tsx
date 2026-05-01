@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Map, Fish, List, Download } from 'lucide-react';
+import logoHero from '../assets/KiroFishingLogo.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -13,7 +14,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       {/* ── Hero ── */}
       <section className="landing-hero">
         <div className="landing-hero-icon">
-          <img src="/fishing-icon.svg" alt="KiroFishing" width="96" height="96" />
+          <img src={logoHero} alt="KiroFishing" width="96" height="96" />
         </div>
         <h1 className="landing-hero-title">{t('landing.hero_title')}</h1>
         <p className="landing-hero-subtitle">{t('landing.hero_subtitle')}</p>
