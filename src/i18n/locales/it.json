@@ -137,6 +137,11 @@
     "export_tooltip": "Scarica tutti i tuoi dati di pesca in JSON",
     "import_tooltip": "Ripristina i dati da un export precedente"
   },
+  "storage": {
+    "read_failed": "Impossibile leggere il file.",
+    "invalid_format": "Formato file non valido.",
+    "parse_failed": "Impossibile analizzare il file."
+  },
   "regulation": {
     "review_required_title": "Informazioni normative",
     "start_review_desc": "Le informazioni normative vengono salvate con ogni uscita. La modalità predefinita è informativa; attiva la modalità rigida se vuoi una conferma prima di iniziare.",

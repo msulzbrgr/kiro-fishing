@@ -92,7 +92,7 @@ export function importData(
       try {
         const text = e.target?.result;
         if (typeof text !== 'string') {
-          resolve({ success: false, error: 'Failed to read file' });
+          resolve({ success: false, error: 'storage.read_failed' });
           return;
         }
 
@@ -102,18 +102,18 @@ export function importData(
           payload.app !== 'kiro-fishing' ||
           !Array.isArray(payload.sessions)
         ) {
-          resolve({ success: false, error: 'Invalid file format' });
+          resolve({ success: false, error: 'storage.invalid_format' });
           return;
         }
 
         saveSessions(payload.sessions);
         resolve({ success: true, count: payload.sessions.length });
       } catch {
-        resolve({ success: false, error: 'Failed to parse file' });
+        resolve({ success: false, error: 'storage.parse_failed' });
       }
     };
 
-    reader.onerror = () => resolve({ success: false, error: 'Failed to read file' });
+    reader.onerror = () => resolve({ success: false, error: 'storage.read_failed' });
     reader.readAsText(file, 'utf-8');
   });
 }
