@@ -1,4 +1,16 @@
 import { CANTON_LAWS } from '../data/cantonLaws';
+
+export const STALENESS_THRESHOLD_DAYS = 180;
+
+export function isRegulationStale(
+  lastVerified: string,
+  thresholdDays = STALENESS_THRESHOLD_DAYS,
+): boolean {
+  const verified = new Date(lastVerified).getTime();
+  const now = Date.now();
+  const diffDays = (now - verified) / (1000 * 60 * 60 * 24);
+  return diffDays > thresholdDays;
+}
 import type {
   FishingLocation,
   RegulationCheckpoint,

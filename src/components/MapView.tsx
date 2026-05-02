@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, ShoppingCart, AlertTriangle, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CANTON_LAWS, STATE_TO_CANTON_CODE } from '../data/cantonLaws';
+import { isRegulationStale } from '../utils/regulations';
 import type { CantonLaw, FishingLocation } from '../types';
 
 interface MapViewProps {

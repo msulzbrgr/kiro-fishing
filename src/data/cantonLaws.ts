@@ -29,6 +29,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Zander (Pike-perch)', sizeCm: 40 },
       { species: 'Barsch (Perch)', sizeCm: 18 },
     ],
+    permitPurchaseUrl: 'https://www.zh.ch/de/umwelt-tiere/tiere/fischerei.html',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   BE: {
     canton: 'Bern',
@@ -57,6 +60,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Seesaibling (Arctic Char)', sizeCm: 25 },
       { species: 'Felchen (Whitefish)', sizeCm: 20 },
     ],
+    permitPurchaseUrl: 'https://www.weu.be.ch/de/start/themen/fischerei/fischerpatent-kaufen.html',
+    lastVerified: '2026-04-15',
+    regulationYear: 2026,
   },
   LU: {
     canton: 'Luzern',
@@ -84,6 +90,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Egli/Barsch (Perch)', sizeCm: 18 },
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
     ],
+    permitPurchaseUrl: 'https://lawa.lu.ch/themen_lawa/jagd_fischerei/fischerei_jf',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   UR: {
     canton: 'Uri',
@@ -108,6 +117,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Hecht (Pike)', sizeCm: 40 },
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
     ],
+    permitPurchaseUrl: 'https://www.ur.ch/dienstleistungen/3394',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   SZ: {
     canton: 'Schwyz',
@@ -131,6 +143,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Forelle (Trout)', sizeCm: 25 },
       { species: 'Hecht (Pike)', sizeCm: 40 },
     ],
+    permitPurchaseUrl: 'https://www.sz.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   OW: {
     canton: 'Obwalden',
@@ -153,6 +168,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Forelle (Trout)', sizeCm: 25 },
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
     ],
+    permitPurchaseUrl: 'https://www.ow.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   NW: {
     canton: 'Nidwalden',
@@ -176,6 +194,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Forelle (Trout)', sizeCm: 25 },
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
     ],
+    permitPurchaseUrl: 'https://www.nw.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   GL: {
     canton: 'Glarus',
@@ -199,6 +220,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Forelle (Trout)', sizeCm: 25 },
       { species: 'Hecht (Pike)', sizeCm: 40 },
     ],
+    permitPurchaseUrl: 'https://www.gl.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   ZG: {
     canton: 'Zug',
@@ -223,6 +247,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
       { species: 'Egli/Barsch (Perch)', sizeCm: 18 },
     ],
+    permitPurchaseUrl: 'https://www.zg.ch/behoerden/baudirektion/amt-fuer-wald-und-wild',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   FR: {
     canton: 'Fribourg',
@@ -248,6 +275,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Brochet / Hecht (Pike)', sizeCm: 45 },
       { species: 'Ombre / Äsche (Grayling)', sizeCm: 30 },
     ],
+    permitPurchaseUrl: 'https://www.fr.ch/nature/peche',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   SO: {
     canton: 'Solothurn',
@@ -271,6 +301,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Hecht (Pike)', sizeCm: 40 },
       { species: 'Äsche (Grayling)', sizeCm: 30 },
     ],
+    permitPurchaseUrl: 'https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-wald-jagd-und-fischerei/fischerei/fischerpatent/',
+    lastVerified: '2026-04-15',
+    regulationYear: 2026,
   },
   BS: {
     canton: 'Basel-Stadt',
@@ -296,6 +329,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Äsche (Grayling)', sizeCm: 35 },
       { species: 'Hecht (Pike)', sizeCm: 40 },
     ],
+    permitPurchaseUrl: 'https://www.bs.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   BL: {
     canton: 'Basel-Landschaft',
@@ -321,6 +357,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Hecht (Pike)', sizeCm: 40 },
       { species: 'Äsche (Grayling)', sizeCm: 30 },
     ],
+    permitPurchaseUrl: 'https://www.baselland.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   SH: {
     canton: 'Schaffhausen',
@@ -345,6 +384,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Äsche (Grayling)', sizeCm: 30 },
       { species: 'Hecht (Pike)', sizeCm: 40 },
     ],
+    permitPurchaseUrl: 'https://www.sh.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   AR: {
     canton: 'Appenzell Ausserrhoden',
@@ -364,6 +406,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       },
     ],
     minimumSizes: [{ species: 'Forelle (Trout)', sizeCm: 25 }],
+    permitPurchaseUrl: 'https://www.ar.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   AI: {
     canton: 'Appenzell Innerrhoden',
@@ -383,6 +428,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       },
     ],
     minimumSizes: [{ species: 'Forelle (Trout)', sizeCm: 25 }],
+    permitPurchaseUrl: 'https://www.ai.ch',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   SG: {
     canton: 'St. Gallen',
@@ -410,6 +458,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
       { species: 'Egli/Barsch (Perch)', sizeCm: 18 },
     ],
+    permitPurchaseUrl: 'https://www.sg.ch/umwelt-natur/natur/jagd-und-fischerei/fischerei.html',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   GR: {
     canton: 'Graubünden',
@@ -436,6 +487,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Hecht (Pike)', sizeCm: 40 },
       { species: 'Seesaibling (Arctic Char)', sizeCm: 22 },
     ],
+    permitPurchaseUrl: 'https://www.gr.ch/DE/institutionen/verwaltung/dvs/ajf/fischerei/Seiten/default.aspx',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   AG: {
     canton: 'Aargau',
@@ -462,6 +516,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Äsche (Grayling)', sizeCm: 30 },
       { species: 'Zander (Pike-perch)', sizeCm: 40 },
     ],
+    permitPurchaseUrl: 'https://www.ag.ch/de/umwelt-natur-landschaft/jagd-fischerei/fischerei',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   TG: {
     canton: 'Thurgau',
@@ -487,6 +544,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Felchen (Whitefish)', sizeCm: 22 },
       { species: 'Barsch (Perch)', sizeCm: 18 },
     ],
+    permitPurchaseUrl: 'https://www.tg.ch/public/themen/20/70.html/21',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   TI: {
     canton: 'Ticino',
@@ -513,6 +573,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Persico / Barsch (Perch)', sizeCm: 15 },
       { species: 'Agone (Shad)', sizeCm: 14 },
     ],
+    permitPurchaseUrl: 'https://www4.ti.ch/dfe/de/caccia-pesca/home/',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   VD: {
     canton: 'Vaud',
@@ -540,6 +603,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Perche (Perch)', sizeCm: 18 },
       { species: 'Féra/Palée (Whitefish)', sizeCm: 22 },
     ],
+    permitPurchaseUrl: 'https://www.vd.ch/themes/environnement/faune/peche/',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   VS: {
     canton: 'Valais',
@@ -565,6 +631,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Ombre / Äsche (Grayling)', sizeCm: 30 },
       { species: 'Brochet / Hecht (Pike)', sizeCm: 40 },
     ],
+    permitPurchaseUrl: 'https://www.vs.ch/web/sfcpf/peche',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   NE: {
     canton: 'Neuchâtel',
@@ -590,6 +659,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Brochet (Pike)', sizeCm: 50 },
       { species: 'Perche (Perch)', sizeCm: 18 },
     ],
+    permitPurchaseUrl: 'https://www.ne.ch/autorites/DDTE/SFPN/peche/Pages/accueil.aspx',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   GE: {
     canton: 'Genève',
@@ -615,6 +687,9 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Brochet (Pike)', sizeCm: 50 },
       { species: 'Perche (Perch)', sizeCm: 18 },
     ],
+    permitPurchaseUrl: 'https://www.ge.ch/peche',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
   },
   JU: {
     canton: 'Jura',
@@ -640,7 +715,10 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Ombre (Grayling)', sizeCm: 30 },
       { species: 'Brochet (Pike)', sizeCm: 45 },
     ],
-  },
+    permitPurchaseUrl: 'https://www.jura.ch/DEN/SNP/Chasse-et-peche/Peche/Peche.html',
+    lastVerified: '2024-01-01',
+    regulationYear: 2024,
+},
 };
 
 // Mapping from Nominatim state names to canton codes
