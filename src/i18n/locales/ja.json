@@ -147,7 +147,8 @@
   "storage": {
     "read_failed": "ファイルを読み込めなかった。",
     "invalid_format": "ファイル形式が無効。",
-    "parse_failed": "ファイルを解析できなかった。"
+    "parse_failed": "ファイルを解析できなかった。",
+    "quota_exceeded": "ストレージ容量が上限に達した。写真を削除するか、古い釣行をエクスポート/削除して容量を確保してね。"
   },
   "regulation": {
     "review_required_title": "規制情報",

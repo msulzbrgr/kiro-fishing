@@ -39,6 +39,14 @@ const EMPTY_FORM: CatchFormState = {
   photos: [],
 };
 
+function isQuotaExceededError(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false;
+  const anyErr = err as { name?: unknown; message?: unknown; code?: unknown };
+  if (anyErr.name === 'QuotaExceededError') return true;
+  if (typeof anyErr.message === 'string' && anyErr.message.toLowerCase().includes('quota')) return true;
+  return anyErr.code === 22 || anyErr.code === 1014;
+}
+
 export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
@@ -46,6 +54,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [expandedCatch, setExpandedCatch] = useState<string | null>(null);
   const [activePhotoIndexByCatch, setActivePhotoIndexByCatch] = useState<Record<string, number>>({});
   const [galleryCatchId, setGalleryCatchId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const MAX_PHOTOS = 10;
@@ -134,10 +143,19 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       catches: [...session.catches, newCatch],
     };
 
-    saveSession(updated);
-    onSessionUpdate(updated);
-    setForm(EMPTY_FORM);
-    setShowForm(false);
+    try {
+      saveSession(updated);
+      setSaveError('');
+      onSessionUpdate(updated);
+      setForm(EMPTY_FORM);
+      setShowForm(false);
+    } catch (err) {
+      if (isQuotaExceededError(err)) {
+        setSaveError(t('storage.quota_exceeded'));
+        return;
+      }
+      throw err;
+    }
   };
 
   const handleDeleteCatch = (id: string) => {
@@ -167,6 +185,11 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       {showForm && (
         <div className="catch-form card">
           <h4>{t('catch.new_catch')}</h4>
+          {saveError && (
+            <div className="form-error" role="alert" data-testid="catch-save-error">
+              {saveError}
+            </div>
+          )}
           <div className="form-grid">
             <div className="form-group">
               <label>{t('catch.species')}</label>

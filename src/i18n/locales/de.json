@@ -147,7 +147,8 @@
   "storage": {
     "read_failed": "Datei konnte nicht gelesen werden.",
     "invalid_format": "Ungültiges Dateiformat.",
-    "parse_failed": "Datei konnte nicht verarbeitet werden."
+    "parse_failed": "Datei konnte nicht verarbeitet werden.",
+    "quota_exceeded": "Speicherlimit erreicht. Entferne Fotos oder exportiere/lösche alte Ausfahrten, um Platz zu schaffen."
   },
   "regulation": {
     "review_required_title": "Vorschriften",
