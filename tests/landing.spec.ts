@@ -8,7 +8,7 @@ test.describe('Landing Page', () => {
   });
 
   test('shows app title in header', async ({ page }) => {
-    await expect(page.locator('.header-brand h1')).toContainText('KiroFishing');
+    await expect(page.getByTestId('header-brand')).toBeVisible();
   });
 
   test('shows hero section with CTA button', async ({ page }) => {

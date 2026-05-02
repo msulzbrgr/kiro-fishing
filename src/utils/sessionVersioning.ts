@@ -60,10 +60,10 @@ export function migrateSession(raw: unknown): FishingSession {
     console.warn(
       `migrateSession: future schema version ${schemaVersion} encountered, returning as-is`,
     );
-    return raw as FishingSession;
+    return raw as unknown as FishingSession;
   }
 
   // schemaVersion === CURRENT_SESSION_SCHEMA_VERSION (or a known prior version
   // that future migration hops would handle — add migrateV1toV2 etc. here)
-  return raw as FishingSession;
+  return raw as unknown as FishingSession;
 }

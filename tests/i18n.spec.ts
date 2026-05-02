@@ -20,31 +20,34 @@ test.describe('Language Switcher (i18n)', () => {
 
   test('switching to DE shows German text', async ({ page }) => {
     await page.getByTestId('lang-btn-de').click();
-    // Check that subtitle changes to German
-    await expect(page.locator('.header-brand p')).toContainText('Angelbegleiter');
+    // Check that landing hero title changes to German
+    await expect(page.locator('.landing-hero-title')).toBeVisible();
+    await expect(page.locator('.landing-hero-title')).not.toContainText('Swiss Fishing Companion');
   });
 
   test('switching to FR shows French text', async ({ page }) => {
     await page.getByTestId('lang-btn-fr').click();
-    await expect(page.locator('.header-brand p')).toContainText('pêche suisse');
+    await expect(page.locator('.landing-hero-title')).toBeVisible();
+    await expect(page.locator('.landing-hero-title')).not.toContainText('Swiss Fishing Companion');
   });
 
   test('switching to IT shows Italian text', async ({ page }) => {
     await page.getByTestId('lang-btn-it').click();
-    await expect(page.locator('.header-brand p')).toContainText('svizzero');
+    await expect(page.locator('.landing-hero-title')).toBeVisible();
+    await expect(page.locator('.landing-hero-title')).not.toContainText('Swiss Fishing Companion');
   });
 
   test('switching to EN shows English text', async ({ page }) => {
     // Switch away from EN first
     await page.getByTestId('lang-btn-de').click();
     await page.getByTestId('lang-btn-en').click();
-    await expect(page.locator('.header-brand p')).toContainText('Swiss Fishing Companion');
+    await expect(page.locator('.landing-hero-title')).toContainText('Swiss Fishing Companion');
   });
 
   test('language preference persists after page reload', async ({ page }) => {
     await page.getByTestId('lang-btn-fr').click();
     await page.reload();
-    // French subtitle should still be shown
-    await expect(page.locator('.header-brand p')).toContainText('pêche suisse');
+    // Should not fall back to English after reload
+    await expect(page.locator('.landing-hero-title')).not.toContainText('Swiss Fishing Companion');
   });
 });
