@@ -147,7 +147,8 @@
   "storage": {
     "read_failed": "Impossibile leggere il file.",
     "invalid_format": "Formato file non valido.",
-    "parse_failed": "Impossibile analizzare il file."
+    "parse_failed": "Impossibile analizzare il file.",
+    "quota_exceeded": "Quota di archiviazione superata. Rimuovi alcune foto o esporta/elimina uscite vecchie per liberare spazio."
   },
   "regulation": {
     "review_required_title": "Informazioni normative",

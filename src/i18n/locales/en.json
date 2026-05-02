@@ -100,6 +100,9 @@
     "view_all_photos": "View all",
     "close": "Close"
   },
+  "storage": {
+    "quota_exceeded": "Storage quota exceeded. Remove some photos or export/delete old sessions to free space."
+  },
   "conditions": {
     "weather_title": "Weather Conditions",
     "water_title": "Water Conditions",

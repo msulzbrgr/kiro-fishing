@@ -30,7 +30,13 @@ export function saveSessions(sessions: FishingSession[]): void {
     ...s,
     schemaVersion: CURRENT_SESSION_SCHEMA_VERSION,
   }));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(versioned));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(versioned));
+  } catch (err) {
+    // Most common cause: browser storage quota exceeded (e.g. large base64 photos).
+    console.error('saveSessions: failed to persist sessions', err);
+    throw err;
+  }
 }
 
 export function saveSession(session: FishingSession): void {
