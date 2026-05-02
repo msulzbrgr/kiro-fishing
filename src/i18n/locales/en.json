@@ -92,7 +92,10 @@
     "add": "Add Catch",
     "cancel": "Cancel",
     "no_catches": "No catches logged yet. Click \"Log Catch\" to add one.",
-    "delete_title": "Delete catch"
+    "delete_title": "Delete catch",
+    "photo_label": "Photo (optional)",
+    "add_photo": "Add Photo",
+    "remove_photo": "Remove"
   },
   "conditions": {
     "weather_title": "Weather Conditions",

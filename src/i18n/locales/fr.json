@@ -92,7 +92,10 @@
     "add": "Ajouter la prise",
     "cancel": "Annuler",
     "no_catches": "Aucune prise enregistrée. Cliquez sur «Enregistrer une prise».",
-    "delete_title": "Supprimer la prise"
+    "delete_title": "Supprimer la prise",
+    "photo_label": "Photo (optionnel)",
+    "add_photo": "Ajouter une photo",
+    "remove_photo": "Supprimer"
   },
   "conditions": {
     "weather_title": "Conditions météo",
