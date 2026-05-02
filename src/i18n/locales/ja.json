@@ -95,7 +95,10 @@
     "delete_title": "釣果を削除",
     "photo_label": "写真（任意）",
     "add_photo": "写真を追加",
-    "remove_photo": "削除"
+    "remove_photo": "削除",
+    "photos": "写真",
+    "view_all_photos": "すべて表示",
+    "close": "閉じる"
   },
   "conditions": {
     "weather_title": "天気",

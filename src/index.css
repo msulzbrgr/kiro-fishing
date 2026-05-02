@@ -908,10 +908,53 @@ textarea {
   background: var(--bg);
 }
 
-.catch-photo-preview {
+.catch-photo-full-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.catch-photo-inline-controls {
   display: flex;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.catch-photo-counter {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.catch-photo-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
+}
+
+.catch-photo-thumb-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catch-photo-thumb-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.catch-photo-thumb-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .catch-photo-thumb {
@@ -933,6 +976,89 @@ textarea {
 
 .badge-photo {
   color: var(--primary);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.modal {
+  width: min(900px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--primary-dark);
+}
+
+.modal-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.catch-photo-modal-main {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.catch-photo-modal-full {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.catch-photo-modal-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catch-photo-modal-thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.catch-photo-modal-thumb.active {
+  border-color: var(--primary);
+}
+
+.catch-photo-modal-thumb img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: calc(var(--radius-sm) - 2px);
+  border: 1px solid var(--border);
 }
 
 /* ===== Conditions Form ===== */

@@ -95,7 +95,10 @@
     "delete_title": "Elimina cattura",
     "photo_label": "Foto (opzionale)",
     "add_photo": "Aggiungi foto",
-    "remove_photo": "Rimuovi"
+    "remove_photo": "Rimuovi",
+    "photos": "Foto",
+    "view_all_photos": "Mostra tutte",
+    "close": "Chiudi"
   },
   "conditions": {
     "weather_title": "Condizioni meteorologiche",

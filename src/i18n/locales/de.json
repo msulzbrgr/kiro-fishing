@@ -95,7 +95,10 @@
     "delete_title": "Fang löschen",
     "photo_label": "Foto (optional)",
     "add_photo": "Foto hinzufügen",
-    "remove_photo": "Entfernen"
+    "remove_photo": "Entfernen",
+    "photos": "Fotos",
+    "view_all_photos": "Alle anzeigen",
+    "close": "Schliessen"
   },
   "conditions": {
     "weather_title": "Wetter",

@@ -124,7 +124,7 @@ test.describe('Catch Log', () => {
     await expect(page.getByTestId('add-photo-btn')).toHaveCount(0);
 
     // Remove photo button should be available
-    await expect(page.getByTestId('remove-photo-btn')).toBeVisible();
+    await expect(page.getByTestId('remove-all-photos-btn')).toBeVisible();
 
     // Add the catch
     await page.getByTestId('add-catch-btn').click();
@@ -147,7 +147,7 @@ test.describe('Catch Log', () => {
     await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
 
     // Remove the photo
-    await page.getByTestId('remove-photo-btn').click();
+    await page.getByTestId('remove-all-photos-btn').click();
     await expect(page.getByTestId('add-photo-btn')).toBeVisible();
     await expect(page.getByTestId('catch-photo-preview')).toHaveCount(0);
 
