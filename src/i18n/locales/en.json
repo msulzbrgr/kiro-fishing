@@ -95,7 +95,10 @@
     "delete_title": "Delete catch",
     "photo_label": "Photo (optional)",
     "add_photo": "Add Photo",
-    "remove_photo": "Remove"
+    "remove_photo": "Remove",
+    "photos": "Photos",
+    "view_all_photos": "View all",
+    "close": "Close"
   },
   "conditions": {
     "weather_title": "Weather Conditions",

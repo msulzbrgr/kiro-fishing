@@ -27,7 +27,7 @@ interface CatchFormState {
   length: string;
   released: boolean;
   notes: string;
-  photo: string;
+  photos: string[];
 }
 
 const EMPTY_FORM: CatchFormState = {
@@ -36,7 +36,7 @@ const EMPTY_FORM: CatchFormState = {
   length: '',
   released: true,
   notes: '',
-  photo: '',
+  photos: [],
 };
 
 export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
@@ -44,29 +44,72 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CatchFormState>(EMPTY_FORM);
   const [expandedCatch, setExpandedCatch] = useState<string | null>(null);
+  const [activePhotoIndexByCatch, setActivePhotoIndexByCatch] = useState<Record<string, number>>({});
+  const [galleryCatchId, setGalleryCatchId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const MAX_PHOTOS = 10;
 
-    const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
-    if (file.size > MAX_BYTES) {
+  const closeGallery = () => setGalleryCatchId(null);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+
+    if (form.photos.length >= MAX_PHOTOS) {
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result;
-      if (typeof result === 'string') {
-        setForm((prev) => ({ ...prev, photo: result }));
+    const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+
+    const acceptedFiles = files
+      .filter((file) => file.size <= MAX_BYTES)
+      .slice(0, MAX_PHOTOS - form.photos.length);
+
+    if (acceptedFiles.length === 0) {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    let canceled = false;
+    const readers: FileReader[] = [];
+
+    const readFiles = async () => {
+      const dataUrls: string[] = [];
+
+      for (const file of acceptedFiles) {
+        const dataUrl = await new Promise<string | null>((resolve) => {
+          const reader = new FileReader();
+          readers.push(reader);
+          reader.onload = (ev) => {
+            const result = ev.target?.result;
+            resolve(typeof result === 'string' ? result : null);
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(file);
+        });
+
+        if (canceled) return;
+        if (dataUrl) dataUrls.push(dataUrl);
       }
-    };
-    reader.onerror = () => {
+
+      if (dataUrls.length > 0) {
+        setForm((prev) => ({
+          ...prev,
+          photos: [...prev.photos, ...dataUrls].slice(0, MAX_PHOTOS),
+        }));
+      }
+
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
-    reader.readAsDataURL(file);
+
+    void readFiles();
+
+    return () => {
+      canceled = true;
+      readers.forEach((reader) => reader.readyState === reader.LOADING && reader.abort());
+    };
   };
 
   const handleAddCatch = () => {
@@ -83,7 +126,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       }),
       released: form.released,
       notes: form.notes.trim() || undefined,
-      photo: form.photo || undefined,
+      photos: form.photos.length > 0 ? form.photos : undefined,
     };
 
     const updated: FishingSession = {
@@ -194,17 +237,39 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               <label>
                 <Camera size={14} /> {t('catch.photo_label')}
               </label>
-              {form.photo ? (
+              {form.photos.length > 0 ? (
                 <div className="catch-photo-preview">
-                  <img src={form.photo} alt="" className="catch-photo-thumb" data-testid="catch-photo-preview" />
+                  <div className="catch-photo-thumb-grid" data-testid="catch-photo-preview">
+                    {form.photos.map((photo, idx) => (
+                      <div key={idx} className="catch-photo-thumb-wrapper">
+                        <img src={photo} alt="" className="catch-photo-thumb" />
+                        <button
+                          type="button"
+                          className="btn btn-icon btn-danger catch-photo-thumb-remove"
+                          onClick={() => {
+                            setForm((prev) => ({
+                              ...prev,
+                              photos: prev.photos.filter((_, photoIdx) => photoIdx !== idx),
+                            }));
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                          }}
+                          aria-label={t('catch.remove_photo')}
+                          title={t('catch.remove_photo')}
+                          data-testid={`remove-photo-btn-${idx}`}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
                     onClick={() => {
-                      setForm((prev) => ({ ...prev, photo: '' }));
+                      setForm((prev) => ({ ...prev, photos: [] }));
                       if (fileInputRef.current) fileInputRef.current.value = '';
                     }}
-                    data-testid="remove-photo-btn"
+                    data-testid="remove-all-photos-btn"
                   >
                     <X size={14} /> {t('catch.remove_photo')}
                   </button>
@@ -223,6 +288,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 className="catch-photo-input"
                 onChange={handlePhotoChange}
                 data-testid="catch-photo-input"
@@ -258,6 +324,22 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
 
       <div className="catches-list">
         {session.catches.map((c) => (
+          (() => {
+            const photos = c.photos ?? [];
+            const activeIndex = Math.min(
+              activePhotoIndexByCatch[c.id] ?? 0,
+              Math.max(photos.length - 1, 0),
+            );
+            const activePhoto = photos[activeIndex];
+
+            const setActiveIndex = (index: number) => {
+              setActivePhotoIndexByCatch((prev) => ({
+                ...prev,
+                [c.id]: Math.min(Math.max(index, 0), Math.max(photos.length - 1, 0)),
+              }));
+            };
+
+            return (
           <div key={c.id} className="catch-item card">
             <div
               className="catch-header"
@@ -284,7 +366,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                       <RefreshCw size={11} /> {t('catch.released')}
                     </span>
                   )}
-                  {c.photo && (
+                  {photos.length > 0 && (
                     <span className="badge badge-photo">
                       <Camera size={11} />
                     </span>
@@ -308,20 +390,153 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
 
             {expandedCatch === c.id && (
               <div className="catch-details">
-                {c.photo && (
-                  <img
-                    src={c.photo}
-                    alt={c.species}
-                    className="catch-photo-full"
-                    data-testid="catch-photo-full"
-                  />
+                {photos.length > 0 && activePhoto && (
+                  <div className="catch-photo-full-wrap">
+                    <div className="catch-photo-inline-controls">
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setActiveIndex(activeIndex - 1)}
+                        disabled={activeIndex <= 0}
+                        data-testid="catch-photo-prev"
+                      >
+                        ‹
+                      </button>
+                      <span className="catch-photo-counter" data-testid="catch-photo-counter">
+                        {activeIndex + 1} / {photos.length}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setActiveIndex(activeIndex + 1)}
+                        disabled={activeIndex >= photos.length - 1}
+                        data-testid="catch-photo-next"
+                      >
+                        ›
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setGalleryCatchId(c.id)}
+                        data-testid="catch-photo-gallery"
+                      >
+                        {t('catch.view_all_photos')}
+                      </button>
+                    </div>
+                    <img
+                      src={activePhoto}
+                      alt={c.species}
+                      className="catch-photo-full"
+                      data-testid="catch-photo-full"
+                      onClick={() => setGalleryCatchId(c.id)}
+                    />
+                  </div>
                 )}
                 {c.notes && <div className="catch-notes">{c.notes}</div>}
               </div>
             )}
           </div>
+            );
+          })()
         ))}
       </div>
+
+      {galleryCatchId && (
+        (() => {
+          const catchEntry = session.catches.find((c) => c.id === galleryCatchId);
+          const photos = catchEntry?.photos ?? [];
+          const activeIndex = Math.min(
+            activePhotoIndexByCatch[galleryCatchId] ?? 0,
+            Math.max(photos.length - 1, 0),
+          );
+          const activePhoto = photos[activeIndex];
+
+          const setActiveIndex = (index: number) => {
+            setActivePhotoIndexByCatch((prev) => ({
+              ...prev,
+              [galleryCatchId]: Math.min(Math.max(index, 0), Math.max(photos.length - 1, 0)),
+            }));
+          };
+
+          if (photos.length === 0 || !activePhoto) return null;
+
+          return (
+            <div
+              className="modal-overlay"
+              role="dialog"
+              aria-modal="true"
+              onClick={closeGallery}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') closeGallery();
+                if (e.key === 'ArrowLeft') setActiveIndex(activeIndex - 1);
+                if (e.key === 'ArrowRight') setActiveIndex(activeIndex + 1);
+              }}
+              tabIndex={-1}
+              data-testid="catch-photo-modal"
+            >
+              <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>{t('catch.photos')}</h3>
+                  <button
+                    type="button"
+                    className="btn btn-icon"
+                    onClick={closeGallery}
+                    aria-label={t('catch.close')}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <div className="modal-body">
+                  <div className="catch-photo-modal-main">
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setActiveIndex(activeIndex - 1)}
+                      disabled={activeIndex <= 0}
+                      data-testid="catch-photo-modal-prev"
+                    >
+                      ‹
+                    </button>
+                    <img
+                      src={activePhoto}
+                      alt=""
+                      className="catch-photo-modal-full"
+                      data-testid="catch-photo-modal-full"
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setActiveIndex(activeIndex + 1)}
+                      disabled={activeIndex >= photos.length - 1}
+                      data-testid="catch-photo-modal-next"
+                    >
+                      ›
+                    </button>
+                  </div>
+
+                  <div className="catch-photo-counter" data-testid="catch-photo-modal-counter">
+                    {activeIndex + 1} / {photos.length}
+                  </div>
+
+                  <div className="catch-photo-modal-grid">
+                    {photos.map((photo, idx) => (
+                      <button
+                        type="button"
+                        key={idx}
+                        className={`catch-photo-modal-thumb ${idx === activeIndex ? 'active' : ''}`}
+                        onClick={() => setActiveIndex(idx)}
+                      >
+                        <img src={photo} alt="" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      )}
     </div>
   );
 }

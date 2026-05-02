@@ -95,7 +95,10 @@
     "delete_title": "Supprimer la prise",
     "photo_label": "Photo (optionnel)",
     "add_photo": "Ajouter une photo",
-    "remove_photo": "Supprimer"
+    "remove_photo": "Supprimer",
+    "photos": "Photos",
+    "view_all_photos": "Tout voir",
+    "close": "Fermer"
   },
   "conditions": {
     "weather_title": "Conditions météo",
