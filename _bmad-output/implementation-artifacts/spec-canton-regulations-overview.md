@@ -2,7 +2,7 @@
 title: 'Canton Regulations Overview'
 type: 'feature'
 created: '2026-04-30T20:46:02.598+00:00'
-status: 'draft'
+status: 'review'
 context:
   - '{project-root}/_bmad-output/project-context.md'
 ---
@@ -47,13 +47,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/types/index.ts` -- add optional structured fields for regulation highlights/source freshness if needed -- supports richer Bern/Solothurn details without breaking existing canton records.
-- [ ] `src/data/cantonLaws.ts` -- enrich Bern and Solothurn with official source-backed regulation information -- delivers the requested starting cantons.
-- [ ] `src/components/MapView.tsx` -- reuse enriched fields in the location-specific canton panel -- ensures selected Bern/Solothurn locations show the new information.
-- [ ] `src/App.tsx` plus a small component if warranted -- add a canton regulations overview to the Laws tab -- supports browsing without a selected location.
-- [ ] `src/i18n/locales/*.json` -- add all new UI keys in EN/DE/FR/IT -- preserves localization contract.
-- [ ] `src/index.css` / `src/App.css` -- style the overview consistently with current mobile-first patterns -- keeps UI usable.
-- [ ] `tests/*.spec.ts` -- cover Laws tab overview and Bern/Solothurn content visibility -- protects the feature from regressions.
+- [x] `src/types/index.ts` -- add optional structured fields for regulation highlights/source freshness if needed -- supports richer Bern/Solothurn details without breaking existing canton records.
+- [x] `src/data/cantonLaws.ts` -- enrich Bern and Solothurn with official source-backed regulation information -- delivers the requested starting cantons.
+- [x] `src/components/MapView.tsx` -- reuse enriched fields in the location-specific canton panel -- ensures selected Bern/Solothurn locations show the new information.
+- [x] `src/App.tsx` plus a small component if warranted -- add a canton regulations overview to the Laws tab -- supports browsing without a selected location.
+- [x] `src/i18n/locales/*.json` -- add all new UI keys in EN/DE/FR/IT -- preserves localization contract.
+- [x] `src/index.css` / `src/App.css` -- style the overview consistently with current mobile-first patterns -- keeps UI usable.
+- [x] `tests/*.spec.ts` -- cover Laws tab overview and Bern/Solothurn content visibility -- protects the feature from regressions.
 
 **Acceptance Criteria:**
 - Given the user opens the Laws tab, when no map location is selected, then an overview of canton regulation information is visible.
@@ -63,6 +63,25 @@ context:
 - Given the app is displayed in EN, DE, FR, or IT, when the new overview labels appear, then they are localized through the existing i18n system.
 
 ## Spec Change Log
+
+## Dev Agent Record
+
+### Implementation Notes
+
+- Added `RegulationSource`, `RegulationRecord`, `RegulationTopic`, `RegulationSourceType` types; extended `CantonLaw` with `permitPurchaseUrl?`, `lastVerified?`, `regulationYear?`
+- Seeded `regulationSources.ts` (SO/BE, 6 entries) and `regulationRecords.ts` (SO/BE, 10 entries covering all 5 topics)
+- Translated all English canton data text to German/French/Italian by canton language region
+- `isRegulationStale(lastVerified, thresholdDays=180)` helper in `utils/regulations.ts`
+- `CantonOverview` accordion component: all 26 cantons, enriched badge for SO/BE, freshness row, staleness warning, permit buy button, regulation records, disclaimer
+- `MapView` updated with same permit buy + freshness + disclaimer elements on location-specific panel
+- All 4 locale files updated with `laws.*` namespace (23 keys each)
+- CSS: freshness, stale warning, buy-permit-btn, disclaimer, canton overview accordion, regulation records
+- 17 Playwright E2E tests all passing
+- Fixed pre-existing TS2352 errors in `sessionVersioning.ts` that blocked the build
+
+### Completion Notes
+
+All 7 acceptance criteria satisfied. 17/17 new tests pass. 6 pre-existing failures (i18n language switch + landing header) unrelated to this story.
 
 ## Verification
 
