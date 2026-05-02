@@ -5,20 +5,20 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Zürich',
     cantonCode: 'ZH',
     generalInfo:
-      'Kanton Zürich requires a cantonal fishing permit. Fishing is regulated by the Fischereigesetz (FischG) of the Canton of Zurich.',
+      'Kanton Zürich verlangt ein kantonales Fischereipatent. Die Fischerei wird durch das Fischereigesetz (FischG) des Kantons Zürich geregelt.',
     permitInfo:
-      'Annual fishing permit required (Fischereikarte). Available at Gemeindeverwaltungen or online at zh.ch.',
+      'Jährliches Fischereipatent erforderlich (Fischereikarte). Erhältlich bei Gemeindeverwaltungen oder online unter zh.ch.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Zürich',
         description:
-          'Main cantonal fishing law regulating permits, closed seasons, and minimum sizes.',
+          'Kantonales Hauptfischereigesetz mit Regelungen zu Patenten, Schonzeiten und Mindestmassen.',
         url: 'https://www.zh.ch/de/umwelt-tiere/tiere/fischerei.html',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
         description:
-          'Federal fishing law applicable across Switzerland, forming the basis for all cantonal regulations.',
+          'Bundesgesetz über die Fischerei, gültig für die gesamte Schweiz und Grundlage aller kantonalen Vorschriften.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -37,19 +37,19 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Bern',
     cantonCode: 'BE',
     generalInfo:
-      'Kanton Bern has extensive fishing waters including Lake Thun, Lake Brienz, and numerous rivers. Fishing is governed by the cantonal Fischereigesetz.',
+      'Kanton Bern verfügt über ausgedehnte Fischereigewässer, darunter Thuner- und Brienzersee sowie zahlreiche Flüsse. Die Fischerei wird durch das kantonale Fischereigesetz geregelt.',
     permitInfo:
-      'Fishing permits (Fischereikarte) available at cantonal authorities. Different permits for lakes and rivers.',
+      'Fischereikarten erhältlich bei kantonalen Behörden. Für Seen und Fliessgewässer gelten unterschiedliche Patente.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Bern (FiG)',
         description:
-          'Cantonal law governing all fishing activities, permits, and species protection in Bern.',
+          'Kantonales Gesetz für sämtliche Fischereiaktivitäten, Patente und Artenschutz in Bern.',
         url: 'https://www.be.ch/de/start/dienstleistungen/sport-freizeit/jagen-und-fischen/fischerei.html',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law as basis for all regulations.',
+        description: 'Bundesgesetz über die Fischerei als Grundlage aller Vorschriften.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -68,19 +68,19 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Luzern',
     cantonCode: 'LU',
     generalInfo:
-      'Kanton Luzern offers fishing on Lake Lucerne (Vierwaldstättersee) and various rivers. Permits are managed by the cantonal authority.',
+      'Kanton Luzern bietet Fischerei auf dem Vierwaldstättersee und verschiedenen Flüssen. Die Patente werden von der kantonalen Behörde verwaltet.',
     permitInfo:
-      'Annual fishing permit required. Available at Dienststelle Landwirtschaft und Wald (lawa).',
+      'Jährliches Fischereipatent erforderlich. Erhältlich bei der Dienststelle Landwirtschaft und Wald (lawa).',
     laws: [
       {
         title: 'Fischereigesetz Kanton Luzern',
         description:
-          'Cantonal fishing legislation covering permits, seasons, and protected species.',
+          'Kantonales Fischereigesetz mit Regelungen zu Patenten, Schonzeiten und geschützten Arten.',
         url: 'https://www.luzern.ch/themen/natur-umwelt/fischerei/',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal framework law for fishing in Switzerland.',
+        description: 'Bundesrahmengesetz für die Fischerei in der Schweiz.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -98,17 +98,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Uri',
     cantonCode: 'UR',
     generalInfo:
-      'Kanton Uri fishing is regulated primarily around Lake Uri and the Reuss river. The canton is part of the Vierwaldstättersee fishing zone.',
-    permitInfo: 'Fishing permit required, available at the cantonal administration.',
+      'Die Fischerei in Kanton Uri ist hauptsächlich rund um den Urnersee und die Reuss geregelt. Uri gehört zur Fischereizone des Vierwaldstättersees.',
+    permitInfo: 'Fischereipatent erforderlich, erhältlich bei der kantonalen Verwaltung.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Uri',
-        description: 'Cantonal fishing regulation for the waters of Uri.',
+        description: 'Kantonale Fischereivorschriften für die Gewässer Uris.',
         url: 'https://www.ur.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal law governing fishing across Switzerland.',
+        description: 'Bundesgesetz über die Fischerei, gültig für die gesamte Schweiz.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -125,17 +125,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Schwyz',
     cantonCode: 'SZ',
     generalInfo:
-      'Kanton Schwyz includes Lake Lauerz, Lake Sihl, and portions of the Zugersee and Lauerzersee.',
-    permitInfo: 'Fishing permits available from the Fischerei- und Jagdverwaltung Schwyz.',
+      'Kanton Schwyz umfasst den Lauerzersee, den Sihlsee sowie Teile des Zugersees.',
+    permitInfo: 'Fischereipatente erhältlich bei der Fischerei- und Jagdverwaltung Schwyz.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Schwyz',
-        description: 'Cantonal fishing law for Schwyz waters.',
+        description: 'Kantonales Fischereigesetz für die Schwyzer Gewässer.',
         url: 'https://www.sz.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law as basis for all cantonal regulations.',
+        description: 'Bundesgesetz über die Fischerei als Grundlage aller kantonalen Vorschriften.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -150,17 +150,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
   OW: {
     canton: 'Obwalden',
     cantonCode: 'OW',
-    generalInfo: 'Kanton Obwalden has the Sarnersee and Lungernersee as its main fishing waters.',
-    permitInfo: 'Annual fishing license required, available at cantonal offices.',
+    generalInfo: 'Kanton Obwalden verfügt mit dem Sarnersee und dem Lungernersee über die wichtigsten Fischereigewässer.',
+    permitInfo: 'Jährliche Fischereilizenz erforderlich, erhältlich bei kantonalen Behörden.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Obwalden',
-        description: 'Fishing regulations for Obwalden canton.',
+        description: 'Fischereivorschriften für den Kanton Obwalden.',
         url: 'https://www.ow.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -176,17 +176,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Nidwalden',
     cantonCode: 'NW',
     generalInfo:
-      'Kanton Nidwalden borders the Vierwaldstättersee (Lake Lucerne) and has the Stanserhorn region.',
-    permitInfo: 'Fishing permit required, available at the cantonal administration in Stans.',
+      'Kanton Nidwalden grenzt an den Vierwaldstättersee und liegt in der Region Stanserhorn.',
+    permitInfo: 'Fischereipatent erforderlich, erhältlich bei der kantonalen Verwaltung in Stans.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Nidwalden',
-        description: 'Cantonal fishing regulation for Nidwalden.',
+        description: 'Kantonale Fischereivorschriften für Nidwalden.',
         url: 'https://www.nw.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -202,17 +202,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Glarus',
     cantonCode: 'GL',
     generalInfo:
-      'Kanton Glarus offers fishing in the Klöntalersee and the Linth river system.',
-    permitInfo: 'Fishing permits available at the cantonal forestry and fishing office.',
+      'Kanton Glarus bietet Fischerei im Klöntalersee und im Linthflusssystem.',
+    permitInfo: 'Fischereipatente erhältlich beim kantonalen Wald- und Fischereiamt.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Glarus',
-        description: 'Cantonal fishing law for Glarus.',
+        description: 'Kantonales Fischereigesetz für Glarus.',
         url: 'https://www.gl.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing regulation.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -227,17 +227,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
   ZG: {
     canton: 'Zug',
     cantonCode: 'ZG',
-    generalInfo: 'Kanton Zug is home to the Zugersee, one of the cleaner Swiss lakes.',
-    permitInfo: 'Annual fishing permit required. Available online and at the cantonal office.',
+    generalInfo: 'Kanton Zug beheimatet den Zugersee, einen der saubersten Schweizer Seen.',
+    permitInfo: 'Jährliches Fischereipatent erforderlich. Online und beim kantonalen Amt erhältlich.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Zug',
-        description: 'Cantonal fishing law for Zug.',
+        description: 'Kantonales Fischereigesetz für Zug.',
         url: 'https://www.zg.ch/behoerden/baudirektion/amt-fuer-wald-und-wild',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal framework fishing law.',
+        description: 'Bundesrahmengesetz für die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -255,18 +255,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Fribourg',
     cantonCode: 'FR',
     generalInfo:
-      'Kanton Fribourg (Freiburg) has the Murten lake, Lac de la Gruyère, and the Saane river.',
+      'Kanton Freiburg (Fribourg) verfügt über den Murtensee, den Lac de la Gruyère und die Saane. Zweisprachig Deutsch/Französisch.',
     permitInfo:
-      'Fishing license required (Fischerkarte/Patente de pêche). Available from the DIAF (Direction des institutions, de l\'agriculture et des forêts).',
+      'Fischereilizenz erforderlich (Fischerkarte/Patente de pêche). Erhältlich bei der DIAF (Direction des institutions, de l\'agriculture et des forêts).',
     laws: [
       {
         title: 'Loi sur la pêche / Fischereigesetz Kanton Freiburg',
-        description: 'Cantonal fishing law for Fribourg, available in French and German.',
+        description: 'Kantonales Fischereigesetz für Freiburg, zweisprachig verfügbar.',
         url: 'https://www.fr.ch/nature/peche',
       },
       {
         title: 'Loi fédérale sur la pêche (LFP)',
-        description: 'Federal fishing law governing all Swiss waters.',
+        description: 'Bundesgesetz über die Fischerei für alle Schweizer Gewässer.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -282,17 +282,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
   SO: {
     canton: 'Solothurn',
     cantonCode: 'SO',
-    generalInfo: 'Kanton Solothurn has fishing along the Aare river and several lakes.',
-    permitInfo: 'Fishing permits available from the Amt für Wald, Jagd und Fischerei Solothurn.',
+    generalInfo: 'Kanton Solothurn verfügt über Fischereigewässer entlang der Aare und verschiedenen Seen.',
+    permitInfo: 'Fischereipatente erhältlich beim Amt für Wald, Jagd und Fischerei (AWJF) Solothurn.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Solothurn',
-        description: 'Cantonal fishing legislation for Solothurn.',
+        description: 'Kantonales Fischereigesetz für Solothurn.',
         url: 'https://www.so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-wald-jagd-und-fischerei/fischerei/',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -309,18 +309,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Basel-Stadt',
     cantonCode: 'BS',
     generalInfo:
-      'Kanton Basel-Stadt fishing is primarily on the Rhine river. Special regulations apply for the Rhine.',
+      'Die Fischerei in Kanton Basel-Stadt findet hauptsächlich am Rhein statt. Für den Rhein gelten besondere Regelungen.',
     permitInfo:
-      'Fishing permit required. Joint Rhine fishing regulations apply across Basel-Stadt and Basel-Landschaft.',
+      'Fischereipatent erforderlich. Gemeinsame Rhein-Fischereivorschriften gelten für Basel-Stadt und Basel-Landschaft.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Basel-Stadt',
-        description: 'Cantonal fishing law for Basel-Stadt including Rhine fishing.',
+        description: 'Kantonales Fischereigesetz für Basel-Stadt, einschliesslich Rheinfischerei.',
         url: 'https://www.bs.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal law as basis for cantonal regulations.',
+        description: 'Bundesgesetz als Grundlage der kantonalen Vorschriften.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -337,18 +337,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Basel-Landschaft',
     cantonCode: 'BL',
     generalInfo:
-      'Kanton Basel-Landschaft offers fishing on the Ergolz, Birs rivers and portions of the Rhine.',
+      'Kanton Basel-Landschaft bietet Fischerei an Ergolz, Birs und Teilen des Rheins.',
     permitInfo:
-      'Annual fishing permit required. Available at the Amt für Raumplanung und Umweltschutz.',
+      'Jährliches Fischereipatent erforderlich. Erhältlich beim Amt für Raumplanung und Umweltschutz.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Basel-Landschaft',
-        description: 'Fishing law for Basel-Landschaft waters.',
+        description: 'Fischereigesetz für die Gewässer von Basel-Landschaft.',
         url: 'https://www.baselland.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -365,17 +365,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Schaffhausen',
     cantonCode: 'SH',
     generalInfo:
-      'Kanton Schaffhausen is famous for the Rhine Falls and offers Rhine river fishing.',
-    permitInfo: 'Fishing license required. Available at the Fischereibehörde Schaffhausen.',
+      'Kanton Schaffhausen ist bekannt für den Rheinfall und bietet Rheinfischerei.',
+    permitInfo: 'Fischereilizenz erforderlich. Erhältlich bei der Fischereibehörde Schaffhausen.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Schaffhausen',
-        description: 'Cantonal fishing law for Schaffhausen including Rhine fishing.',
+        description: 'Kantonales Fischereigesetz für Schaffhausen, einschliesslich Rheinfischerei.',
         url: 'https://www.sh.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -391,17 +391,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
   AR: {
     canton: 'Appenzell Ausserrhoden',
     cantonCode: 'AR',
-    generalInfo: 'Kanton Appenzell Ausserrhoden has mountain streams and the Sitter river.',
-    permitInfo: 'Fishing permits available at the cantonal administration.',
+    generalInfo: 'Kanton Appenzell Ausserrhoden verfügt über Gebirgsflüsse und die Sitter.',
+    permitInfo: 'Fischereipatente erhältlich bei der kantonalen Verwaltung.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Appenzell Ausserrhoden',
-        description: 'Fishing regulations for AR.',
+        description: 'Fischereivorschriften für Appenzell Ausserrhoden.',
         url: 'https://www.ar.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -413,17 +413,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
   AI: {
     canton: 'Appenzell Innerrhoden',
     cantonCode: 'AI',
-    generalInfo: 'Kanton Appenzell Innerrhoden offers pristine mountain stream fishing.',
-    permitInfo: 'Fishing permits available at the Landeskanzlei AI.',
+    generalInfo: 'Kanton Appenzell Innerrhoden bietet unberührte Gebirgsflüsse.',
+    permitInfo: 'Fischereipatente erhältlich bei der Landeskanzlei AI.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Appenzell Innerrhoden',
-        description: 'Fishing law for Appenzell Innerrhoden.',
+        description: 'Fischereigesetz für Appenzell Innerrhoden.',
         url: 'https://www.ai.ch',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -436,18 +436,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'St. Gallen',
     cantonCode: 'SG',
     generalInfo:
-      'Kanton St. Gallen has the Walensee, Bodensee (Lake Constance), and the Thur river.',
+      'Kanton St. Gallen verfügt über den Walensee, den Bodensee und den Thur.',
     permitInfo:
-      'Annual fishing permit required. Available online or at the Amt für Natur, Jagd und Fischerei.',
+      'Jährliches Fischereipatent erforderlich. Online oder beim Amt für Natur, Jagd und Fischerei erhältlich.',
     laws: [
       {
         title: 'Fischereigesetz Kanton St. Gallen',
-        description: 'Cantonal fishing law covering all St. Gallen waters.',
+        description: 'Kantonales Fischereigesetz für alle St. Galler Gewässer.',
         url: 'https://www.sg.ch/umwelt-natur/natur/jagd-und-fischerei/fischerei.html',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -466,18 +466,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Graubünden',
     cantonCode: 'GR',
     generalInfo:
-      'Kanton Graubünden (Grisons) is the largest Swiss canton with extensive fishing waters including the Inn, Rhine, and many alpine lakes.',
+      'Kanton Graubünden ist der grösste Schweizer Kanton mit ausgedehnten Fischereigewässern, darunter Inn, Rhein und zahlreiche Alpenseen.',
     permitInfo:
-      'Day and season fishing permits available. Purchase at Amt für Jagd und Fischerei Graubünden or online.',
+      'Tages- und Saisonpatente erhältlich. Erhältlich beim Amt für Jagd und Fischerei Graubünden oder online.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Graubünden (FG)',
-        description: 'Main cantonal fishing law for Graubünden.',
+        description: 'Hauptkantonales Fischereigesetz für Graubünden.',
         url: 'https://www.gr.ch/DE/institutionen/verwaltung/dvs/ajf/fischerei/Seiten/default.aspx',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -495,18 +495,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Aargau',
     cantonCode: 'AG',
     generalInfo:
-      'Kanton Aargau has extensive river fishing along the Aare, Reuss, Limmat, and Rhine rivers.',
+      'Kanton Aargau verfügt über ausgedehnte Flussfischerei entlang Aare, Reuss, Limmat und Rhein.',
     permitInfo:
-      'Fishing license (Fischereikarte) required. Available at Departement Bau, Verkehr und Umwelt.',
+      'Fischereikarte erforderlich. Erhältlich beim Departement Bau, Verkehr und Umwelt.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Aargau (FG)',
-        description: 'Cantonal fishing law for Aargau.',
+        description: 'Kantonales Fischereigesetz für Aargau.',
         url: 'https://www.ag.ch/de/umwelt-natur-landschaft/jagd-fischerei/fischerei',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -524,17 +524,17 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Thurgau',
     cantonCode: 'TG',
     generalInfo:
-      'Kanton Thurgau borders the Bodensee (Lake Constance) and has the Thur river.',
-    permitInfo: 'Annual fishing permit required. Available at Fischereibehörde Thurgau.',
+      'Kanton Thurgau grenzt an den Bodensee und verfügt über den Thur.',
+    permitInfo: 'Jährliches Fischereipatent erforderlich. Erhältlich bei der Fischereibehörde Thurgau.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Thurgau',
-        description: 'Cantonal fishing law for Thurgau including Bodensee regulations.',
+        description: 'Kantonales Fischereigesetz für Thurgau, einschliesslich Bodenseevorschriften.',
         url: 'https://www.tg.ch/public/themen/20/70.html/21',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
-        description: 'Federal fishing law.',
+        description: 'Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -552,18 +552,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Ticino',
     cantonCode: 'TI',
     generalInfo:
-      'Kanton Ticino (Tessin) has the Lago Maggiore, Lago di Lugano, and the Ticino river. Italian fishing traditions apply.',
+      'Il Canton Ticino dispone del Lago Maggiore, del Lago di Lugano e del fiume Ticino. Si applicano le tradizioni di pesca italiane.',
     permitInfo:
-      'Annual fishing permit (patente di pesca) required. Available at Sezione della caccia e della pesca.',
+      'È richiesta la patente di pesca annuale. Disponibile presso la Sezione della caccia e della pesca.',
     laws: [
       {
         title: 'Legge sulla pesca / Fischereigesetz Kanton Tessin',
-        description: 'Cantonal fishing law for Ticino, primarily in Italian.',
+        description: 'Legge cantonale sulla pesca per il Ticino, principalmente in italiano.',
         url: 'https://www.ti.ch/caccia-pesca',
       },
       {
         title: 'Legge federale sulla pesca (LFP)',
-        description: 'Federal fishing law.',
+        description: 'Legge federale sulla pesca (LFP).',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -581,18 +581,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Vaud',
     cantonCode: 'VD',
     generalInfo:
-      'Canton de Vaud borders Lac Léman (Lake Geneva) and has the Broye river. French-speaking fishing regulations apply.',
+      'Le canton de Vaud borde le Lac Léman et dispose de la Broye. Les réglementations de pêche sont en français.',
     permitInfo:
-      'Annual fishing permit (patente de pêche) required. Available from the Direction générale de l\'environnement.',
+      'Patente de pêche annuelle requise. Disponible auprès de la Direction générale de l\'environnement.',
     laws: [
       {
         title: 'Loi vaudoise sur la pêche (LVPêche)',
-        description: 'Cantonal fishing law for Vaud, available in French.',
+        description: 'Loi cantonale sur la pêche pour Vaud, disponible en français.',
         url: 'https://www.vd.ch/themes/environnement/faune/peche/',
       },
       {
         title: 'Loi fédérale sur la pêche (LFP)',
-        description: 'Federal fishing law.',
+        description: 'Loi fédérale sur la pêche (LFP).',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -611,18 +611,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Valais',
     cantonCode: 'VS',
     generalInfo:
-      'Canton du Valais (Wallis) has the Rhône river and many alpine lakes. A paradise for trout fishing.',
+      'Le canton du Valais (Wallis) possède le Rhône et de nombreux lacs alpins — un paradis pour la pêche à la truite. / Kanton Wallis verfügt über die Rhône und viele Alpenseen.',
     permitInfo:
-      'Fishing permit required (patente de pêche/Fischereikarte). Available at Service de la chasse, de la pêche et de la faune.',
+      'Patente de pêche/Fischereikarte requise. Disponible au Service de la chasse, de la pêche et de la faune.',
     laws: [
       {
         title: 'Loi sur la pêche / Fischereigesetz Wallis',
-        description: 'Cantonal fishing law for Valais in French and German.',
+        description: 'Loi cantonale sur la pêche pour le Valais, disponible en français et en allemand.',
         url: 'https://www.vs.ch/web/sfcpf/peche',
       },
       {
         title: 'Loi fédérale sur la pêche (LFP)',
-        description: 'Federal fishing law.',
+        description: 'Loi fédérale sur la pêche / Bundesgesetz über die Fischerei.',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -639,18 +639,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Neuchâtel',
     cantonCode: 'NE',
     generalInfo:
-      'Canton de Neuchâtel borders Lac de Neuchâtel and has the Doubs river on its border.',
+      'Le canton de Neuchâtel borde le Lac de Neuchâtel et dispose du Doubs à sa frontière.',
     permitInfo:
-      'Annual fishing permit required. Available at the Service de la faune, des forêts et de la nature.',
+      'Patente de pêche annuelle requise. Disponible au Service de la faune, des forêts et de la nature.',
     laws: [
       {
         title: 'Loi sur la pêche du canton de Neuchâtel',
-        description: 'Cantonal fishing law for Neuchâtel.',
+        description: 'Loi cantonale sur la pêche pour Neuchâtel.',
         url: 'https://www.ne.ch/autorites/DDTE/SFPN/peche/Pages/accueil.aspx',
       },
       {
         title: 'Loi fédérale sur la pêche (LFP)',
-        description: 'Federal fishing law.',
+        description: 'Loi fédérale sur la pêche (LFP).',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -667,18 +667,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Genève',
     cantonCode: 'GE',
     generalInfo:
-      'Canton de Genève is on Lac Léman (Lake Geneva). The Rhône river flows through Geneva. Strict urban fishing regulations apply.',
+      'Le canton de Genève est situé sur le Lac Léman. Le Rhône traverse Genève. Des réglementations de pêche urbaines strictes s\'appliquent.',
     permitInfo:
-      'Fishing permit required. Available at the Direction générale de la nature et du paysage.',
+      'Patente de pêche requise. Disponible à la Direction générale de la nature et du paysage.',
     laws: [
       {
         title: 'Loi sur la pêche du canton de Genève',
-        description: 'Cantonal fishing law for Geneva with specific Lake Geneva regulations.',
+        description: 'Loi cantonale sur la pêche pour Genève, avec des réglementations spécifiques au Lac Léman.',
         url: 'https://www.ge.ch/peche',
       },
       {
         title: 'Loi fédérale sur la pêche (LFP)',
-        description: 'Federal fishing law.',
+        description: 'Loi fédérale sur la pêche (LFP).',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],
@@ -695,18 +695,18 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Jura',
     cantonCode: 'JU',
     generalInfo:
-      'Canton du Jura has the Doubs river and the Allaine. The Doubs is shared with France.',
+      'Le canton du Jura dispose du Doubs et de l\'Allaine. Le Doubs est partagé avec la France.',
     permitInfo:
-      'Annual fishing permit required. Available at the Service de l\'environnement.',
+      'Patente de pêche annuelle requise. Disponible au Service de l\'environnement.',
     laws: [
       {
         title: 'Loi sur la pêche du canton du Jura',
-        description: 'Cantonal fishing law for Jura.',
+        description: 'Loi cantonale sur la pêche pour le Jura.',
         url: 'https://www.jura.ch/DEN/SNP/Chasse-et-peche/Peche/Peche.html',
       },
       {
         title: 'Loi fédérale sur la pêche (LFP)',
-        description: 'Federal fishing law.',
+        description: 'Loi fédérale sur la pêche (LFP).',
         url: 'https://www.fedlex.admin.ch/eli/cc/1993/1256_1256_1256/de',
       },
     ],

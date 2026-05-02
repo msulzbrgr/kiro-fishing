@@ -176,5 +176,29 @@
     "strict_mode_desc": "Strikter Modus: ausdrückliche Bestätigung vor dem Start oder nach Regelungsänderungen.",
     "info_notification_title": "Vorschriften aktualisiert",
     "info_notification_desc": "Deine Position könnte in ein anderes Regelungsgebiet gewechselt haben. Die neuen Infos wurden als Checkpoint gespeichert."
+  },
+  "laws": {
+    "overview_title": "Kantonale Fischereivorschriften",
+    "overview_subtitle": "Fischereivorschriften für alle 26 Schweizer Kantone. Kanton antippen zum Aufklappen.",
+    "buy_permit": "Patent kaufen",
+    "last_verified": "Zuletzt geprüft",
+    "regulation_year": "Vorschriftsjahr",
+    "stale_badge": "Prüfung nötig",
+    "stale_warning": "Diese Informationen könnten veraltet sein. Vor dem Fischen die offizielle kantonale Behörde konsultieren.",
+    "stale_warning_short": "Veraltet",
+    "disclaimer": "Nur zur Information. Aktuelle Vorschriften immer bei der zuständigen Kantonsbehörde prüfen.",
+    "enriched_label": "Detailangaben verfügbar",
+    "regulation_records": "Regelungsdetails",
+    "source_link": "Offizielle Quelle",
+    "topic_patent_purchase": "Patentkauf",
+    "topic_patent_types": "Patentarten",
+    "topic_patent_price": "Patentpreis",
+    "topic_minimum_sizes": "Mindestmasse",
+    "topic_closed_seasons": "Schonzeiten",
+    "topic_method_restrictions": "Methodeneinschränkungen",
+    "topic_protected_zones": "Schutzzonen",
+    "topic_legal_basis": "Rechtsgrundlage",
+    "topic_authority_contact": "Behördenkontakt",
+    "topic_inter_cantonal": "Interkantonale Regelungen"
   }
 }

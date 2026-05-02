@@ -176,5 +176,29 @@
     "strict_mode_desc": "Mode strict: exiger une confirmation explicite avant de commencer ou de continuer après un changement réglementaire.",
     "info_notification_title": "Informations réglementaires mises à jour",
     "info_notification_desc": "Votre position a peut-être changé de zone réglementaire. Les nouvelles informations sourcées ont été enregistrées comme checkpoint supplémentaire."
+  },
+  "laws": {
+    "overview_title": "Réglementations cantonales",
+    "overview_subtitle": "Parcourez les réglementations de pêche pour les 26 cantons suisses. Cliquez pour développer.",
+    "buy_permit": "Acheter un permis",
+    "last_verified": "Dernière vérification",
+    "regulation_year": "Année de réglementation",
+    "stale_badge": "À vérifier",
+    "stale_warning": "Ces informations peuvent être dépassées. Vérifiez auprès de l'autorité cantonale officielle avant de pêcher.",
+    "stale_warning_short": "Périmé",
+    "disclaimer": "À titre informatif uniquement. Vérifiez toujours les réglementations en vigueur auprès de l'autorité cantonale officielle.",
+    "enriched_label": "Données détaillées disponibles",
+    "regulation_records": "Détails réglementaires",
+    "source_link": "Source officielle",
+    "topic_patent_purchase": "Achat de permis",
+    "topic_patent_types": "Types de permis",
+    "topic_patent_price": "Prix du permis",
+    "topic_minimum_sizes": "Tailles minimales",
+    "topic_closed_seasons": "Périodes de fermeture",
+    "topic_method_restrictions": "Restrictions de méthodes",
+    "topic_protected_zones": "Zones protégées",
+    "topic_legal_basis": "Base légale",
+    "topic_authority_contact": "Contact de l'autorité",
+    "topic_inter_cantonal": "Règles intercantonales"
   }
 }

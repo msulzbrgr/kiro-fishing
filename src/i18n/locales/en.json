@@ -178,5 +178,29 @@
     "strict_mode_desc": "Strict mode: require explicit confirmation before starting or continuing after regulation changes.",
     "info_notification_title": "Regulation information updated",
     "info_notification_desc": "Your position may have entered a different regulation area. The new source-backed information was saved as an additional session checkpoint."
+  },
+  "laws": {
+    "overview_title": "Canton Regulations Overview",
+    "overview_subtitle": "Browse fishing regulations for all 26 Swiss cantons. Click a canton to expand its details.",
+    "buy_permit": "Buy Permit",
+    "last_verified": "Last verified",
+    "regulation_year": "Regulation year",
+    "stale_badge": "Needs review",
+    "stale_warning": "This information may be outdated. Please verify with the official cantonal authority before fishing.",
+    "stale_warning_short": "Outdated",
+    "disclaimer": "For information only. Always verify current regulations with the official cantonal authority before fishing.",
+    "enriched_label": "Detailed records available",
+    "regulation_records": "Regulation details",
+    "source_link": "Official source",
+    "topic_patent_purchase": "Permit purchase",
+    "topic_patent_types": "Permit types",
+    "topic_patent_price": "Permit price",
+    "topic_minimum_sizes": "Minimum sizes",
+    "topic_closed_seasons": "Closed seasons",
+    "topic_method_restrictions": "Method restrictions",
+    "topic_protected_zones": "Protected zones",
+    "topic_legal_basis": "Legal basis",
+    "topic_authority_contact": "Authority contact",
+    "topic_inter_cantonal": "Inter-cantonal rules"
   }
 }

@@ -176,5 +176,29 @@
     "strict_mode_desc": "Modalità rigida: richiede una conferma esplicita prima di iniziare o continuare dopo cambi normativi.",
     "info_notification_title": "Informazioni normative aggiornate",
     "info_notification_desc": "La tua posizione potrebbe essere entrata in un’altra area normativa. Le nuove informazioni con fonte sono state salvate come checkpoint aggiuntivo."
+  },
+  "laws": {
+    "overview_title": "Normative cantonali",
+    "overview_subtitle": "Sfoglia le normative di pesca per tutti i 26 cantoni svizzeri. Clicca per espandere.",
+    "buy_permit": "Acquista licenza",
+    "last_verified": "Ultima verifica",
+    "regulation_year": "Anno normativa",
+    "stale_badge": "Da verificare",
+    "stale_warning": "Queste informazioni potrebbero essere obsolete. Verifica con l’autorità cantonale ufficiale prima di pescare.",
+    "stale_warning_short": "Obsoleto",
+    "disclaimer": "Solo a scopo informativo. Verifica sempre le normative vigenti con l’autorità cantonale ufficiale.",
+    "enriched_label": "Dati dettagliati disponibili",
+    "regulation_records": "Dettagli normativi",
+    "source_link": "Fonte ufficiale",
+    "topic_patent_purchase": "Acquisto licenza",
+    "topic_patent_types": "Tipi di licenza",
+    "topic_patent_price": "Prezzo licenza",
+    "topic_minimum_sizes": "Taglie minime",
+    "topic_closed_seasons": "Periodi di divieto",
+    "topic_method_restrictions": "Restrizioni metodi",
+    "topic_protected_zones": "Zone protette",
+    "topic_legal_basis": "Base legale",
+    "topic_authority_contact": "Contatto autorità",
+    "topic_inter_cantonal": "Regole intercantonali"
   }
 }
