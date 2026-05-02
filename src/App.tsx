@@ -9,6 +9,7 @@ import NewSessionForm from './components/NewSessionForm';
 import LandingPage from './components/LandingPage';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import DataManager from './components/DataManager';
+import CantonOverview from './components/CantonOverview';
 import logoApp from './assets/KiroFishingLogoApp.png';
 import './App.css';
 
@@ -68,6 +69,7 @@ function App() {
               <p>{t('map.click_instruction')}</p>
             </div>
             <MapView />
+            <CantonOverview />
           </div>
         )}
 

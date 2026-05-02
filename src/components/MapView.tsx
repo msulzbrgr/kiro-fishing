@@ -213,6 +213,42 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
             <p className="canton-general-info">{cantonLaw.generalInfo}</p>
           )}
 
+          {/* Freshness row */}
+          {cantonLaw.lastVerified && (
+            <div className={`freshness-row ${isRegulationStale(cantonLaw.lastVerified) ? 'stale' : 'fresh'}`}>
+              <Info size={13} />
+              <span>
+                {t('laws.last_verified')}: {cantonLaw.lastVerified}
+                {cantonLaw.regulationYear && ` · ${t('laws.regulation_year')}: ${cantonLaw.regulationYear}`}
+              </span>
+              {isRegulationStale(cantonLaw.lastVerified) && (
+                <span className="stale-badge">{t('laws.stale_badge')}</span>
+              )}
+            </div>
+          )}
+
+          {/* Staleness warning */}
+          {cantonLaw.lastVerified && isRegulationStale(cantonLaw.lastVerified) && (
+            <div className="stale-warning" role="alert">
+              <AlertTriangle size={14} />
+              <span>{t('laws.stale_warning')}</span>
+            </div>
+          )}
+
+          {/* Buy permit button */}
+          {cantonLaw.permitPurchaseUrl && (
+            <a
+              href={cantonLaw.permitPurchaseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-sm buy-permit-btn"
+              data-testid="map-buy-permit-btn"
+            >
+              <ShoppingCart size={14} />
+              {t('laws.buy_permit')}
+            </a>
+          )}
+
           {cantonLaw.permitInfo && (
             <div className="permit-info">
               <strong>📋 {t('map.permit')}:</strong> {cantonLaw.permitInfo}
@@ -258,6 +294,12 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
               </table>
             </div>
           )}
+
+          {/* Disclaimer */}
+          <div className="regulation-disclaimer" role="note">
+            <Info size={13} />
+            <span>{t('laws.disclaimer')}</span>
+          </div>
         </div>
       )}
 
