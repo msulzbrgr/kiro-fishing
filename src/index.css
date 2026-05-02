@@ -885,6 +885,56 @@ textarea {
   border-top: 1px solid var(--border);
 }
 
+.catch-details {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.catch-details .catch-notes {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.catch-photo-full {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.catch-photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.catch-photo-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+}
+
+.catch-photo-add-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.catch-photo-input {
+  display: none;
+}
+
+.badge-photo {
+  color: var(--primary);
+}
+
 /* ===== Conditions Form ===== */
 .conditions-form {
   display: flex;

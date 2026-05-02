@@ -96,4 +96,67 @@ test.describe('Catch Log', () => {
     // Catch should appear in the list
     await expect(page.locator('.catch-item')).toHaveCount(1);
   });
+
+  test('photo upload button is visible in catch form', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await expect(page.getByTestId('add-photo-btn')).toBeVisible();
+    await expect(page.getByTestId('catch-photo-input')).toBeHidden();
+  });
+
+  test('can attach a photo to a catch and see it when expanded', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+
+    // Upload a minimal valid PNG as the photo
+    const minimalPng = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'fish.png',
+      mimeType: 'image/png',
+      buffer: minimalPng,
+    });
+
+    // Preview thumbnail should appear and the add-photo button should disappear
+    await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
+    await expect(page.getByTestId('add-photo-btn')).toHaveCount(0);
+
+    // Remove photo button should be available
+    await expect(page.getByTestId('remove-photo-btn')).toBeVisible();
+
+    // Add the catch
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    // Expand the catch — photo should show
+    await page.locator('.catch-item .catch-header').click();
+    await expect(page.getByTestId('catch-photo-full')).toBeVisible();
+  });
+
+  test('can remove a photo before saving catch', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+
+    const minimalPng = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'fish.png',
+      mimeType: 'image/png',
+      buffer: minimalPng,
+    });
+    await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
+
+    // Remove the photo
+    await page.getByTestId('remove-photo-btn').click();
+    await expect(page.getByTestId('add-photo-btn')).toBeVisible();
+    await expect(page.getByTestId('catch-photo-preview')).toHaveCount(0);
+
+    // Add catch without photo
+    await page.getByTestId('add-catch-btn').click();
+    await page.locator('.catch-item .catch-header').click();
+    await expect(page.getByTestId('catch-photo-full')).toHaveCount(0);
+  });
 });

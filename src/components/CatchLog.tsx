@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Plus,
   Fish,
@@ -9,6 +9,7 @@ import {
   Weight,
   Clock,
   RefreshCw,
+  Camera,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Catch, FishingSession } from '../types';
@@ -26,6 +27,7 @@ interface CatchFormState {
   length: string;
   released: boolean;
   notes: string;
+  photo: string;
 }
 
 const EMPTY_FORM: CatchFormState = {
@@ -34,6 +36,7 @@ const EMPTY_FORM: CatchFormState = {
   length: '',
   released: true,
   notes: '',
+  photo: '',
 };
 
 export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
@@ -41,6 +44,20 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CatchFormState>(EMPTY_FORM);
   const [expandedCatch, setExpandedCatch] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result;
+      if (typeof result === 'string') {
+        setForm((prev) => ({ ...prev, photo: result }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAddCatch = () => {
     if (!form.species.trim()) return;
@@ -56,6 +73,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       }),
       released: form.released,
       notes: form.notes.trim() || undefined,
+      photo: form.photo || undefined,
     };
 
     const updated: FishingSession = {
@@ -161,6 +179,45 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                 rows={2}
               />
             </div>
+
+            <div className="form-group form-group-full">
+              <label>
+                <Camera size={14} /> {t('catch.photo_label')}
+              </label>
+              {form.photo ? (
+                <div className="catch-photo-preview">
+                  <img src={form.photo} alt="" className="catch-photo-thumb" data-testid="catch-photo-preview" />
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, photo: '' }));
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                    data-testid="remove-photo-btn"
+                  >
+                    <X size={14} /> {t('catch.remove_photo')}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm catch-photo-add-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  data-testid="add-photo-btn"
+                >
+                  <Camera size={14} /> {t('catch.add_photo')}
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="catch-photo-input"
+                onChange={handlePhotoChange}
+                data-testid="catch-photo-input"
+              />
+            </div>
           </div>
 
           <div className="form-actions">
@@ -217,6 +274,11 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                       <RefreshCw size={11} /> {t('catch.released')}
                     </span>
                   )}
+                  {c.photo && (
+                    <span className="badge badge-photo">
+                      <Camera size={11} />
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="catch-actions">
@@ -234,8 +296,18 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               </div>
             </div>
 
-            {expandedCatch === c.id && c.notes && (
-              <div className="catch-notes">{c.notes}</div>
+            {expandedCatch === c.id && (
+              <div className="catch-details">
+                {c.photo && (
+                  <img
+                    src={c.photo}
+                    alt={c.species}
+                    className="catch-photo-full"
+                    data-testid="catch-photo-full"
+                  />
+                )}
+                {c.notes && <div className="catch-notes">{c.notes}</div>}
+              </div>
             )}
           </div>
         ))}

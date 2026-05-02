@@ -27,6 +27,7 @@ export interface Catch {
   time: string;
   released: boolean;
   notes?: string;
+  photo?: string; // base64 data URL
 }
 
 export interface FishingLocation {

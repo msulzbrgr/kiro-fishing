@@ -92,7 +92,10 @@
     "add": "Fang hinzufügen",
     "cancel": "Abbrechen",
     "no_catches": "Noch nix gefangen. Drück auf «Fang erfassen».",
-    "delete_title": "Fang löschen"
+    "delete_title": "Fang löschen",
+    "photo_label": "Foto (optional)",
+    "add_photo": "Foto hinzufügen",
+    "remove_photo": "Entfernen"
   },
   "conditions": {
     "weather_title": "Wetter",

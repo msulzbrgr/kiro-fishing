@@ -92,7 +92,10 @@
     "add": "Aggiungi cattura",
     "cancel": "Annulla",
     "no_catches": "Nessuna cattura registrata. Clicca su «Registra cattura».",
-    "delete_title": "Elimina cattura"
+    "delete_title": "Elimina cattura",
+    "photo_label": "Foto (opzionale)",
+    "add_photo": "Aggiungi foto",
+    "remove_photo": "Rimuovi"
   },
   "conditions": {
     "weather_title": "Condizioni meteorologiche",
