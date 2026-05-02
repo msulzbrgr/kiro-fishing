@@ -111,4 +111,52 @@ export interface CantonLaw {
   permitInfo?: string;
   minimumSizes?: MinimumSize[];
   generalInfo?: string;
+  permitPurchaseUrl?: string;
+  lastVerified?: string;   // ISO date string
+  regulationYear?: number;
+}
+
+export type RegulationSourceType =
+  | 'official_authority'
+  | 'official_law_text'
+  | 'official_pdf'
+  | 'permit_portal'
+  | 'aggregator'
+  | 'news_blog'
+  | 'forum';
+
+export type RegulationTopic =
+  | 'patent_types'
+  | 'patent_purchase'
+  | 'patent_price'
+  | 'minimum_sizes'
+  | 'closed_seasons'
+  | 'method_restrictions'
+  | 'protected_zones'
+  | 'legal_basis'
+  | 'authority_contact'
+  | 'inter_cantonal';
+
+export interface RegulationSource {
+  canton: string;
+  url: string;
+  type: RegulationSourceType;
+  language: 'de' | 'fr' | 'it' | 'en';
+  trustLevel: 'high' | 'medium' | 'low';
+  lastVerified: string;  // ISO date
+  effectiveYear: number;
+  description?: string;
+  isPatentPurchase?: boolean;
+}
+
+export interface RegulationRecord {
+  id: string;
+  canton: string;
+  topic: RegulationTopic;
+  content: string;
+  sourceUrl: string;
+  extractedDate: string;  // ISO date
+  effectiveYear: number;
+  confidence: 'high' | 'medium' | 'low';
+  isStale?: boolean;      // computed: age > staleness threshold
 }
