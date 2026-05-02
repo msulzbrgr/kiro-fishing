@@ -103,19 +103,20 @@ test.describe('Catch Log', () => {
     await expect(page.getByTestId('catch-photo-input')).toBeHidden();
   });
 
+  // Minimal 1×1 PNG for upload tests
+  const MINIMAL_PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  );
+
   test('can attach a photo to a catch and see it when expanded', async ({ page }) => {
     await page.getByTestId('log-catch-btn').click();
     await page.getByTestId('species-select').selectOption({ index: 1 });
 
-    // Upload a minimal valid PNG as the photo
-    const minimalPng = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-      'base64',
-    );
     await page.getByTestId('catch-photo-input').setInputFiles({
       name: 'fish.png',
       mimeType: 'image/png',
-      buffer: minimalPng,
+      buffer: MINIMAL_PNG,
     });
 
     // Preview thumbnail should appear and the add-photo button should disappear
@@ -138,14 +139,10 @@ test.describe('Catch Log', () => {
     await page.getByTestId('log-catch-btn').click();
     await page.getByTestId('species-select').selectOption({ index: 1 });
 
-    const minimalPng = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-      'base64',
-    );
     await page.getByTestId('catch-photo-input').setInputFiles({
       name: 'fish.png',
       mimeType: 'image/png',
-      buffer: minimalPng,
+      buffer: MINIMAL_PNG,
     });
     await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
 
