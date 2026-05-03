@@ -123,6 +123,14 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
   const handlePersistenceToggle = async (nextChecked: boolean) => {
     if (nextChecked && !storageHealth?.persistent) {
       await handleRequestPersistence();
+      return;
+    }
+
+    if (!nextChecked && storageHealth?.persistent) {
+      setStatus({
+        type: 'error',
+        message: t('storage.persistence_disable_not_supported'),
+      });
     }
   };
 
@@ -219,7 +227,9 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
             <span className="settings-toggle-slider" aria-hidden="true" />
           </label>
           <div className="settings-hint">
-            {storageHealth.persistent ? t('storage.persistent_yes') : t('storage.persistent_no')}
+            {storageHealth.persistent
+              ? `${t('storage.persistent_yes')} · ${t('storage.persistence_disable_not_supported_short')}`
+              : t('storage.persistent_no')}
           </div>
         </div>
       )}

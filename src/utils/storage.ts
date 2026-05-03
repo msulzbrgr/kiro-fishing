@@ -521,5 +521,9 @@ export async function requestPersistentStorage(): Promise<boolean> {
     return false;
   }
 
-  return navigator.storage.persist();
+  try {
+    return await navigator.storage.persist();
+  } catch {
+    return false;
+  }
 }
