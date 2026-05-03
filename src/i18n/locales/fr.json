@@ -12,7 +12,13 @@
   },
   "settings": {
     "title": "Paramètres",
-    "subtitle": "Gérer le stockage et les sauvegardes"
+    "subtitle": "Gérer le stockage et les sauvegardes",
+    "backups_title": "Import / Export",
+    "backups_subtitle": "Sauvegardez vos sorties et restaurez-les plus tard.",
+    "export_preview": "Aperçu export : {{sessions}} sorties, {{photos}} photos",
+    "storage_title": "Stockage",
+    "storage_subtitle": "Voir l'utilisation et activer le stockage persistant.",
+    "persistent_storage_label": "Stockage persistant"
   },
   "landing": {
     "hero_title": "Votre compagnon de pêche suisse",
