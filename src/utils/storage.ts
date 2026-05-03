@@ -351,6 +351,32 @@ export async function exportData(): Promise<void> {
   triggerDownload(content, `kiro-fishing-backup-${dateStr}.zip`);
 }
 
+export interface ExportPreview {
+  sessionCount: number;
+  photoCount: number;
+  usage?: number;
+  quota?: number;
+  percentUsed?: number;
+}
+
+export async function getExportPreview(): Promise<ExportPreview> {
+  await ensureLegacyMigration();
+  const db = await getDb();
+  const [sessions, photos, health] = await Promise.all([
+    db.count('sessions'),
+    db.count('photos'),
+    getStorageHealth(),
+  ]);
+
+  return {
+    sessionCount: sessions,
+    photoCount: photos,
+    usage: health.supported ? health.usage : undefined,
+    quota: health.supported ? health.quota : undefined,
+    percentUsed: health.supported ? health.percentUsed : undefined,
+  };
+}
+
 async function importV1Json(payload: Partial<ExportPayloadV1>): Promise<number> {
   if (payload.app !== 'kiro-fishing' || !Array.isArray(payload.sessions)) {
     throw new Error('storage.invalid_format');

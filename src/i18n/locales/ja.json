@@ -12,7 +12,13 @@
   },
   "settings": {
     "title": "設定",
-    "subtitle": "ストレージとバックアップを管理"
+    "subtitle": "ストレージとバックアップを管理",
+    "backups_title": "インポート / エクスポート",
+    "backups_subtitle": "釣行データをバックアップして後で復元できます。",
+    "export_preview": "エクスポート内容: {{sessions}} 件, 写真 {{photos}} 枚",
+    "storage_title": "ストレージ",
+    "storage_subtitle": "使用量の確認と永続ストレージの有効化。",
+    "persistent_storage_label": "永続ストレージ"
   },
   "landing": {
     "hero_title": "スイスの釣りをもっと楽しく",

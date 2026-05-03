@@ -12,7 +12,13 @@
   },
   "settings": {
     "title": "Einstellungen",
-    "subtitle": "Speicher und Backups verwalten"
+    "subtitle": "Speicher und Backups verwalten",
+    "backups_title": "Import / Export",
+    "backups_subtitle": "Sichere deine Ausfahrten und stell sie später wieder her.",
+    "export_preview": "Export-Vorschau: {{sessions}} Ausfahrten, {{photos}} Fotos",
+    "storage_title": "Speicher",
+    "storage_subtitle": "Belegung anzeigen und permanenten Speicher aktivieren.",
+    "persistent_storage_label": "Permanenter Speicher"
   },
   "landing": {
     "hero_title": "Dein Schweizer Angelbegleiter",

@@ -12,7 +12,13 @@
   },
   "settings": {
     "title": "Impostazioni",
-    "subtitle": "Gestisci archiviazione e backup"
+    "subtitle": "Gestisci archiviazione e backup",
+    "backups_title": "Import / Export",
+    "backups_subtitle": "Esegui il backup delle uscite e ripristinale in seguito.",
+    "export_preview": "Anteprima export: {{sessions}} uscite, {{photos}} foto",
+    "storage_title": "Archiviazione",
+    "storage_subtitle": "Vedi l'utilizzo e abilita l'archiviazione persistente.",
+    "persistent_storage_label": "Archiviazione persistente"
   },
   "landing": {
     "hero_title": "Il tuo compagno di pesca svizzero",

@@ -12,7 +12,13 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Manage storage and backups"
+    "subtitle": "Manage storage and backups",
+    "backups_title": "Import / Export",
+    "backups_subtitle": "Back up your sessions and restore them later.",
+    "export_preview": "Export preview: {{sessions}} sessions, {{photos}} photos",
+    "storage_title": "Storage",
+    "storage_subtitle": "See usage and enable persistent storage.",
+    "persistent_storage_label": "Persistent storage"
   },
   "landing": {
     "hero_title": "Your Swiss Fishing Companion",
