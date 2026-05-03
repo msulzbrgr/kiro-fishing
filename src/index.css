@@ -1633,15 +1633,6 @@ textarea {
 .data-manager .btn {
   font-size: 11px;
   padding: 5px 9px;
-  border: 1.5px solid rgba(255,255,255,0.3);
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.9);
-}
-
-.data-manager .btn:hover {
-  background: rgba(255,255,255,0.2);
-  border-color: rgba(255,255,255,0.5);
-  color: white;
 }
 
 .data-status {
@@ -1660,7 +1651,7 @@ textarea {
 
 .data-status--error {
   background: rgba(231, 76, 60, 0.2);
-  color: #ffc9c4;
+  color: var(--danger);
 }
 
 /* ===== Landing Page ===== */
