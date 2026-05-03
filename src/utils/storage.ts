@@ -6,6 +6,7 @@ import { migrateSession } from './sessionVersioning';
 
 const EXPORT_FORMAT_VERSION_V2 = '2.0';
 const LEGACY_MIGRATION_META_KEY = 'legacy_localstorage_migration_v1_done';
+let idFallbackCounter = 0;
 
 export interface ExportPayloadV1 {
   version: string;
@@ -295,7 +296,17 @@ export async function deleteSession(id: string): Promise<void> {
 }
 
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const random = crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+    return `${Date.now()}-${random}`;
+  }
+
+  idFallbackCounter += 1;
+  return `${Date.now()}-${idFallbackCounter}`;
 }
 
 function triggerDownload(blob: Blob, filename: string): void {
@@ -402,11 +413,16 @@ async function importV2Zip(file: File): Promise<number> {
     if (!zipFile) continue;
 
     const blob = await zipFile.async('blob');
+    const manifestMimeType = photoEntry.mimeType?.trim();
+    const mimeType = manifestMimeType || blob.type || 'application/octet-stream';
+    if (!manifestMimeType && !blob.type) {
+      console.warn('importData: missing photo mimeType, falling back to application/octet-stream', photoEntry.id);
+    }
     await tx.objectStore('photos').put({
       id: photoEntry.id,
       sessionId: photoEntry.sessionId,
       catchId: photoEntry.catchId,
-      mimeType: photoEntry.mimeType || blob.type || 'application/octet-stream',
+      mimeType,
       blob,
       createdAt: new Date().toISOString(),
     });
@@ -432,7 +448,7 @@ export async function importData(
     const payload = JSON.parse(text) as Partial<ExportPayloadV1>;
 
     if (payload.version === EXPORT_FORMAT_VERSION_V2) {
-      return { success: false, error: 'storage.invalid_format' };
+      return { success: false, error: 'storage.v2_requires_zip' };
     }
 
     const count = await importV1Json(payload);

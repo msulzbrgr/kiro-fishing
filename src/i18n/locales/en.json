@@ -157,7 +157,8 @@
     "persistent_no": "Persistent storage: not enabled",
     "request_persistence": "Enable persistent storage",
     "persistence_enabled": "Persistent storage enabled.",
-    "persistence_failed": "Could not enable persistent storage on this browser."
+    "persistence_failed": "Could not enable persistent storage on this browser.",
+    "v2_requires_zip": "This backup requires importing the ZIP file, not manifest.json directly."
   },
   "regulation": {
     "review_required_title": "Regulation information",

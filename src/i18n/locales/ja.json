@@ -64,7 +64,7 @@
     "tab_map": "地図",
     "finish": "釣行を終了",
     "delete": "釣行を削除",
-    "loading": "Loading sessions…"
+    "loading": "釣行データを読み込み中…"
   },
   "new_session": {
     "title": "新しい釣行を始めよう",
@@ -144,20 +144,21 @@
     "import_confirm": "現在のデータがすべて上書きされる。本当にいい？",
     "export_tooltip": "釣行データをJSONでダウンロード",
     "import_tooltip": "以前のエクスポートからデータを復元",
-    "exporting": "Exporting…"
+    "exporting": "エクスポート中…"
   },
   "storage": {
     "read_failed": "ファイルを読み込めなかった。",
     "invalid_format": "ファイル形式が無効。",
     "parse_failed": "ファイルを解析できなかった。",
     "quota_exceeded": "ストレージ容量が上限に達した。写真を削除するか、古い釣行をエクスポート/削除して容量を確保してね。",
-    "load_failed": "Failed to load saved sessions.",
-    "usage": "Storage used",
-    "persistent_yes": "Persistent storage: enabled",
-    "persistent_no": "Persistent storage: not enabled",
-    "request_persistence": "Enable persistent storage",
-    "persistence_enabled": "Persistent storage enabled.",
-    "persistence_failed": "Could not enable persistent storage on this browser."
+    "load_failed": "保存済みの釣行データを読み込めませんでした。",
+    "usage": "使用中のストレージ",
+    "persistent_yes": "永続ストレージ: 有効",
+    "persistent_no": "永続ストレージ: 無効",
+    "request_persistence": "永続ストレージを有効化",
+    "persistence_enabled": "永続ストレージを有効化しました。",
+    "persistence_failed": "このブラウザでは永続ストレージを有効化できませんでした。",
+    "v2_requires_zip": "このバックアップは manifest.json 単体ではなく ZIP ファイルとしてインポートしてください。"
   },
   "regulation": {
     "review_required_title": "規制情報",

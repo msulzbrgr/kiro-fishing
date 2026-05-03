@@ -64,7 +64,7 @@
     "tab_map": "Carte",
     "finish": "Terminer la sortie",
     "delete": "Supprimer la sortie",
-    "loading": "Loading sessions…"
+    "loading": "Chargement des sessions…"
   },
   "new_session": {
     "title": "Nouvelle sortie de pêche",
@@ -144,20 +144,21 @@
     "import_confirm": "Cela remplacera toutes les données actuelles. Continuer?",
     "export_tooltip": "Télécharger toutes vos données de pêche en JSON",
     "import_tooltip": "Restaurer les données d'un export précédent",
-    "exporting": "Exporting…"
+    "exporting": "Export en cours…"
   },
   "storage": {
     "read_failed": "Impossible de lire le fichier.",
     "invalid_format": "Format de fichier invalide.",
     "parse_failed": "Impossible d'analyser le fichier.",
     "quota_exceeded": "Quota de stockage dépassé. Supprimez des photos ou exportez/supprimez d’anciennes sorties pour libérer de l’espace.",
-    "load_failed": "Failed to load saved sessions.",
-    "usage": "Storage used",
-    "persistent_yes": "Persistent storage: enabled",
-    "persistent_no": "Persistent storage: not enabled",
-    "request_persistence": "Enable persistent storage",
-    "persistence_enabled": "Persistent storage enabled.",
-    "persistence_failed": "Could not enable persistent storage on this browser."
+    "load_failed": "Impossible de charger les sessions enregistrées.",
+    "usage": "Stockage utilisé",
+    "persistent_yes": "Stockage persistant : activé",
+    "persistent_no": "Stockage persistant : non activé",
+    "request_persistence": "Activer le stockage persistant",
+    "persistence_enabled": "Stockage persistant activé.",
+    "persistence_failed": "Impossible d’activer le stockage persistant dans ce navigateur.",
+    "v2_requires_zip": "Cette sauvegarde doit être importée en fichier ZIP, pas via manifest.json seule."
   },
   "regulation": {
     "review_required_title": "Informations réglementaires",

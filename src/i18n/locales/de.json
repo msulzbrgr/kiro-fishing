@@ -64,7 +64,7 @@
     "tab_map": "Karte",
     "finish": "Ausfahrt beenden",
     "delete": "Ausfahrt löschen",
-    "loading": "Loading sessions…"
+    "loading": "Sitzungen werden geladen…"
   },
   "new_session": {
     "title": "Neue Angelausfahrt",
@@ -144,20 +144,21 @@
     "import_confirm": "Achtung: alle Daten werden ersetzt. Weiter?",
     "export_tooltip": "Alle Angeldaten als JSON herunterladen",
     "import_tooltip": "Daten aus einem früheren Export laden",
-    "exporting": "Exporting…"
+    "exporting": "Export wird erstellt…"
   },
   "storage": {
     "read_failed": "Datei konnte nicht gelesen werden.",
     "invalid_format": "Ungültiges Dateiformat.",
     "parse_failed": "Datei konnte nicht verarbeitet werden.",
     "quota_exceeded": "Speicherlimit erreicht. Entferne Fotos oder exportiere/lösche alte Ausfahrten, um Platz zu schaffen.",
-    "load_failed": "Failed to load saved sessions.",
-    "usage": "Storage used",
-    "persistent_yes": "Persistent storage: enabled",
-    "persistent_no": "Persistent storage: not enabled",
-    "request_persistence": "Enable persistent storage",
-    "persistence_enabled": "Persistent storage enabled.",
-    "persistence_failed": "Could not enable persistent storage on this browser."
+    "load_failed": "Gespeicherte Sitzungen konnten nicht geladen werden.",
+    "usage": "Genutzter Speicher",
+    "persistent_yes": "Dauerhafte Speicherung: aktiviert",
+    "persistent_no": "Dauerhafte Speicherung: nicht aktiviert",
+    "request_persistence": "Dauerhafte Speicherung aktivieren",
+    "persistence_enabled": "Dauerhafte Speicherung aktiviert.",
+    "persistence_failed": "Dauerhafte Speicherung konnte in diesem Browser nicht aktiviert werden.",
+    "v2_requires_zip": "Dieses Backup muss als ZIP-Datei importiert werden, nicht als einzelne manifest.json."
   },
   "regulation": {
     "review_required_title": "Vorschriften",

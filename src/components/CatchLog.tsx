@@ -18,7 +18,7 @@ import { generateId, saveSession } from '../utils/storage';
 
 interface CatchLogProps {
   session: FishingSession;
-  onSessionUpdate: (session: FishingSession) => void;
+  onSessionUpdate: (session: FishingSession) => Promise<void>;
 }
 
 interface CatchFormState {
@@ -146,7 +146,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     try {
       const savedSession = await saveSession(updated);
       setSaveError('');
-      onSessionUpdate(savedSession);
+      await onSessionUpdate(savedSession);
       setForm(EMPTY_FORM);
       setShowForm(false);
     } catch (err) {
@@ -164,7 +164,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       catches: session.catches.filter((c) => c.id !== id),
     };
     const savedSession = await saveSession(updated);
-    onSessionUpdate(savedSession);
+    await onSessionUpdate(savedSession);
   };
 
   return (
