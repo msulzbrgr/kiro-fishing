@@ -9,7 +9,7 @@ export const REGULATION_RECORDS: RegulationRecord[] = [
     content:
       'Das Fischerpatent für Kanton Solothurn kann online über die offizielle Website des Amts für Wald, Jagd und Fischerei (AWJF) oder direkt am Schalter erworben werden. Jahres- und Tagespatente sind verfügbar.',
     sourceUrl:
-      'https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-wald-jagd-und-fischerei/fischerei/fischerpatent/',
+      'https://so.ch/services/fischerpatent-beantragen/',
     extractedDate: '2026-04-15',
     effectiveYear: 2026,
     confidence: 'high',
