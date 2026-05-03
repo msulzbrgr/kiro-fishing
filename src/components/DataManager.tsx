@@ -11,11 +11,12 @@ import {
 
 interface DataManagerProps {
   onImportSuccess: () => void;
+  onStorageHealthChange?: (health: StorageHealth | null) => void;
 }
 
 const BYTES_PER_MB = 1024 * 1024;
 
-export default function DataManager({ onImportSuccess }: DataManagerProps) {
+export default function DataManager({ onImportSuccess, onStorageHealthChange }: DataManagerProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<
@@ -28,7 +29,8 @@ export default function DataManager({ onImportSuccess }: DataManagerProps) {
   const refreshStorageHealth = useCallback(async () => {
     const next = await getStorageHealth();
     setStorageHealth(next);
-  }, []);
+    onStorageHealthChange?.(next);
+  }, [onStorageHealthChange]);
 
   useEffect(() => {
     let cancelled = false;

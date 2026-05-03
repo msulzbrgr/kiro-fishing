@@ -9,9 +9,9 @@ test.describe('Navigation', () => {
     await page.goto('/');
   });
 
-  test('bottom nav has four items', async ({ page }) => {
+  test('bottom nav has five items', async ({ page }) => {
     const navItems = page.locator('.nav-item');
-    await expect(navItems).toHaveCount(4);
+    await expect(navItems).toHaveCount(5);
   });
 
   test('Home nav item is active by default', async ({ page }) => {

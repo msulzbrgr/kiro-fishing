@@ -229,6 +229,22 @@ textarea {
   color: white;
 }
 
+.nav-icon {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--danger, #e03131);
+  border: 2px solid var(--surface);
+}
+
 /* ===== Cards ===== */
 .card {
   background: var(--surface);

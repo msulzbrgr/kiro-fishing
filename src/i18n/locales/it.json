@@ -7,7 +7,12 @@
     "home": "Home",
     "sessions": "Uscite",
     "new": "Nuovo",
-    "laws": "Leggi"
+    "laws": "Leggi",
+    "settings": "Impostazioni"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Gestisci archiviazione e backup"
   },
   "landing": {
     "hero_title": "Il tuo compagno di pesca svizzero",

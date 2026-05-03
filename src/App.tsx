@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Map, List, Plus, Home } from 'lucide-react';
+import { Map, List, Plus, Home, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingSession } from './types';
 import { loadSessions, saveSession } from './utils/storage';
@@ -8,12 +8,12 @@ import SessionList from './components/SessionList';
 import NewSessionForm from './components/NewSessionForm';
 import LandingPage from './components/LandingPage';
 import LanguageSwitcher from './components/LanguageSwitcher';
-import DataManager from './components/DataManager';
+import SettingsView from './components/SettingsView';
 import CantonOverview from './components/CantonOverview';
 import logoApp from './assets/KiroFishingLogoApp.png';
 import './App.css';
 
-type Tab = 'home' | 'map' | 'sessions' | 'new';
+type Tab = 'home' | 'map' | 'sessions' | 'new' | 'settings';
 
 function App() {
   const { t } = useTranslation();
@@ -21,6 +21,7 @@ function App() {
   const [sessions, setSessions] = useState<FishingSession[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [sessionsError, setSessionsError] = useState<string | null>(null);
+  const [showSettingsBadge, setShowSettingsBadge] = useState(false);
 
   const refreshSessions = useCallback(async () => {
     try {
@@ -80,6 +81,10 @@ function App() {
     setActiveTab('sessions');
   }, [refreshSessions]);
 
+  const handleSettingsBadgeChange = useCallback((shouldShow: boolean) => {
+    setShowSettingsBadge(shouldShow);
+  }, []);
+
   return (
     <div className="app">
       <header className="app-header">
@@ -92,7 +97,6 @@ function App() {
             <img src={logoApp} alt="KiroFishing" width="36" height="36" className="brand-img" />
           </button>
           <div className="header-right">
-            <DataManager onImportSuccess={handleImportSuccess} />
             <LanguageSwitcher />
           </div>
         </div>
@@ -138,6 +142,15 @@ function App() {
             />
           </div>
         )}
+
+        {activeTab === 'settings' && (
+          <div className="page">
+            <SettingsView
+              onImportSuccess={handleImportSuccess}
+              onBadgeChange={handleSettingsBadgeChange}
+            />
+          </div>
+        )}
       </main>
 
       <nav className="bottom-nav">
@@ -172,6 +185,17 @@ function App() {
         >
           <Map size={22} />
           <span>{t('nav.laws')}</span>
+        </button>
+        <button
+          className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+          data-testid="nav-settings"
+        >
+          <span className="nav-icon">
+            <Settings size={22} />
+            {showSettingsBadge && <span className="nav-badge" aria-hidden="true" />}
+          </span>
+          <span>{t('nav.settings')}</span>
         </button>
       </nav>
     </div>

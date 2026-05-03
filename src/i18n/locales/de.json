@@ -7,7 +7,12 @@
     "home": "Start",
     "sessions": "Ausfahrten",
     "new": "Neu",
-    "laws": "Gesetze"
+    "laws": "Gesetze",
+    "settings": "Einstellungen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Speicher und Backups verwalten"
   },
   "landing": {
     "hero_title": "Dein Schweizer Angelbegleiter",
