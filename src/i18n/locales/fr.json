@@ -7,7 +7,12 @@
     "home": "Accueil",
     "sessions": "Sorties",
     "new": "Nouveau",
-    "laws": "Lois"
+    "laws": "Lois",
+    "settings": "Paramètres"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérer le stockage et les sauvegardes"
   },
   "landing": {
     "hero_title": "Votre compagnon de pêche suisse",

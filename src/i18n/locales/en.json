@@ -7,7 +7,12 @@
     "home": "Home",
     "sessions": "Sessions",
     "new": "New",
-    "laws": "Laws"
+    "laws": "Laws",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage storage and backups"
   },
   "landing": {
     "hero_title": "Your Swiss Fishing Companion",

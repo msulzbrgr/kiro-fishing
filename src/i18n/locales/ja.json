@@ -7,7 +7,12 @@
     "home": "ホーム",
     "sessions": "釣行",
     "new": "新規",
-    "laws": "規則"
+    "laws": "規則",
+    "settings": "設定"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "ストレージとバックアップを管理"
   },
   "landing": {
     "hero_title": "スイスの釣りをもっと楽しく",

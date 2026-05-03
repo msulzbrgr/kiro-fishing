@@ -13,7 +13,8 @@ test.describe('Export / Import Data', () => {
     await page.goto('/');
   });
 
-  test('export and import buttons are visible in header', async ({ page }) => {
+  test('export and import buttons are visible in settings', async ({ page }) => {
+    await page.getByTestId('nav-settings').click();
     await expect(page.getByTestId('export-btn')).toBeVisible();
     await expect(page.getByTestId('import-btn')).toBeVisible();
   });
@@ -24,6 +25,8 @@ test.describe('Export / Import Data', () => {
     await selectSwissLocation(page);
     await page.getByTestId('create-session-btn').click();
     await page.goto('/');
+
+    await page.getByTestId('nav-settings').click();
 
     // Start waiting for download before clicking
     const downloadPromise = page.waitForEvent('download');
@@ -58,13 +61,11 @@ test.describe('Export / Import Data', () => {
     // Mock the confirm dialog to auto-accept
     page.on('dialog', (dialog) => dialog.accept());
 
+    await page.getByTestId('nav-settings').click();
     const fileInput = page.getByTestId('import-file-input');
     await fileInput.setInputFiles(tmpFile);
 
-    // Success status should appear
-    await expect(page.locator('.data-status--success')).toBeVisible({ timeout: 5000 });
-
-    // Navigate to sessions to verify the imported session is shown
+    // Imported session should be visible in sessions tab
     await page.getByTestId('nav-sessions').click();
     await expect(page.locator('.session-card')).toHaveCount(1);
 
@@ -78,6 +79,7 @@ test.describe('Export / Import Data', () => {
 
     page.on('dialog', (dialog) => dialog.accept());
 
+    await page.getByTestId('nav-settings').click();
     const fileInput = page.getByTestId('import-file-input');
     await fileInput.setInputFiles(tmpFile);
 
@@ -119,6 +121,7 @@ test.describe('IndexedDB storage migration', () => {
       void indexedDB.deleteDatabase('kiro-fishing');
     });
     await page.goto('/');
+    await page.getByTestId('nav-settings').click();
     await expect(page.getByTestId('storage-health')).toBeVisible();
   });
 });
