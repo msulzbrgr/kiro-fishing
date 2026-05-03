@@ -301,7 +301,7 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Hecht (Pike)', sizeCm: 40 },
       { species: 'Äsche (Grayling)', sizeCm: 30 },
     ],
-    permitPurchaseUrl: 'https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-wald-jagd-und-fischerei/fischerei/fischerpatent/',
+    permitPurchaseUrl: 'https://so.ch/services/fischerpatent-beantragen/',
     lastVerified: '2026-04-15',
     regulationYear: 2026,
   },

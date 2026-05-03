@@ -15,7 +15,7 @@ export const REGULATION_SOURCES: RegulationSource[] = [
   },
   {
     canton: 'SO',
-    url: 'https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-wald-jagd-und-fischerei/fischerei/fischerpatent/',
+    url: 'https://so.ch/services/fischerpatent-beantragen/',
     type: 'permit_portal',
     language: 'de',
     trustLevel: 'high',
