@@ -13,6 +13,8 @@ interface DataManagerProps {
   onImportSuccess: () => void;
 }
 
+const BYTES_PER_MB = 1024 * 1024;
+
 export default function DataManager({ onImportSuccess }: DataManagerProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,9 +31,17 @@ export default function DataManager({ onImportSuccess }: DataManagerProps) {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void refreshStorageHealth();
-  }, [refreshStorageHealth]);
+    let cancelled = false;
+    void (async () => {
+      const next = await getStorageHealth();
+      if (!cancelled) {
+        setStorageHealth(next);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleExport = async () => {
     setExporting(true);
@@ -114,7 +124,7 @@ export default function DataManager({ onImportSuccess }: DataManagerProps) {
         <input
           ref={fileInputRef}
           type="file"
-          accept="application/json,.json,application/zip,.zip"
+          accept=".json,.zip"
           style={{ display: 'none' }}
           onChange={handleFileChange}
           data-testid="import-file-input"
@@ -134,9 +144,9 @@ export default function DataManager({ onImportSuccess }: DataManagerProps) {
       {storageHealth?.supported && (
         <div className="data-status" data-testid="storage-health">
           <span>
-            {t('storage.usage')}: {Math.round((storageHealth.usage ?? 0) / (1024 * 1024))} MB
+            {t('storage.usage')}: {Math.round((storageHealth.usage ?? 0) / BYTES_PER_MB)} MB
             {typeof storageHealth.quota === 'number'
-              ? ` / ${Math.round(storageHealth.quota / (1024 * 1024))} MB`
+              ? ` / ${Math.round(storageHealth.quota / BYTES_PER_MB)} MB`
               : ''}
             {typeof storageHealth.percentUsed === 'number' ? ` (${storageHealth.percentUsed}%)` : ''}
           </span>

@@ -271,10 +271,10 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
           <div className="tab-content">
             {activeTab === 'catches' && (
-              <CatchLog session={session} onSessionUpdate={(nextSession) => void onUpdate(nextSession)} />
+              <CatchLog session={session} onSessionUpdate={onUpdate} />
             )}
             {activeTab === 'conditions' && (
-              <ConditionsForm session={session} onSessionUpdate={(nextSession) => void onUpdate(nextSession)} />
+              <ConditionsForm session={session} onSessionUpdate={onUpdate} />
             )}
             {activeTab === 'map' && (
               <MapView
@@ -309,7 +309,11 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                 className="btn btn-danger btn-sm"
                 onClick={() => {
                   if (confirm(t('sessions.delete_confirm'))) {
-                    void deleteSession(session.id).then(() => onDelete(session.id));
+                    void deleteSession(session.id)
+                      .then(() => onDelete(session.id))
+                      .catch((err) => {
+                        console.error('Failed to delete session', err);
+                      });
                   }
                 }}
               >

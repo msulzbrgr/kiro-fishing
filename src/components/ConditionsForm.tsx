@@ -6,7 +6,7 @@ import { saveSession } from '../utils/storage';
 
 interface ConditionsFormProps {
   session: FishingSession;
-  onSessionUpdate: (session: FishingSession) => void;
+  onSessionUpdate: (session: FishingSession) => Promise<void>;
 }
 
 export default function ConditionsForm({ session, onSessionUpdate }: ConditionsFormProps) {
@@ -45,7 +45,7 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
   const handleSave = async () => {
     const updated: FishingSession = { ...session, weather, water };
     const savedSession = await saveSession(updated);
-    onSessionUpdate(savedSession);
+    await onSessionUpdate(savedSession);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

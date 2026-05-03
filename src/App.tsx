@@ -36,9 +36,30 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void refreshSessions();
-  }, [refreshSessions]);
+    let cancelled = false;
+    void (async () => {
+      try {
+        setSessionsError(null);
+        const loaded = await loadSessions();
+        if (!cancelled) {
+          setSessions(loaded);
+        }
+      } catch (err) {
+        console.error('Failed to load sessions', err);
+        if (!cancelled) {
+          setSessionsError('storage.load_failed');
+        }
+      } finally {
+        if (!cancelled) {
+          setSessionsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSessionCreated = useCallback((session: FishingSession) => {
     setSessions((prev) => [session, ...prev]);
