@@ -8,9 +8,14 @@ import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
 export type FishingSessionV0 = Omit<FishingSession, 'schemaVersion'>;
 
 /**
- * V1 — current version. Adds the `schemaVersion: 1` discriminant.
+ * V1 — adds the `schemaVersion: 1` discriminant.
  */
 export type FishingSessionV1 = FishingSessionV0 & { schemaVersion: 1 };
+
+/**
+ * V2 — current version. Introduces optional catch `photoIds`.
+ */
+export type FishingSessionV2 = Omit<FishingSessionV1, 'schemaVersion'> & { schemaVersion: 2 };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -26,6 +31,17 @@ function isFishingSessionV0(raw: unknown): raw is FishingSessionV0 {
 
 function migrateV0toV1(v0: FishingSessionV0): FishingSessionV1 {
   return { ...v0, schemaVersion: 1 };
+}
+
+function migrateV1toV2(v1: FishingSessionV1): FishingSessionV2 {
+  return {
+    ...v1,
+    schemaVersion: 2,
+    catches: (v1.catches ?? []).map((entry) => ({
+      ...entry,
+      photoIds: entry.photoIds ?? undefined,
+    })),
+  };
 }
 
 /**
@@ -45,7 +61,7 @@ export function migrateSession(raw: unknown): FishingSession {
   }
 
   if (isFishingSessionV0(raw)) {
-    return migrateV0toV1(raw);
+    return migrateV1toV2(migrateV0toV1(raw));
   }
 
   const schemaVersion = raw.schemaVersion;
@@ -53,7 +69,11 @@ export function migrateSession(raw: unknown): FishingSession {
   if (typeof schemaVersion !== 'number') {
     // Malformed schemaVersion — treat defensively as V0
     console.warn('migrateSession: non-numeric schemaVersion, treating as V0', raw);
-    return migrateV0toV1(raw as FishingSessionV0);
+    return migrateV1toV2(migrateV0toV1(raw as FishingSessionV0));
+  }
+
+  if (schemaVersion === 1) {
+    return migrateV1toV2(raw as FishingSessionV1);
   }
 
   if (schemaVersion > CURRENT_SESSION_SCHEMA_VERSION) {

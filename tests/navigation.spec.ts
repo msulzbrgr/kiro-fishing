@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Navigation', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
     await page.goto('/');
   });
 

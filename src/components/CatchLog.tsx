@@ -121,7 +121,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     };
   };
 
-  const handleAddCatch = () => {
+  const handleAddCatch = async () => {
     if (!form.species.trim()) return;
 
     const newCatch: Catch = {
@@ -144,9 +144,9 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     };
 
     try {
-      saveSession(updated);
+      const savedSession = await saveSession(updated);
       setSaveError('');
-      onSessionUpdate(updated);
+      onSessionUpdate(savedSession);
       setForm(EMPTY_FORM);
       setShowForm(false);
     } catch (err) {
@@ -158,13 +158,13 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     }
   };
 
-  const handleDeleteCatch = (id: string) => {
+  const handleDeleteCatch = async (id: string) => {
     const updated: FishingSession = {
       ...session,
       catches: session.catches.filter((c) => c.id !== id),
     };
-    saveSession(updated);
-    onSessionUpdate(updated);
+    const savedSession = await saveSession(updated);
+    onSessionUpdate(savedSession);
   };
 
   return (

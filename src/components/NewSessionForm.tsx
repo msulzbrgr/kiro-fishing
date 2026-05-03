@@ -41,7 +41,7 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
     title: regulationSnapshot.sourceTitles[index] ?? url,
   })) ?? [];
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!location || !regulationSnapshot || !canCreateSession) return;
 
     const session: FishingSession = {
@@ -58,8 +58,8 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
       regulationState: getRegulationStateAfterConfirmation(regulationSnapshot),
       regulationCheckpoints: [],
     };
-    saveSession(session);
-    onSessionCreated(session);
+    const savedSession = await saveSession(session);
+    onSessionCreated(savedSession);
   };
 
   return (

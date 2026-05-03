@@ -1,149 +1,483 @@
-import type { FishingSession } from '../types';
+import JSZip from 'jszip';
+import type { Catch, FishingSession } from '../types';
 import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
+import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord } from './indexedDb';
 import { migrateSession } from './sessionVersioning';
 
-const STORAGE_KEY = 'kiro_fishing_sessions';
-const EXPORT_FORMAT_VERSION = '1.0';
+const EXPORT_FORMAT_VERSION_V2 = '2.0';
+const LEGACY_MIGRATION_META_KEY = 'legacy_localstorage_migration_v1_done';
 
-export function loadSessions(): FishingSession[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return [];
-    const raw: unknown = JSON.parse(data);
-    if (!Array.isArray(raw)) return [];
-    const result: FishingSession[] = [];
-    for (const entry of raw) {
-      try {
-        result.push(migrateSession(entry));
-      } catch {
-        console.warn('loadSessions: skipping invalid session entry', entry);
-      }
-    }
-    return result;
-  } catch {
-    return [];
-  }
-}
-
-export function saveSessions(sessions: FishingSession[]): void {
-  const versioned = sessions.map((s) => ({
-    ...s,
-    schemaVersion: CURRENT_SESSION_SCHEMA_VERSION,
-  }));
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(versioned));
-  } catch (err) {
-    // Most common cause: browser storage quota exceeded (e.g. large base64 photos).
-    console.error('saveSessions: failed to persist sessions', err);
-    throw err;
-  }
-}
-
-export function saveSession(session: FishingSession): void {
-  const sessions = loadSessions();
-  const idx = sessions.findIndex((s) => s.id === session.id);
-  if (idx >= 0) {
-    sessions[idx] = session;
-  } else {
-    sessions.unshift(session);
-  }
-  saveSessions(sessions);
-}
-
-export function deleteSession(id: string): void {
-  const sessions = loadSessions().filter((s) => s.id !== id);
-  saveSessions(sessions);
-}
-
-export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-// ─── Export / Import ────────────────────────────────────────────────────────
-
-export interface ExportPayload {
+export interface ExportPayloadV1 {
   version: string;
   app: string;
   exportedAt: string;
   sessions: FishingSession[];
 }
 
-/**
- * Exports all sessions as a downloadable JSON file.
- * Compatible with Chromium, Firefox, Vivaldi, Brave, and Safari (modern versions)
- * by using a dynamically created <a> with a Blob object URL.
- */
-export function exportData(): void {
-  const sessions = loadSessions();
-  const payload: ExportPayload = {
-    version: EXPORT_FORMAT_VERSION,
-    app: 'kiro-fishing',
-    exportedAt: new Date().toISOString(),
-    sessions,
+interface ExportPhotoManifestEntry {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  sessionId: string;
+  catchId: string;
+}
+
+interface ExportPayloadV2 {
+  version: string;
+  app: string;
+  exportedAt: string;
+  sessions: FishingSession[];
+  photos: ExportPhotoManifestEntry[];
+}
+
+interface SaveSessionResult {
+  storedSession: FishingSession;
+  newPhotoRecords: PhotoRecord[];
+  obsoletePhotoIds: string[];
+}
+
+function isDataUrl(value: string): boolean {
+  return value.startsWith('data:');
+}
+
+function getMimeFromDataUrl(dataUrl: string): string {
+  const match = dataUrl.match(/^data:([^;]+);base64,/);
+  return match?.[1] ?? 'application/octet-stream';
+}
+
+function dataUrlToBlob(dataUrl: string): Blob {
+  const commaIndex = dataUrl.indexOf(',');
+  if (commaIndex < 0) {
+    throw new Error('Invalid data URL');
+  }
+
+  const mimeType = getMimeFromDataUrl(dataUrl);
+  const base64 = dataUrl.slice(commaIndex + 1);
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i += 1) {
+    byteNumbers[i] = byteChars.charCodeAt(i);
+  }
+
+  return new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
+}
+
+function stripInlinePhotos(session: FishingSession): FishingSession {
+  return {
+    ...session,
+    schemaVersion: CURRENT_SESSION_SCHEMA_VERSION,
+    catches: session.catches.map((catchEntry) => ({
+      ...catchEntry,
+      photos: undefined,
+    })),
   };
+}
 
-  const json = JSON.stringify(payload, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
+function cloneSessionForUi(session: FishingSession): FishingSession {
+  return {
+    ...session,
+    catches: session.catches.map((catchEntry) => ({ ...catchEntry })),
+  };
+}
+
+function sortSessions(sessions: FishingSession[]): FishingSession[] {
+  return [...sessions].sort((a, b) => {
+    if (a.date !== b.date) return b.date.localeCompare(a.date);
+    if (a.startTime !== b.startTime) return b.startTime.localeCompare(a.startTime);
+    return b.id.localeCompare(a.id);
+  });
+}
+
+async function hydrateSessionPhotos(session: FishingSession): Promise<FishingSession> {
+  const db = await getDb();
+  const hydrated = cloneSessionForUi(session);
+
+  for (const catchEntry of hydrated.catches) {
+    if (!catchEntry.photoIds || catchEntry.photoIds.length === 0) {
+      catchEntry.photos = undefined;
+      continue;
+    }
+
+    const photoRecords = await Promise.all(
+      catchEntry.photoIds.map((id) => db.get('photos', id)),
+    );
+
+    catchEntry.photos = photoRecords
+      .filter((record): record is PhotoRecord => Boolean(record))
+      .map((record) => URL.createObjectURL(record.blob));
+  }
+
+  return hydrated;
+}
+
+function collectPhotoIds(session: FishingSession): Set<string> {
+  const ids = new Set<string>();
+  for (const catchEntry of session.catches) {
+    for (const photoId of catchEntry.photoIds ?? []) {
+      ids.add(photoId);
+    }
+  }
+  return ids;
+}
+
+async function buildStoredSession(
+  next: FishingSession,
+  previous: FishingSession | undefined,
+): Promise<SaveSessionResult> {
+  const oldPhotoIds = previous ? collectPhotoIds(previous) : new Set<string>();
+  const nextPhotoIds = new Set<string>();
+  const newPhotoRecords: PhotoRecord[] = [];
+
+  const catches: Catch[] = [];
+
+  for (const catchEntry of next.catches) {
+    const currentPhotoIds = [...(catchEntry.photoIds ?? [])];
+    const inputPhotos = catchEntry.photos ?? [];
+
+    if (currentPhotoIds.length === 0 && inputPhotos.length > 0) {
+      for (const photo of inputPhotos) {
+        if (!isDataUrl(photo)) continue;
+        const id = generateId();
+        currentPhotoIds.push(id);
+        newPhotoRecords.push({
+          id,
+          sessionId: next.id,
+          catchId: catchEntry.id,
+          blob: dataUrlToBlob(photo),
+          mimeType: getMimeFromDataUrl(photo),
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    for (const id of currentPhotoIds) {
+      nextPhotoIds.add(id);
+    }
+
+    catches.push({
+      ...catchEntry,
+      photoIds: currentPhotoIds.length > 0 ? currentPhotoIds : undefined,
+      photos: undefined,
+    });
+  }
+
+  const obsoletePhotoIds = [...oldPhotoIds].filter((id) => !nextPhotoIds.has(id));
+
+  return {
+    storedSession: {
+      ...next,
+      schemaVersion: CURRENT_SESSION_SCHEMA_VERSION,
+      catches,
+    },
+    newPhotoRecords,
+    obsoletePhotoIds,
+  };
+}
+
+async function setMetaValue(key: string, value: unknown): Promise<void> {
+  const db = await getDb();
+  await db.put('meta', { key, value });
+}
+
+async function getMetaValue<T>(key: string): Promise<T | undefined> {
+  const db = await getDb();
+  const value = await db.get('meta', key);
+  return value?.value as T | undefined;
+}
+
+async function ensureLegacyMigration(): Promise<void> {
+  const migrationDone = await getMetaValue<boolean>(LEGACY_MIGRATION_META_KEY);
+  if (migrationDone) return;
+
+  const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (!legacy) {
+    await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
+    return;
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(legacy);
+  } catch {
+    await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
+    return;
+  }
+
+  if (!Array.isArray(parsed)) {
+    await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
+    return;
+  }
+
+  const migratedSessions: FishingSession[] = [];
+  for (const raw of parsed) {
+    try {
+      migratedSessions.push(migrateSession(raw));
+    } catch {
+      console.warn('ensureLegacyMigration: skipping invalid legacy session entry', raw);
+    }
+  }
+
+  await saveSessions(migratedSessions);
+  await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
+}
+
+async function replaceAllSessions(sessions: FishingSession[]): Promise<void> {
+  const db = await getDb();
+  const tx = db.transaction(['sessions', 'photos'], 'readwrite');
+  const sessionStore = tx.objectStore('sessions');
+  const photoStore = tx.objectStore('photos');
+
+  await Promise.all([sessionStore.clear(), photoStore.clear()]);
+
+  for (const rawSession of sessions) {
+    const session = migrateSession(rawSession);
+    const { storedSession, newPhotoRecords } = await buildStoredSession(session, undefined);
+    await sessionStore.put(stripInlinePhotos(storedSession));
+    for (const photo of newPhotoRecords) {
+      await photoStore.put(photo);
+    }
+  }
+
+  await tx.done;
+}
+
+export async function loadSessions(): Promise<FishingSession[]> {
+  await ensureLegacyMigration();
+  const db = await getDb();
+  const sessions = await db.getAll('sessions');
+  const hydrated = await Promise.all(sessions.map((session) => hydrateSessionPhotos(migrateSession(session))));
+  return sortSessions(hydrated);
+}
+
+export async function saveSessions(sessions: FishingSession[]): Promise<void> {
+  await replaceAllSessions(sessions);
+}
+
+export async function saveSession(session: FishingSession): Promise<FishingSession> {
+  await ensureLegacyMigration();
+  const db = await getDb();
+  const existing = await db.get('sessions', session.id);
+  const previous = existing ? migrateSession(existing) : undefined;
+
+  const { storedSession, newPhotoRecords, obsoletePhotoIds } = await buildStoredSession(session, previous);
+
+  const tx = db.transaction(['sessions', 'photos'], 'readwrite');
+  await tx.objectStore('sessions').put(stripInlinePhotos(storedSession));
+
+  for (const photoRecord of newPhotoRecords) {
+    await tx.objectStore('photos').put(photoRecord);
+  }
+
+  for (const photoId of obsoletePhotoIds) {
+    await tx.objectStore('photos').delete(photoId);
+  }
+
+  await tx.done;
+
+  return hydrateSessionPhotos(storedSession);
+}
+
+export async function deleteSession(id: string): Promise<void> {
+  await ensureLegacyMigration();
+  const db = await getDb();
+  const existing = await db.get('sessions', id);
+  const tx = db.transaction(['sessions', 'photos'], 'readwrite');
+
+  if (existing) {
+    const session = migrateSession(existing);
+    for (const photoId of collectPhotoIds(session)) {
+      await tx.objectStore('photos').delete(photoId);
+    }
+  }
+
+  await tx.objectStore('sessions').delete(id);
+  await tx.done;
+}
+
+export function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
-
-  const dateStr = new Date().toISOString().split('T')[0];
   const a = document.createElement('a');
   a.href = url;
-  a.download = `kiro-fishing-backup-${dateStr}.json`;
-
-  // Append to body for Firefox compatibility
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-
-  // Clean up the object URL after a short delay to allow the download to start
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-/**
- * Imports sessions from a JSON file exported by exportData().
- * Validates the payload before overwriting localStorage.
- */
-export function importData(
+export async function exportData(): Promise<void> {
+  await ensureLegacyMigration();
+  const db = await getDb();
+  const sessions = await db.getAll('sessions');
+  const photos = await db.getAll('photos');
+
+  const payload: ExportPayloadV2 = {
+    version: EXPORT_FORMAT_VERSION_V2,
+    app: 'kiro-fishing',
+    exportedAt: new Date().toISOString(),
+    sessions: sessions.map((session) => stripInlinePhotos(migrateSession(session))),
+    photos: photos.map((photo) => ({
+      id: photo.id,
+      fileName: `photos/${photo.id}`,
+      mimeType: photo.mimeType,
+      sessionId: photo.sessionId,
+      catchId: photo.catchId,
+    })),
+  };
+
+  const zip = new JSZip();
+  zip.file('manifest.json', JSON.stringify(payload, null, 2));
+  for (const photo of photos) {
+    zip.file(`photos/${photo.id}`, await photo.blob.arrayBuffer());
+  }
+
+  const content = await zip.generateAsync({ type: 'blob' });
+  const dateStr = new Date().toISOString().split('T')[0];
+  triggerDownload(content, `kiro-fishing-backup-${dateStr}.zip`);
+}
+
+async function importV1Json(payload: Partial<ExportPayloadV1>): Promise<number> {
+  if (payload.app !== 'kiro-fishing' || !Array.isArray(payload.sessions)) {
+    throw new Error('storage.invalid_format');
+  }
+
+  const sessions: FishingSession[] = [];
+  for (const entry of payload.sessions) {
+    try {
+      sessions.push(migrateSession(entry));
+    } catch {
+      console.warn('importData: skipping invalid V1 session entry', entry);
+    }
+  }
+
+  await saveSessions(sessions);
+  await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
+  return sessions.length;
+}
+
+async function importV2Zip(file: File): Promise<number> {
+  const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const manifestFile = zip.file('manifest.json');
+  if (!manifestFile) {
+    throw new Error('storage.invalid_format');
+  }
+
+  const manifestText = await manifestFile.async('string');
+  const payload = JSON.parse(manifestText) as Partial<ExportPayloadV2>;
+  if (
+    payload.app !== 'kiro-fishing'
+    || payload.version !== EXPORT_FORMAT_VERSION_V2
+    || !Array.isArray(payload.sessions)
+    || !Array.isArray(payload.photos)
+  ) {
+    throw new Error('storage.invalid_format');
+  }
+
+  const sessions: FishingSession[] = [];
+  for (const entry of payload.sessions) {
+    try {
+      sessions.push(migrateSession(entry));
+    } catch {
+      console.warn('importData: skipping invalid V2 session entry', entry);
+    }
+  }
+
+  const db = await getDb();
+  const tx = db.transaction(['sessions', 'photos'], 'readwrite');
+  await Promise.all([
+    tx.objectStore('sessions').clear(),
+    tx.objectStore('photos').clear(),
+  ]);
+
+  for (const session of sessions) {
+    await tx.objectStore('sessions').put(stripInlinePhotos(session));
+  }
+
+  for (const photoEntry of payload.photos) {
+    const zipFile = zip.file(photoEntry.fileName);
+    if (!zipFile) continue;
+
+    const blob = await zipFile.async('blob');
+    await tx.objectStore('photos').put({
+      id: photoEntry.id,
+      sessionId: photoEntry.sessionId,
+      catchId: photoEntry.catchId,
+      mimeType: photoEntry.mimeType || blob.type || 'application/octet-stream',
+      blob,
+      createdAt: new Date().toISOString(),
+    });
+  }
+
+  await tx.done;
+  await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
+  return sessions.length;
+}
+
+export async function importData(
   file: File,
 ): Promise<{ success: true; count: number } | { success: false; error: string }> {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
+  try {
+    const lowerName = file.name.toLowerCase();
 
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text !== 'string') {
-          resolve({ success: false, error: 'storage.read_failed' });
-          return;
-        }
+    if (lowerName.endsWith('.zip') || file.type === 'application/zip') {
+      const count = await importV2Zip(file);
+      return { success: true, count };
+    }
 
-        const payload = JSON.parse(text) as Partial<ExportPayload>;
+    const text = await file.text();
+    const payload = JSON.parse(text) as Partial<ExportPayloadV1>;
 
-        if (
-          payload.app !== 'kiro-fishing' ||
-          !Array.isArray(payload.sessions)
-        ) {
-          resolve({ success: false, error: 'storage.invalid_format' });
-          return;
-        }
+    if (payload.version === EXPORT_FORMAT_VERSION_V2) {
+      return { success: false, error: 'storage.invalid_format' };
+    }
 
-        const migratedSessions: FishingSession[] = [];
-        for (const entry of payload.sessions) {
-          try {
-            migratedSessions.push(migrateSession(entry));
-          } catch {
-            console.warn('importData: skipping invalid session entry', entry);
-          }
-        }
-        saveSessions(migratedSessions);
-        resolve({ success: true, count: migratedSessions.length });
-      } catch {
-        resolve({ success: false, error: 'storage.parse_failed' });
-      }
-    };
+    const count = await importV1Json(payload);
+    return { success: true, count };
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('storage.')) {
+      return { success: false, error: err.message };
+    }
 
-    reader.onerror = () => resolve({ success: false, error: 'storage.read_failed' });
-    reader.readAsText(file, 'utf-8');
-  });
+    return { success: false, error: 'storage.parse_failed' };
+  }
+}
+
+export interface StorageHealth {
+  supported: boolean;
+  usage?: number;
+  quota?: number;
+  percentUsed?: number;
+  persistent?: boolean;
+}
+
+export async function getStorageHealth(): Promise<StorageHealth> {
+  if (!('storage' in navigator) || !navigator.storage?.estimate) {
+    return { supported: false };
+  }
+
+  const estimate = await navigator.storage.estimate();
+  const usage = estimate.usage ?? 0;
+  const quota = estimate.quota ?? 0;
+  const percentUsed = quota > 0 ? Math.round((usage / quota) * 100) : undefined;
+  const persistent = navigator.storage.persisted ? await navigator.storage.persisted() : undefined;
+
+  return {
+    supported: true,
+    usage,
+    quota,
+    percentUsed,
+    persistent,
+  };
+}
+
+export async function requestPersistentStorage(): Promise<boolean> {
+  if (!('storage' in navigator) || !navigator.storage?.persist) {
+    return false;
+  }
+
+  return navigator.storage.persist();
 }

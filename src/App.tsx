@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Map, List, Plus, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingSession } from './types';
@@ -18,26 +18,46 @@ type Tab = 'home' | 'map' | 'sessions' | 'new';
 function App() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>('home');
-  const [sessions, setSessions] = useState<FishingSession[]>(loadSessions);
+  const [sessions, setSessions] = useState<FishingSession[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+
+  const refreshSessions = useCallback(async () => {
+    try {
+      setSessionsError(null);
+      const loaded = await loadSessions();
+      setSessions(loaded);
+    } catch (err) {
+      console.error('Failed to load sessions', err);
+      setSessionsError('storage.load_failed');
+    } finally {
+      setSessionsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refreshSessions();
+  }, [refreshSessions]);
 
   const handleSessionCreated = useCallback((session: FishingSession) => {
     setSessions((prev) => [session, ...prev]);
     setActiveTab('sessions');
   }, []);
 
-  const handleSessionUpdate = useCallback((session: FishingSession) => {
-    saveSession(session);
-    setSessions((prev) => prev.map((s) => (s.id === session.id ? session : s)));
+  const handleSessionUpdate = useCallback(async (session: FishingSession) => {
+    const savedSession = await saveSession(session);
+    setSessions((prev) => prev.map((s) => (s.id === savedSession.id ? savedSession : s)));
   }, []);
 
   const handleSessionDelete = useCallback((id: string) => {
     setSessions((prev) => prev.filter((s) => s.id !== id));
   }, []);
 
-  const handleImportSuccess = useCallback(() => {
-    setSessions(loadSessions());
+  const handleImportSuccess = useCallback(async () => {
+    await refreshSessions();
     setActiveTab('sessions');
-  }, []);
+  }, [refreshSessions]);
 
   return (
     <div className="app">
@@ -79,6 +99,8 @@ function App() {
               <h2>{t('sessions.title')}</h2>
               <p>{t('sessions.subtitle')}</p>
             </div>
+            {sessionsLoading && <p>{t('sessions.loading')}</p>}
+            {sessionsError && <p className="form-error">{t(sessionsError)}</p>}
             <SessionList
               sessions={sessions}
               onSessionUpdate={handleSessionUpdate}

@@ -3,7 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Landing Page', () => {
   test.beforeEach(async ({ page }) => {
     // Clear localStorage before each test to ensure clean state
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
     await page.goto('/');
   });
 

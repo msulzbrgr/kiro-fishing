@@ -31,7 +31,7 @@ import MapView from './MapView';
 
 interface SessionCardProps {
   session: FishingSession;
-  onUpdate: (session: FishingSession) => void;
+  onUpdate: (session: FishingSession) => Promise<void>;
   onDelete: (id: string) => void;
 }
 
@@ -92,7 +92,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const catchCount = session.catches.length;
   const catchLabel = `${catchCount} ${catchCount === 1 ? t('sessions.catches_one') : t('sessions.catches_other')}`;
 
-  const handleLocationSelect = (nextLocation: FishingLocation) => {
+  const handleLocationSelect = async (nextLocation: FishingLocation) => {
     if (session.endTime) return;
 
     const previousSnapshot = session.regulationSnapshot ?? createRegulationSnapshot(session.location);
@@ -107,12 +107,12 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     const reason = getRegulationChangeReason(previousSnapshot.location, nextLocation);
 
     if (!reason) {
-      onUpdate({ ...session, location: nextLocation });
+      await onUpdate({ ...session, location: nextLocation });
       return;
     }
 
     const checkpoint = createRegulationCheckpoint(previousSnapshot, newSnapshot, reason);
-    onUpdate({
+    await onUpdate({
       ...session,
       location: nextLocation,
       regulationState: checkpoint.requiresConfirmation ? 'paused_due_to_regulation_change' : 'active_current',
@@ -120,7 +120,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     });
   };
 
-  const handleConfirmCheckpoint = (checkpoint: RegulationCheckpoint) => {
+  const handleConfirmCheckpoint = async (checkpoint: RegulationCheckpoint) => {
     const confirmedSnapshot = {
       ...checkpoint.newSnapshot,
       userConfirmedUncertain: true,
@@ -132,7 +132,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
         : item,
     );
 
-    onUpdate({
+    await onUpdate({
       ...session,
       regulationSnapshot: confirmedSnapshot,
       regulationState: getRegulationStateAfterConfirmation(confirmedSnapshot),
@@ -271,10 +271,10 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
           <div className="tab-content">
             {activeTab === 'catches' && (
-              <CatchLog session={session} onSessionUpdate={onUpdate} />
+              <CatchLog session={session} onSessionUpdate={(nextSession) => void onUpdate(nextSession)} />
             )}
             {activeTab === 'conditions' && (
-              <ConditionsForm session={session} onSessionUpdate={onUpdate} />
+              <ConditionsForm session={session} onSessionUpdate={(nextSession) => void onUpdate(nextSession)} />
             )}
             {activeTab === 'map' && (
               <MapView
@@ -291,14 +291,14 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               {!session.endTime && (
                 <button
                   className="btn btn-primary btn-sm"
-                  onClick={() => {
+                  onClick={async () => {
                     const endTime = new Date().toLocaleTimeString('de-CH', {
                       hour: '2-digit',
                       minute: '2-digit',
                     });
                     const updated = { ...session, endTime };
-                    saveSession(updated);
-                    onUpdate(updated);
+                    const savedSession = await saveSession(updated);
+                    await onUpdate(savedSession);
                   }}
                   data-testid="finish-session-btn"
                 >
@@ -309,8 +309,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                 className="btn btn-danger btn-sm"
                 onClick={() => {
                   if (confirm(t('sessions.delete_confirm'))) {
-                    deleteSession(session.id);
-                    onDelete(session.id);
+                    void deleteSession(session.id).then(() => onDelete(session.id));
                   }
                 }}
               >
@@ -326,7 +325,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
 interface SessionListProps {
   sessions: FishingSession[];
-  onSessionUpdate: (session: FishingSession) => void;
+  onSessionUpdate: (session: FishingSession) => Promise<void>;
   onSessionDelete: (id: string) => void;
 }
 
