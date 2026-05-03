@@ -120,6 +120,12 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
     }
   };
 
+  const handlePersistenceToggle = async (nextChecked: boolean) => {
+    if (nextChecked && !storageHealth?.persistent) {
+      await handleRequestPersistence();
+    }
+  };
+
   return (
     <div className="data-manager">
       <div className="settings-section" data-testid="settings-import-export">
@@ -205,11 +211,9 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
             <input
               type="checkbox"
               checked={Boolean(storageHealth.persistent)}
-              disabled={persistenceTogglePending || Boolean(storageHealth.persistent)}
-              onChange={() => {
-                if (!storageHealth.persistent) {
-                  void handleRequestPersistence();
-                }
+              disabled={persistenceTogglePending}
+              onChange={(e) => {
+                void handlePersistenceToggle(e.target.checked);
               }}
             />
             <span className="settings-toggle-slider" aria-hidden="true" />
