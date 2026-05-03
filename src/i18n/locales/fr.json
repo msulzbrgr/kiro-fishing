@@ -169,7 +169,9 @@
     "request_persistence": "Activer le stockage persistant",
     "persistence_enabled": "Stockage persistant activé.",
     "persistence_failed": "Impossible d’activer le stockage persistant dans ce navigateur.",
-    "v2_requires_zip": "Cette sauvegarde doit être importée en fichier ZIP, pas via manifest.json seule."
+    "v2_requires_zip": "Cette sauvegarde doit être importée en fichier ZIP, pas via manifest.json seule.",
+    "persistence_disable_not_supported": "La désactivation du stockage persistant n'est pas prise en charge par les navigateurs une fois activé.",
+    "persistence_disable_not_supported_short": "non désactivable"
   },
   "regulation": {
     "review_required_title": "Informations réglementaires",

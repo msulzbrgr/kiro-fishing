@@ -169,7 +169,9 @@
     "request_persistence": "Abilita archiviazione persistente",
     "persistence_enabled": "Archiviazione persistente abilitata.",
     "persistence_failed": "Impossibile abilitare l'archiviazione persistente in questo browser.",
-    "v2_requires_zip": "Questo backup deve essere importato come file ZIP, non come manifest.json separato."
+    "v2_requires_zip": "Questo backup deve essere importato come file ZIP, non come manifest.json separato.",
+    "persistence_disable_not_supported": "La disattivazione dell'archiviazione persistente non è supportata dai browser una volta attivata.",
+    "persistence_disable_not_supported_short": "non disattivabile"
   },
   "regulation": {
     "review_required_title": "Informazioni normative",
