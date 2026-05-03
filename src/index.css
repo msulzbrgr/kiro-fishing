@@ -286,7 +286,13 @@ textarea {
 .settings-toggle input {
   position: absolute;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
+  width: 44px;
+  height: 24px;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
 
 .settings-toggle-slider {
