@@ -63,7 +63,8 @@
     "tab_conditions": "Bedingungen",
     "tab_map": "Karte",
     "finish": "Ausfahrt beenden",
-    "delete": "Ausfahrt löschen"
+    "delete": "Ausfahrt löschen",
+    "loading": "Loading sessions…"
   },
   "new_session": {
     "title": "Neue Angelausfahrt",
@@ -142,13 +143,21 @@
     "import_error": "Import fehlgeschlagen: falsches Dateiformat.",
     "import_confirm": "Achtung: alle Daten werden ersetzt. Weiter?",
     "export_tooltip": "Alle Angeldaten als JSON herunterladen",
-    "import_tooltip": "Daten aus einem früheren Export laden"
+    "import_tooltip": "Daten aus einem früheren Export laden",
+    "exporting": "Exporting…"
   },
   "storage": {
     "read_failed": "Datei konnte nicht gelesen werden.",
     "invalid_format": "Ungültiges Dateiformat.",
     "parse_failed": "Datei konnte nicht verarbeitet werden.",
-    "quota_exceeded": "Speicherlimit erreicht. Entferne Fotos oder exportiere/lösche alte Ausfahrten, um Platz zu schaffen."
+    "quota_exceeded": "Speicherlimit erreicht. Entferne Fotos oder exportiere/lösche alte Ausfahrten, um Platz zu schaffen.",
+    "load_failed": "Failed to load saved sessions.",
+    "usage": "Storage used",
+    "persistent_yes": "Persistent storage: enabled",
+    "persistent_no": "Persistent storage: not enabled",
+    "request_persistence": "Enable persistent storage",
+    "persistence_enabled": "Persistent storage enabled.",
+    "persistence_failed": "Could not enable persistent storage on this browser."
   },
   "regulation": {
     "review_required_title": "Vorschriften",

@@ -63,7 +63,8 @@
     "tab_conditions": "Conditions",
     "tab_map": "Carte",
     "finish": "Terminer la sortie",
-    "delete": "Supprimer la sortie"
+    "delete": "Supprimer la sortie",
+    "loading": "Loading sessions…"
   },
   "new_session": {
     "title": "Nouvelle sortie de pêche",
@@ -142,13 +143,21 @@
     "import_error": "Échec de l'importation: format de fichier invalide.",
     "import_confirm": "Cela remplacera toutes les données actuelles. Continuer?",
     "export_tooltip": "Télécharger toutes vos données de pêche en JSON",
-    "import_tooltip": "Restaurer les données d'un export précédent"
+    "import_tooltip": "Restaurer les données d'un export précédent",
+    "exporting": "Exporting…"
   },
   "storage": {
     "read_failed": "Impossible de lire le fichier.",
     "invalid_format": "Format de fichier invalide.",
     "parse_failed": "Impossible d'analyser le fichier.",
-    "quota_exceeded": "Quota de stockage dépassé. Supprimez des photos ou exportez/supprimez d’anciennes sorties pour libérer de l’espace."
+    "quota_exceeded": "Quota de stockage dépassé. Supprimez des photos ou exportez/supprimez d’anciennes sorties pour libérer de l’espace.",
+    "load_failed": "Failed to load saved sessions.",
+    "usage": "Storage used",
+    "persistent_yes": "Persistent storage: enabled",
+    "persistent_no": "Persistent storage: not enabled",
+    "request_persistence": "Enable persistent storage",
+    "persistence_enabled": "Persistent storage enabled.",
+    "persistence_failed": "Could not enable persistent storage on this browser."
   },
   "regulation": {
     "review_required_title": "Informations réglementaires",

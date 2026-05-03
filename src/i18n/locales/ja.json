@@ -63,7 +63,8 @@
     "tab_conditions": "状況",
     "tab_map": "地図",
     "finish": "釣行を終了",
-    "delete": "釣行を削除"
+    "delete": "釣行を削除",
+    "loading": "Loading sessions…"
   },
   "new_session": {
     "title": "新しい釣行を始めよう",
@@ -142,13 +143,21 @@
     "import_error": "インポート失敗：ファイル形式が違う。",
     "import_confirm": "現在のデータがすべて上書きされる。本当にいい？",
     "export_tooltip": "釣行データをJSONでダウンロード",
-    "import_tooltip": "以前のエクスポートからデータを復元"
+    "import_tooltip": "以前のエクスポートからデータを復元",
+    "exporting": "Exporting…"
   },
   "storage": {
     "read_failed": "ファイルを読み込めなかった。",
     "invalid_format": "ファイル形式が無効。",
     "parse_failed": "ファイルを解析できなかった。",
-    "quota_exceeded": "ストレージ容量が上限に達した。写真を削除するか、古い釣行をエクスポート/削除して容量を確保してね。"
+    "quota_exceeded": "ストレージ容量が上限に達した。写真を削除するか、古い釣行をエクスポート/削除して容量を確保してね。",
+    "load_failed": "Failed to load saved sessions.",
+    "usage": "Storage used",
+    "persistent_yes": "Persistent storage: enabled",
+    "persistent_no": "Persistent storage: not enabled",
+    "request_persistence": "Enable persistent storage",
+    "persistence_enabled": "Persistent storage enabled.",
+    "persistence_failed": "Could not enable persistent storage on this browser."
   },
   "regulation": {
     "review_required_title": "規制情報",

@@ -6,7 +6,10 @@ import { selectSwissLocation } from './helpers/location';
 
 test.describe('Export / Import Data', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
     await page.goto('/');
   });
 
@@ -27,7 +30,7 @@ test.describe('Export / Import Data', () => {
     await page.getByTestId('export-btn').click();
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toMatch(/kiro-fishing-backup-.+\.json/);
+    expect(download.suggestedFilename()).toMatch(/kiro-fishing-backup-.+\.zip/);
   });
 
   test('import replaces sessions and shows success message', async ({ page }) => {
@@ -81,5 +84,41 @@ test.describe('Export / Import Data', () => {
     await expect(page.locator('.data-status--error')).toBeVisible({ timeout: 5000 });
 
     fs.unlinkSync(tmpFile);
+  });
+});
+
+test.describe('IndexedDB storage migration', () => {
+  test('migrates legacy localStorage sessions on first load', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+      localStorage.setItem(
+        'kiro_fishing_sessions',
+        JSON.stringify([
+          {
+            id: 'legacy-1',
+            date: '2026-02-01',
+            startTime: '07:00',
+            location: { lat: 47.3769, lng: 8.5417 },
+            weather: {},
+            water: {},
+            catches: [],
+          },
+        ]),
+      );
+    });
+
+    await page.goto('/');
+    await page.getByTestId('nav-sessions').click();
+    await expect(page.locator('.session-card')).toHaveCount(1);
+  });
+
+  test('shows storage health details in data manager', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
+    await page.goto('/');
+    await expect(page.getByTestId('storage-health')).toBeVisible();
   });
 });

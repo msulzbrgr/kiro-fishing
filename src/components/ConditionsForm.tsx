@@ -42,10 +42,10 @@ export default function ConditionsForm({ session, onSessionUpdate }: ConditionsF
     { value: 'fast', label: t('conditions.current_fast') },
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const updated: FishingSession = { ...session, weather, water };
-    saveSession(updated);
-    onSessionUpdate(updated);
+    const savedSession = await saveSession(updated);
+    onSessionUpdate(savedSession);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

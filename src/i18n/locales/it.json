@@ -63,7 +63,8 @@
     "tab_conditions": "Condizioni",
     "tab_map": "Mappa",
     "finish": "Termina uscita",
-    "delete": "Elimina uscita"
+    "delete": "Elimina uscita",
+    "loading": "Loading sessions…"
   },
   "new_session": {
     "title": "Nuova uscita di pesca",
@@ -142,13 +143,21 @@
     "import_error": "Importazione fallita: formato file non valido.",
     "import_confirm": "Verranno sostituiti tutti i dati attuali. Continuare?",
     "export_tooltip": "Scarica tutti i tuoi dati di pesca in JSON",
-    "import_tooltip": "Ripristina i dati da un export precedente"
+    "import_tooltip": "Ripristina i dati da un export precedente",
+    "exporting": "Exporting…"
   },
   "storage": {
     "read_failed": "Impossibile leggere il file.",
     "invalid_format": "Formato file non valido.",
     "parse_failed": "Impossibile analizzare il file.",
-    "quota_exceeded": "Quota di archiviazione superata. Rimuovi alcune foto o esporta/elimina uscite vecchie per liberare spazio."
+    "quota_exceeded": "Quota di archiviazione superata. Rimuovi alcune foto o esporta/elimina uscite vecchie per liberare spazio.",
+    "load_failed": "Failed to load saved sessions.",
+    "usage": "Storage used",
+    "persistent_yes": "Persistent storage: enabled",
+    "persistent_no": "Persistent storage: not enabled",
+    "request_persistence": "Enable persistent storage",
+    "persistence_enabled": "Persistent storage enabled.",
+    "persistence_failed": "Could not enable persistent storage on this browser."
   },
   "regulation": {
     "review_required_title": "Informazioni normative",

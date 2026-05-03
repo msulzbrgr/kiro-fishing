@@ -3,7 +3,10 @@ import { selectSwissLocation } from './helpers/location';
 
 test.describe('Session Management', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
     await page.goto('/');
     // Navigate to New session form
     await page.getByTestId('nav-new').click();
@@ -46,10 +49,27 @@ test.describe('Session Management', () => {
     // One session card should exist
     await expect(page.locator('.session-card')).toHaveCount(1);
 
-    const sessions = await page.evaluate(() => JSON.parse(localStorage.getItem('kiro_fishing_sessions') ?? '[]'));
-    expect(sessions[0].regulationSnapshot.userConfirmedUncertain).toBe(false);
-    expect(sessions[0].regulationSnapshot.reviewMode).toBe('information');
-    expect(sessions[0].regulationState).toBe('active_current');
+    const sessions = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const tx = db.transaction('sessions', 'readonly');
+      const store = tx.objectStore('sessions');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result as unknown[]);
+      });
+      db.close();
+      return records;
+    });
+    expect((sessions[0] as Record<string, unknown>).regulationSnapshot).toBeTruthy();
+    expect((sessions[0] as { regulationSnapshot: { userConfirmedUncertain: boolean } }).regulationSnapshot.userConfirmedUncertain).toBe(false);
+    expect((sessions[0] as { regulationSnapshot: { reviewMode: string } }).regulationSnapshot.reviewMode).toBe('information');
+    expect((sessions[0] as { regulationState: string }).regulationState).toBe('active_current');
   });
 
   test('cancel returns to sessions tab', async ({ page }) => {
@@ -66,7 +86,10 @@ test.describe('Session Management', () => {
 
 test.describe('Catch Log', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => localStorage.clear());
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
     await page.goto('/');
     // Create a session first
     await page.getByTestId('nav-new').click();
