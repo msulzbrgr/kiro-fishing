@@ -423,6 +423,29 @@ async function importV2Zip(file: File): Promise<number> {
     }
   }
 
+  // Pre-fetch all photo blobs from the ZIP before opening the IDB transaction.
+  // Calling zipFile.async('blob') inside a transaction would cause it to
+  // auto-commit (IDB transactions commit when no IDB request is pending and
+  // the engine yields to the event loop via non-IDB async work).
+  interface ResolvedPhoto {
+    entry: ExportPhotoManifestEntry;
+    blob: Blob;
+    mimeType: string;
+  }
+  const resolvedPhotos: ResolvedPhoto[] = [];
+  for (const photoEntry of payload.photos) {
+    const zipFile = zip.file(photoEntry.fileName);
+    if (!zipFile) continue;
+
+    const blob = await zipFile.async('blob');
+    const manifestMimeType = photoEntry.mimeType?.trim();
+    const mimeType = manifestMimeType || blob.type || 'application/octet-stream';
+    if (!manifestMimeType && !blob.type) {
+      console.warn('importData: missing photo mimeType, falling back to application/octet-stream', photoEntry.id);
+    }
+    resolvedPhotos.push({ entry: photoEntry, blob, mimeType });
+  }
+
   const db = await getDb();
   const tx = db.transaction(['sessions', 'photos'], 'readwrite');
   await Promise.all([
@@ -434,16 +457,7 @@ async function importV2Zip(file: File): Promise<number> {
     await tx.objectStore('sessions').put(stripInlinePhotos(session));
   }
 
-  for (const photoEntry of payload.photos) {
-    const zipFile = zip.file(photoEntry.fileName);
-    if (!zipFile) continue;
-
-    const blob = await zipFile.async('blob');
-    const manifestMimeType = photoEntry.mimeType?.trim();
-    const mimeType = manifestMimeType || blob.type || 'application/octet-stream';
-    if (!manifestMimeType && !blob.type) {
-      console.warn('importData: missing photo mimeType, falling back to application/octet-stream', photoEntry.id);
-    }
+  for (const { entry: photoEntry, blob, mimeType } of resolvedPhotos) {
     await tx.objectStore('photos').put({
       id: photoEntry.id,
       sessionId: photoEntry.sessionId,
