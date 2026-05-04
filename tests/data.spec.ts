@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
+import JSZip from 'jszip';
 import { selectSwissLocation } from './helpers/location';
 
 test.describe('Export / Import Data', () => {
@@ -76,6 +77,155 @@ test.describe('Export / Import Data', () => {
   test('import shows error for invalid file', async ({ page }) => {
     const tmpFile = path.join(os.tmpdir(), 'kiro-invalid.json');
     fs.writeFileSync(tmpFile, JSON.stringify({ bad: 'data' }));
+
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.getByTestId('nav-settings').click();
+    const fileInput = page.getByTestId('import-file-input');
+    await fileInput.setInputFiles(tmpFile);
+
+    await expect(page.locator('.data-status--error')).toBeVisible({ timeout: 5000 });
+
+    fs.unlinkSync(tmpFile);
+  });
+
+  test('import V2 zip replaces sessions and shows success message', async ({ page }) => {
+    const zip = new JSZip();
+    const payload = {
+      version: '2.0',
+      app: 'kiro-fishing',
+      exportedAt: new Date().toISOString(),
+      sessions: [
+        {
+          schemaVersion: 2,
+          id: 'zip-session-1',
+          date: '2026-03-15',
+          startTime: '09:00',
+          location: { lat: 47.3769, lng: 8.5417 },
+          weather: {},
+          water: {},
+          catches: [],
+        },
+      ],
+      photos: [],
+    };
+    zip.file('manifest.json', JSON.stringify(payload));
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+
+    const tmpFile = path.join(os.tmpdir(), 'kiro-test-import-v2.zip');
+    fs.writeFileSync(tmpFile, zipBuffer);
+
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.getByTestId('nav-settings').click();
+    const fileInput = page.getByTestId('import-file-input');
+    await fileInput.setInputFiles(tmpFile);
+
+    // After a successful import the app navigates to the sessions tab
+    await page.getByTestId('nav-sessions').click();
+    await expect(page.locator('.session-card')).toHaveCount(1);
+
+    fs.unlinkSync(tmpFile);
+  });
+
+  test('import V2 zip with photos succeeds', async ({ page }) => {
+    const sessionId = 'zip-photo-session-1';
+    const catchId = 'catch-1';
+    const photoId = 'photo-1';
+
+    const zip = new JSZip();
+    const payload = {
+      version: '2.0',
+      app: 'kiro-fishing',
+      exportedAt: new Date().toISOString(),
+      sessions: [
+        {
+          schemaVersion: 2,
+          id: sessionId,
+          date: '2026-04-10',
+          startTime: '10:00',
+          location: { lat: 47.3769, lng: 8.5417 },
+          weather: {},
+          water: {},
+          catches: [
+            {
+              id: catchId,
+              species: 'Trout',
+              time: '10:30',
+              released: true,
+              photoIds: [photoId],
+            },
+          ],
+        },
+      ],
+      photos: [
+        {
+          id: photoId,
+          fileName: `photos/${photoId}`,
+          mimeType: 'image/png',
+          sessionId,
+          catchId,
+        },
+      ],
+    };
+    zip.file('manifest.json', JSON.stringify(payload));
+    // A minimal 1×1 transparent PNG (67 bytes)
+    const minimalPng = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    zip.file(`photos/${photoId}`, minimalPng);
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+
+    const tmpFile = path.join(os.tmpdir(), 'kiro-test-import-v2-photos.zip');
+    fs.writeFileSync(tmpFile, zipBuffer);
+
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.getByTestId('nav-settings').click();
+    const fileInput = page.getByTestId('import-file-input');
+    await fileInput.setInputFiles(tmpFile);
+
+    // After a successful import the app navigates to the sessions tab
+    await page.getByTestId('nav-sessions').click();
+    await expect(page.locator('.session-card')).toHaveCount(1);
+
+    fs.unlinkSync(tmpFile);
+  });
+
+  test('import V2 zip shows error for missing manifest', async ({ page }) => {
+    const zip = new JSZip();
+    zip.file('other.json', JSON.stringify({ data: 'no manifest here' }));
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+
+    const tmpFile = path.join(os.tmpdir(), 'kiro-test-no-manifest.zip');
+    fs.writeFileSync(tmpFile, zipBuffer);
+
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.getByTestId('nav-settings').click();
+    const fileInput = page.getByTestId('import-file-input');
+    await fileInput.setInputFiles(tmpFile);
+
+    await expect(page.locator('.data-status--error')).toBeVisible({ timeout: 5000 });
+
+    fs.unlinkSync(tmpFile);
+  });
+
+  test('import V2 zip shows error for wrong app name in manifest', async ({ page }) => {
+    const zip = new JSZip();
+    const payload = {
+      version: '2.0',
+      app: 'some-other-app',
+      exportedAt: new Date().toISOString(),
+      sessions: [],
+      photos: [],
+    };
+    zip.file('manifest.json', JSON.stringify(payload));
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+
+    const tmpFile = path.join(os.tmpdir(), 'kiro-test-wrong-app.zip');
+    fs.writeFileSync(tmpFile, zipBuffer);
 
     page.on('dialog', (dialog) => dialog.accept());
 
