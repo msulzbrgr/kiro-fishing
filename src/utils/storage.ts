@@ -423,6 +423,31 @@ async function importV2Zip(file: File): Promise<number> {
     }
   }
 
+  // Resolve all photo blobs before opening the transaction.
+  // IndexedDB transactions auto-commit when there are no pending IDB requests
+  // and control returns to the event loop, so non-IDB async work (e.g. zip
+  // decompression) must be completed before the transaction is started.
+  const photoRecords: PhotoRecord[] = [];
+  for (const photoEntry of payload.photos) {
+    const zipFile = zip.file(photoEntry.fileName);
+    if (!zipFile) continue;
+
+    const blob = await zipFile.async('blob');
+    const manifestMimeType = photoEntry.mimeType?.trim();
+    const mimeType = manifestMimeType || blob.type || 'application/octet-stream';
+    if (!manifestMimeType && !blob.type) {
+      console.warn('importData: missing photo mimeType, falling back to application/octet-stream', photoEntry.id);
+    }
+    photoRecords.push({
+      id: photoEntry.id,
+      sessionId: photoEntry.sessionId,
+      catchId: photoEntry.catchId,
+      mimeType,
+      blob,
+      createdAt: new Date().toISOString(),
+    });
+  }
+
   const db = await getDb();
   const tx = db.transaction(['sessions', 'photos'], 'readwrite');
   await Promise.all([
@@ -434,24 +459,8 @@ async function importV2Zip(file: File): Promise<number> {
     await tx.objectStore('sessions').put(stripInlinePhotos(session));
   }
 
-  for (const photoEntry of payload.photos) {
-    const zipFile = zip.file(photoEntry.fileName);
-    if (!zipFile) continue;
-
-    const blob = await zipFile.async('blob');
-    const manifestMimeType = photoEntry.mimeType?.trim();
-    const mimeType = manifestMimeType || blob.type || 'application/octet-stream';
-    if (!manifestMimeType && !blob.type) {
-      console.warn('importData: missing photo mimeType, falling back to application/octet-stream', photoEntry.id);
-    }
-    await tx.objectStore('photos').put({
-      id: photoEntry.id,
-      sessionId: photoEntry.sessionId,
-      catchId: photoEntry.catchId,
-      mimeType,
-      blob,
-      createdAt: new Date().toISOString(),
-    });
+  for (const photoRecord of photoRecords) {
+    await tx.objectStore('photos').put(photoRecord);
   }
 
   await tx.done;
