@@ -617,6 +617,11 @@ textarea {
   font-size: 13px;
 }
 
+.not-switzerland p {
+  margin: 6px 0 0;
+  color: inherit;
+}
+
 /* ===== Regulation Review ===== */
 .regulation-review,
 .regulation-alert {
@@ -686,6 +691,37 @@ textarea {
 .source-list li {
   list-style: disc;
   margin-bottom: 4px;
+}
+
+.research-prompt-card {
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(0, 75, 100, 0.06);
+  border: 1.5px solid rgba(0, 75, 100, 0.16);
+  border-radius: var(--radius-sm);
+}
+
+.research-prompt-card strong {
+  display: block;
+  color: var(--primary-dark);
+  margin-bottom: 6px;
+}
+
+.research-prompt-card p {
+  margin-bottom: 8px;
+}
+
+.research-prompt-textarea {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.45;
 }
 
 /* ===== Canton Laws ===== */

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { selectSwissLocation } from './helpers/location';
+import { selectFinnishLocation, selectSwissLocation } from './helpers/location';
 
 test.describe('Session Management', () => {
   test.beforeEach(async ({ page }) => {
@@ -70,6 +70,41 @@ test.describe('Session Management', () => {
     expect((sessions[0] as { regulationSnapshot: { userConfirmedUncertain: boolean } }).regulationSnapshot.userConfirmedUncertain).toBe(false);
     expect((sessions[0] as { regulationSnapshot: { reviewMode: string } }).regulationSnapshot.reviewMode).toBe('information');
     expect((sessions[0] as { regulationState: string }).regulationState).toBe('active_current');
+  });
+
+  test('Finland location shows a research prompt and can be saved', async ({ page }) => {
+    await selectFinnishLocation(page);
+
+    await expect(page.getByTestId('outside-switzerland-warning')).toBeVisible();
+    await expect(page.getByTestId('new-session-research-prompt')).toBeVisible();
+    await expect(page.getByTestId('new-session-research-prompt-textarea')).toHaveValue(/Helsinki/);
+    await expect(page.getByTestId('new-session-research-prompt-textarea')).toHaveValue(/Finland/);
+    await expect(page.getByTestId('create-session-btn')).toBeEnabled();
+
+    await page.getByTestId('create-session-btn').click();
+    await expect(page.locator('.session-card')).toHaveCount(1);
+
+    const sessions = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const tx = db.transaction('sessions', 'readonly');
+      const store = tx.objectStore('sessions');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result as unknown[]);
+      });
+      db.close();
+      return records;
+    });
+
+    expect((sessions[0] as { location: { countryCode?: string } }).location.countryCode).toBe('fi');
+    expect((sessions[0] as { regulationSnapshot: { jurisdiction?: string } }).regulationSnapshot.jurisdiction).toBe('Finland');
+    expect((sessions[0] as { regulationSnapshot: { sourceUrls: string[] } }).regulationSnapshot.sourceUrls).toEqual([]);
   });
 
   test('cancel returns to sessions tab', async ({ page }) => {

@@ -37,6 +37,8 @@ export interface FishingLocation {
   canton?: string;
   cantonCode?: string;
   locationName?: string;
+  country?: string;
+  countryCode?: string;
 }
 
 export type RegulationDataStatus = 'available' | 'missing' | 'stale' | 'conflicting';
