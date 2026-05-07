@@ -201,6 +201,7 @@
     "strict_mode_desc": "Strikter Modus: ausdrückliche Bestätigung vor dem Start oder nach Regelungsänderungen.",
     "research_prompt_title": "Vorgeschlagener Recherche-Prompt",
     "research_prompt_desc": "Füge das in dein bevorzugtes LLM oder in eine Websuche ein und prüf die Antwort danach mit offiziellen lokalen Quellen.",
+    "research_prompt_template": "Welche Freizeitfischerei-Regeln, Bewilligungen, Mindestmasse, Schonzeiten, geschützten Arten, Geräteeinschränkungen, Fanglimits und gewässerspezifischen lokalen Vorschriften gelten in der Nähe von {{location}} in {{country}} (Koordinaten {{lat}}, {{lng}})? Bitte nenne offizielle nationale, regionale und lokale Behördenquellen, weise auf Unterschiede je Gewässer oder Patentgebiet hin und markiere die wichtigsten Regeln, die man vor dem Fischen dort prüfen muss.",
     "info_notification_title": "Vorschriften aktualisiert",
     "info_notification_desc": "Deine Position könnte in ein anderes Regelungsgebiet gewechselt haben. Die neuen Infos wurden als Checkpoint gespeichert."
   },

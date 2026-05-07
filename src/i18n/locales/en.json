@@ -201,6 +201,7 @@
     "strict_mode_desc": "Strict mode: require explicit confirmation before starting or continuing after regulation changes.",
     "research_prompt_title": "Suggested research prompt",
     "research_prompt_desc": "Paste this into your preferred LLM or web search, then verify the answer with official local sources.",
+    "research_prompt_template": "What recreational fishing laws, permits, size limits, closed seasons, protected species, gear restrictions, catch quotas, and water-specific local rules apply near {{location}} in {{country}} (coordinates {{lat}}, {{lng}})? Please cite official national, regional, and local authority sources, note whether rules differ by water body or permit area, and highlight the most important rules an angler must verify before fishing there.",
     "info_notification_title": "Regulation information updated",
     "info_notification_desc": "Your position may have entered a different regulation area. The new source-backed information was saved as an additional session checkpoint."
   },
