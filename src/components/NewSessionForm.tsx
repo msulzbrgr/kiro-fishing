@@ -7,9 +7,11 @@ import { generateId, saveSession } from '../utils/storage';
 import {
   createRegulationSnapshot,
   getRegulationStateAfterConfirmation,
+  isOutsideSwitzerland,
 } from '../utils/regulations';
 import { getSafeExternalUrl } from '../utils/urls';
 import MapView from './MapView';
+import RegulationResearchPrompt from './RegulationResearchPrompt';
 
 interface NewSessionFormProps {
   onSessionCreated: (session: FishingSession) => void;
@@ -40,6 +42,9 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
     safeUrl: getSafeExternalUrl(url),
     title: regulationSnapshot.sourceTitles[index] ?? url,
   })) ?? [];
+  const outsideSwitzerland = regulationSnapshot
+    ? isOutsideSwitzerland(regulationSnapshot.location)
+    : false;
 
   const handleCreate = async () => {
     if (!location || !regulationSnapshot || !canCreateSession) return;
@@ -172,9 +177,13 @@ export default function NewSessionForm({ onSessionCreated, onCancel }: NewSessio
               ))}
             </ul>
           ) : (
-            <p>{t('regulation.no_sources')}</p>
+            <p>{t(outsideSwitzerland ? 'regulation.no_sources_outside_switzerland' : 'regulation.no_sources')}</p>
           )}
         </div>
+        <RegulationResearchPrompt
+          location={regulationSnapshot?.location ?? null}
+          dataTestId="new-session-research-prompt"
+        />
         {strictMode && (
           <label className="checkbox-label regulation-confirm">
             <input

@@ -23,11 +23,13 @@ import {
   createRegulationSnapshot,
   getRegulationChangeReason,
   getRegulationStateAfterConfirmation,
+  isOutsideSwitzerland,
 } from '../utils/regulations';
 import { getSafeExternalUrl } from '../utils/urls';
 import CatchLog from './CatchLog';
 import ConditionsForm from './ConditionsForm';
 import MapView from './MapView';
+import RegulationResearchPrompt from './RegulationResearchPrompt';
 
 interface SessionCardProps {
   session: FishingSession;
@@ -76,6 +78,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     safeUrl: getSafeExternalUrl(url),
     title: regulationSnapshot.sourceTitles[index] ?? url,
   }));
+  const outsideSwitzerland = isOutsideSwitzerland(regulationSnapshot.location);
 
   const duration = session.endTime
     ? (() => {
@@ -233,7 +236,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                     ))}
                   </ul>
                 ) : (
-                  <p>{t('regulation.no_sources')}</p>
+                  <p>{t(outsideSwitzerland ? 'regulation.no_sources_outside_switzerland' : 'regulation.no_sources')}</p>
                 )}
               </div>
               {pendingCheckpoint && (
@@ -247,6 +250,11 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               )}
             </div>
           )}
+
+          <RegulationResearchPrompt
+            location={regulationSnapshot.location}
+            dataTestId={`session-research-prompt-${session.id}`}
+          />
 
           <div className="tab-bar">
             <button

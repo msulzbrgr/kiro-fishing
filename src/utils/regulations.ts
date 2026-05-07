@@ -1,6 +1,16 @@
+import type {
+  FishingLocation,
+  RegulationCheckpoint,
+  RegulationCheckpointReason,
+  RegulationSnapshot,
+  RegulationReviewMode,
+  SessionRegulationState,
+} from '../types';
 import { CANTON_LAWS } from '../data/cantonLaws';
+import { generateId } from './storage';
 
 export const STALENESS_THRESHOLD_DAYS = 180;
+const REVALIDATION_DISTANCE_KM = 0.5;
 
 export function isRegulationStale(
   lastVerified: string,
@@ -11,17 +21,18 @@ export function isRegulationStale(
   const diffDays = (now - verified) / (1000 * 60 * 60 * 24);
   return diffDays > thresholdDays;
 }
-import type {
-  FishingLocation,
-  RegulationCheckpoint,
-  RegulationCheckpointReason,
-  RegulationSnapshot,
-  RegulationReviewMode,
-  SessionRegulationState,
-} from '../types';
-import { generateId } from './storage';
 
-const REVALIDATION_DISTANCE_KM = 0.5;
+export function isOutsideSwitzerland(location: Pick<FishingLocation, 'countryCode' | 'cantonCode'>): boolean {
+  return Boolean(location.countryCode && location.countryCode !== 'ch' && !location.cantonCode);
+}
+
+export function buildRegulationResearchPrompt(location: FishingLocation): string {
+  const locationLabel = location.locationName ?? 'the selected fishing location';
+  const countryLabel = location.country ?? 'the current country';
+  const coordinates = `${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`;
+
+  return `What recreational fishing laws, permits, size limits, closed seasons, protected species, gear restrictions, catch quotas, and water-specific local rules apply near ${locationLabel} in ${countryLabel} (coordinates ${coordinates})? Please cite official national, regional, and local authority sources, note whether rules differ by water body or permit area, and highlight the most important rules an angler must verify before fishing there.`;
+}
 
 export function createRegulationSnapshot(
   location: FishingLocation,
@@ -33,7 +44,7 @@ export function createRegulationSnapshot(
 
   return {
     location,
-    jurisdiction: location.canton ?? cantonLaw?.canton,
+    jurisdiction: location.canton ?? location.country ?? cantonLaw?.canton,
     cantonCode: location.cantonCode ?? cantonLaw?.cantonCode,
     status,
     sourceUrls: cantonLaw?.laws.flatMap((law) => (law.url ? [law.url] : [])) ?? [],

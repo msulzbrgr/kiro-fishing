@@ -52,7 +52,8 @@
     "loading": "地図を読み込み中…",
     "location": "場所",
     "unknown_location": "不明な場所",
-    "not_switzerland": "スイス国内のカントンが検出できなかった。スイス国内の場所を選んでね。",
+    "not_switzerland": "この場所ではスイスのカントン規則は使えない。",
+    "not_switzerland_hint": "下の調査プロンプトを使って、現地の釣り規則と公式情報源を探してね。",
     "laws_title": "釣り規則",
     "permit": "ライセンス",
     "legal_sources": "公式情報源",
@@ -184,6 +185,7 @@
     "jurisdiction": "管轄",
     "source_links": "公式情報源",
     "no_sources": "この場所のカントン情報源はない。",
+    "no_sources_outside_switzerland": "この場所はスイス国外なので、スイスのカントン情報源はない。",
     "confirm_label": "公式情報源を確認して、納得した上で続ける。",
     "session_needs_review": "要確認",
     "change_notification_title": "規制エリアが変わったかも",
@@ -197,6 +199,8 @@
     "strict_mode_label": "厳格な規制確認モードをオン",
     "information_mode_desc": "情報モード：規制情報を保存して、自分で判断できる。",
     "strict_mode_desc": "厳格モード：開始時や規制変更後に明示的な確認が必要。",
+    "research_prompt_title": "おすすめの調査プロンプト",
+    "research_prompt_desc": "これを使って好きなLLMやWeb検索で調べて、そのあと必ず公式の現地情報で確認してね。",
     "info_notification_title": "規制情報を更新した",
     "info_notification_desc": "別の規制エリアに移動した可能性がある。新しい情報を追加チェックポイントとして保存したよ。"
   }

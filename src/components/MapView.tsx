@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { MapPin, Loader2, ShoppingCart, AlertTriangle, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CANTON_LAWS, STATE_TO_CANTON_CODE } from '../data/cantonLaws';
-import { isRegulationStale } from '../utils/regulations';
+import RegulationResearchPrompt from './RegulationResearchPrompt';
+import { isOutsideSwitzerland, isRegulationStale } from '../utils/regulations';
 import type { CantonLaw, FishingLocation } from '../types';
 
 interface MapViewProps {
@@ -119,13 +120,13 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
             locationName: placeName,
             canton: canton?.name,
             cantonCode: canton?.code,
+            country: addr.country,
+            countryCode: addr.country_code,
           };
 
-          if (canton && CANTON_LAWS[canton.code]) {
-            setCantonLaw(CANTON_LAWS[canton.code]);
-          } else {
-            setCantonLaw(null);
-          }
+          setCantonLaw(canton && CANTON_LAWS[canton.code] ? CANTON_LAWS[canton.code] : null);
+        } else {
+          setCantonLaw(null);
         }
 
         setSelectedLocation(location);
@@ -159,12 +160,15 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       leafletMapRef.current.setView([initialLocation.lat, initialLocation.lng], 12);
       if (initialLocation.cantonCode && CANTON_LAWS[initialLocation.cantonCode]) {
         setCantonLaw(CANTON_LAWS[initialLocation.cantonCode]);
+      } else {
+        setCantonLaw(null);
       }
       setSelectedLocation(initialLocation);
     });
   }, [initialLocation]);
 
   const mapHeight = compact ? '250px' : '400px';
+  const outsideSwitzerland = selectedLocation ? isOutsideSwitzerland(selectedLocation) : false;
 
   return (
     <div className="map-view">
@@ -303,11 +307,17 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
         </div>
       )}
 
-      {selectedLocation && !selectedLocation.canton && !loading && (
-        <div className="not-switzerland">
-          ⚠️ {t('map.not_switzerland')}
+      {outsideSwitzerland && !loading && (
+        <div className="not-switzerland" data-testid="outside-switzerland-warning">
+          <strong>⚠️ {t('map.not_switzerland')}</strong>
+          <p>{t('map.not_switzerland_hint')}</p>
         </div>
       )}
+
+      <RegulationResearchPrompt
+        location={selectedLocation}
+        dataTestId={compact ? 'compact-map-research-prompt' : 'map-research-prompt'}
+      />
     </div>
   );
 }
