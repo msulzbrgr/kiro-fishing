@@ -23,7 +23,8 @@ export function isRegulationStale(
 }
 
 export function isOutsideSwitzerland(location: Pick<FishingLocation, 'countryCode' | 'cantonCode'>): boolean {
-  return Boolean(location.countryCode && location.countryCode !== 'ch' && !location.cantonCode);
+  const countryCode = location.countryCode?.toLowerCase();
+  return Boolean(countryCode && countryCode !== 'ch' && !location.cantonCode);
 }
 
 export function buildRegulationResearchPrompt(location: FishingLocation): string {

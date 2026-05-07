@@ -121,7 +121,7 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
             canton: canton?.name,
             cantonCode: canton?.code,
             country: addr.country,
-            countryCode: addr.country_code,
+            countryCode: addr.country_code?.toLowerCase(),
           };
 
           setCantonLaw(canton && CANTON_LAWS[canton.code] ? CANTON_LAWS[canton.code] : null);
