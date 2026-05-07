@@ -201,6 +201,7 @@
     "strict_mode_desc": "Modalità rigida: richiede una conferma esplicita prima di iniziare o continuare dopo cambi normativi.",
     "research_prompt_title": "Prompt di ricerca suggerito",
     "research_prompt_desc": "Incolla questo nel tuo LLM preferito o in una ricerca web, poi verifica la risposta con fonti locali ufficiali.",
+    "research_prompt_template": "Quali leggi per la pesca ricreativa, permessi, misure minime, periodi di divieto, specie protette, restrizioni sull’attrezzatura, limiti di cattura e regole locali specifiche per il singolo specchio d’acqua si applicano vicino a {{location}} in {{country}} (coordinate {{lat}}, {{lng}})? Cita fonti ufficiali nazionali, regionali e locali, indica se le regole cambiano in base al corpo idrico o all’area del permesso, e metti in evidenza le regole più importanti da verificare prima di pescare lì.",
     "info_notification_title": "Informazioni normative aggiornate",
     "info_notification_desc": "La tua posizione potrebbe essere entrata in un’altra area normativa. Le nuove informazioni con fonte sono state salvate come checkpoint aggiuntivo."
   },

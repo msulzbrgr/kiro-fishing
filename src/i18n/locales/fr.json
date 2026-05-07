@@ -201,6 +201,7 @@
     "strict_mode_desc": "Mode strict: exiger une confirmation explicite avant de commencer ou de continuer après un changement réglementaire.",
     "research_prompt_title": "Prompt de recherche suggéré",
     "research_prompt_desc": "Collez ceci dans votre LLM préféré ou dans une recherche web, puis vérifiez la réponse auprès de sources locales officielles.",
+    "research_prompt_template": "Quelles lois de pêche de loisir, quels permis, tailles minimales, périodes de fermeture, espèces protégées, restrictions de matériel, quotas de capture et règles locales propres au plan d’eau s’appliquent près de {{location}} en {{country}} (coordonnées {{lat}}, {{lng}}) ? Merci de citer des sources officielles nationales, régionales et locales, de préciser si les règles varient selon le plan d’eau ou la zone de permis, et de mettre en avant les règles les plus importantes à vérifier avant d’y pêcher.",
     "info_notification_title": "Informations réglementaires mises à jour",
     "info_notification_desc": "Votre position a peut-être changé de zone réglementaire. Les nouvelles informations sourcées ont été enregistrées comme checkpoint supplémentaire."
   },

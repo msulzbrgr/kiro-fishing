@@ -27,14 +27,6 @@ export function isOutsideSwitzerland(location: Pick<FishingLocation, 'countryCod
   return Boolean(countryCode && countryCode !== 'ch' && !location.cantonCode);
 }
 
-export function buildRegulationResearchPrompt(location: FishingLocation): string {
-  const locationLabel = location.locationName ?? 'the selected fishing location';
-  const countryLabel = location.country ?? 'the current country';
-  const coordinates = `${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`;
-
-  return `What recreational fishing laws, permits, size limits, closed seasons, protected species, gear restrictions, catch quotas, and water-specific local rules apply near ${locationLabel} in ${countryLabel} (coordinates ${coordinates})? Please cite official national, regional, and local authority sources, note whether rules differ by water body or permit area, and highlight the most important rules an angler must verify before fishing there.`;
-}
-
 export function createRegulationSnapshot(
   location: FishingLocation,
   userConfirmedUncertain = false,

@@ -102,6 +102,7 @@ test.describe('Session Management', () => {
       return records;
     });
 
+    expect((sessions[0] as { location: { country?: string; countryCode?: string } }).location.country).toBe('Finland');
     expect((sessions[0] as { location: { countryCode?: string } }).location.countryCode).toBe('fi');
     expect((sessions[0] as { regulationSnapshot: { jurisdiction?: string } }).regulationSnapshot.jurisdiction).toBe('Finland');
     expect((sessions[0] as { regulationSnapshot: { sourceUrls: string[] } }).regulationSnapshot.sourceUrls).toEqual([]);
