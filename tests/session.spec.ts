@@ -20,24 +20,15 @@ test.describe('Session Management', () => {
     await expect(page.getByTestId('select-location-btn')).toBeVisible();
     await expect(page.getByTestId('regulation-review')).toBeVisible();
     await expect(page.getByTestId('create-session-btn')).toBeDisabled();
-    await expect(page.getByTestId('regulation-strict-mode-checkbox')).not.toBeChecked();
   });
 
-  test('information mode allows session creation without regulation confirmation', async ({ page }) => {
-    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
-    await selectSwissLocation(page);
+  test('regulation section shows responsibility notice', async ({ page }) => {
+    const regulationSection = page.getByTestId('regulation-review');
+    await expect(regulationSection).toBeVisible();
+    // No strict mode checkbox should exist
+    await expect(page.getByTestId('regulation-strict-mode-checkbox')).toHaveCount(0);
+    // No confirm checkbox should exist
     await expect(page.getByTestId('regulation-confirm-checkbox')).toHaveCount(0);
-    await expect(page.getByTestId('create-session-btn')).toBeEnabled();
-  });
-
-  test('strict mode requires regulation confirmation before creating a session', async ({ page }) => {
-    await page.getByTestId('regulation-strict-mode-checkbox').check();
-    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
-    await selectSwissLocation(page);
-    await expect(page.getByTestId('regulation-confirm-checkbox')).toBeEnabled();
-    await expect(page.getByTestId('create-session-btn')).toBeDisabled();
-    await page.getByTestId('regulation-confirm-checkbox').check();
-    await expect(page.getByTestId('create-session-btn')).toBeEnabled();
   });
 
   test('can create a session and see it in session list', async ({ page }) => {

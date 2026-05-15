@@ -12,7 +12,7 @@ import {
   CheckCircle,
   Circle,
   AlertTriangle,
-  ShieldCheck,
+  Info,
   StopCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,6 @@ import {
   createRegulationCheckpoint,
   createRegulationSnapshot,
   getRegulationChangeReason,
-  getRegulationStateAfterConfirmation,
   isOutsideSwitzerland,
 } from '../utils/regulations';
 import { getSafeExternalUrl } from '../utils/urls';
@@ -70,9 +69,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const regulationSnapshot = displayedCheckpoint?.newSnapshot
     ?? session.regulationSnapshot
     ?? createRegulationSnapshot(session.location);
-  const regulationState = pendingCheckpoint
-    ? 'paused_due_to_regulation_change'
-    : session.regulationState ?? getRegulationStateAfterConfirmation(regulationSnapshot);
+  const regulationState = session.regulationState ?? 'active_current';
   const regulationSources = regulationSnapshot.sourceUrls.map((url, index) => ({
     key: `${index}-${url}`,
     safeUrl: getSafeExternalUrl(url),
@@ -102,11 +99,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     if (!previousSnapshot.reviewMode) {
       console.warn('Regulation snapshot is missing reviewMode; defaulting to information mode.');
     }
-    const newSnapshot = createRegulationSnapshot(
-      nextLocation,
-      false,
-      previousSnapshot.reviewMode ?? 'information',
-    );
+    const newSnapshot = createRegulationSnapshot(nextLocation);
     const reason = getRegulationChangeReason(previousSnapshot.location, nextLocation);
 
     if (!reason) {
@@ -118,30 +111,11 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
     await onUpdate({
       ...session,
       location: nextLocation,
-      regulationState: checkpoint.requiresConfirmation ? 'paused_due_to_regulation_change' : 'active_current',
+      regulationState: 'active_current',
       regulationCheckpoints: [...(session.regulationCheckpoints ?? []), checkpoint],
     });
   };
 
-  const handleConfirmCheckpoint = async (checkpoint: RegulationCheckpoint) => {
-    const confirmedSnapshot = {
-      ...checkpoint.newSnapshot,
-      userConfirmedUncertain: true,
-      capturedAt: new Date().toISOString(),
-    };
-    const regulationCheckpoints = (session.regulationCheckpoints ?? []).map((item) =>
-      item.id === checkpoint.id
-        ? { ...item, newSnapshot: confirmedSnapshot, userConfirmed: true }
-        : item,
-    );
-
-    await onUpdate({
-      ...session,
-      regulationSnapshot: confirmedSnapshot,
-      regulationState: getRegulationStateAfterConfirmation(confirmedSnapshot),
-      regulationCheckpoints,
-    });
-  };
 
   return (
     <div className={`session-card card ${expanded ? 'expanded' : ''}`}>
@@ -193,22 +167,18 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
         <div className="session-body">
           {(displayedCheckpoint || regulationState === 'active_confirmed_uncertain') && (
             <div
-              className={`regulation-alert ${pendingCheckpoint ? 'regulation-alert-warning' : ''}`}
+              className="regulation-alert"
               data-testid="session-regulation-alert"
             >
               <h3>
-                {pendingCheckpoint ? <AlertTriangle size={16} /> : <ShieldCheck size={16} />}
-                {pendingCheckpoint
-                  ? t('regulation.change_notification_title')
-                  : latestInfoCheckpoint
-                    ? t('regulation.info_notification_title')
+                <Info size={16} />
+                {displayedCheckpoint
+                  ? t('regulation.info_notification_title')
                   : t('regulation.confirmed_uncertain_title')}
               </h3>
               <p>
-                {pendingCheckpoint
-                  ? t('regulation.change_notification_desc')
-                  : latestInfoCheckpoint
-                    ? t('regulation.info_notification_desc')
+                {displayedCheckpoint
+                  ? t('regulation.info_notification_desc')
                   : t('regulation.confirmed_uncertain_desc')}
               </p>
               {displayedCheckpoint && (
@@ -239,15 +209,6 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                   <p>{t(outsideSwitzerland ? 'regulation.no_sources_outside_switzerland' : 'regulation.no_sources')}</p>
                 )}
               </div>
-              {pendingCheckpoint && (
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => handleConfirmCheckpoint(pendingCheckpoint)}
-                  data-testid="confirm-regulation-change-btn"
-                >
-                  <ShieldCheck size={14} /> {t('regulation.confirm_change')}
-                </button>
-              )}
             </div>
           )}
 

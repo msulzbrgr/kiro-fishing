@@ -52,12 +52,8 @@ export function isRegulationUncertain(snapshot: RegulationSnapshot): boolean {
   return snapshot.status === 'missing' || snapshot.status === 'stale' || snapshot.status === 'conflicting';
 }
 
-export function getRegulationStateAfterConfirmation(
-  snapshot: RegulationSnapshot,
-): SessionRegulationState {
-  return snapshot.reviewMode === 'strict' && isRegulationUncertain(snapshot)
-    ? 'active_confirmed_uncertain'
-    : 'active_current';
+export function getRegulationStateAfterConfirmation(): SessionRegulationState {
+  return 'active_current';
 }
 
 export function distanceKm(a: FishingLocation, b: FishingLocation): number {
@@ -91,8 +87,6 @@ export function createRegulationCheckpoint(
   newSnapshot: RegulationSnapshot,
   reason: RegulationCheckpointReason,
 ): RegulationCheckpoint {
-  const requiresConfirmation = newSnapshot.reviewMode === 'strict';
-
   return {
     id: generateId(),
     previousJurisdiction: previousSnapshot.jurisdiction,
@@ -102,7 +96,7 @@ export function createRegulationCheckpoint(
     previousSnapshot,
     newSnapshot,
     userConfirmed: false,
-    requiresConfirmation,
+    requiresConfirmation: false,
     reason,
   };
 }

@@ -667,6 +667,29 @@ textarea {
   margin-top: 4px;
 }
 
+.regulation-responsibility-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(0, 75, 100, 0.06);
+  border: 1px solid rgba(0, 75, 100, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.regulation-responsibility-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.regulation-responsibility-notice p {
+  margin: 0;
+}
+
 .regulation-alert {
   margin-bottom: 12px;
 }
