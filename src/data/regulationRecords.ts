@@ -73,8 +73,9 @@ export const REGULATION_RECORDS: RegulationRecord[] = [
     canton: 'BE',
     topic: 'patent_purchase',
     content:
-      'Das Fischerpatent für Kanton Bern (Fischereikarte) wird online über die WEU-Website oder an kantonalen Schaltern erworben. Verschiedene Patenttypen für Seen und Fliessgewässer sind erhältlich.',
-    sourceUrl: 'https://www.weu.be.ch/de/start/themen/fischerei/fischerpatent-kaufen.html',
+      'Das Fischerpatent für Bern kann online über die offizielle WEU-Seite „Fischer Patent kaufen“ gelöst werden. Zusätzlich sind kantonale Ausgabestellen verfügbar; je nach Gewässer werden unterschiedliche Patentarten angeboten.',
+    sourceUrl:
+      'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei/fischerpatent-kaufen.html',
     extractedDate: '2026-04-15',
     effectiveYear: 2026,
     confidence: 'high',
@@ -85,8 +86,8 @@ export const REGULATION_RECORDS: RegulationRecord[] = [
     canton: 'BE',
     topic: 'patent_types',
     content:
-      'Kanton Bern bietet Jahrespatente (Seen und Fliessgewässer getrennt), Tagespatente und kombinierte Patente an. Für den Bielersee, Thunersee und Brienzersee gelten eigene Regelungen.',
-    sourceUrl: 'https://www.weu.be.ch/de/start/themen/fischerei.html',
+      'Für Bern sind je nach Gewässer Tages- und Jahrespatente verfügbar. Die offiziellen Informationen unterscheiden zwischen Seen, Fliessgewässern und Spezialregelungen einzelner Reviere.',
+    sourceUrl: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei.html',
     extractedDate: '2026-04-15',
     effectiveYear: 2026,
     confidence: 'high',
@@ -97,8 +98,8 @@ export const REGULATION_RECORDS: RegulationRecord[] = [
     canton: 'BE',
     topic: 'minimum_sizes',
     content:
-      'Mindestmasse Kanton Bern (2026): Bachforelle / Seeforelle 25 cm, Hecht 45 cm, Äsche 35 cm, Seesaibling 25 cm, Felchen 20 cm, Egli 18 cm. Massgebend ist die gesetzliche Bestimmung — offizielle Quelle prüfen.',
-    sourceUrl: 'https://www.weu.be.ch/de/start/themen/fischerei.html',
+      'Für Bern gelten artspezifische Mindestmasse (z. B. Forellen, Hecht, Äsche). Für die Praxis sind die jeweils aktuell publizierten kantonalen Tabellen und Gewässerbestimmungen massgebend.',
+    sourceUrl: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei.html',
     extractedDate: '2026-04-15',
     effectiveYear: 2026,
     confidence: 'high',
@@ -109,8 +110,8 @@ export const REGULATION_RECORDS: RegulationRecord[] = [
     canton: 'BE',
     topic: 'closed_seasons',
     content:
-      'Schonzeiten Kanton Bern (2026): Bachforelle 15. September – 15. März; Äsche 1. März – 30. April; Hecht 1. Februar – 31. März; Seesaibling 1. Oktober – 31. Dezember. Abweichungen je Gewässer möglich.',
-    sourceUrl: 'https://www.weu.be.ch/de/start/themen/fischerei.html',
+      'Schonzeiten und Fangverbote sind in Bern je Art und Gewässer definiert. Vor jedem Angelausflug sollten die aktuellen kantonalen Zeitfenster und Revierhinweise geprüft werden.',
+    sourceUrl: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei.html',
     extractedDate: '2026-04-15',
     effectiveYear: 2026,
     confidence: 'high',
@@ -121,8 +122,8 @@ export const REGULATION_RECORDS: RegulationRecord[] = [
     canton: 'BE',
     topic: 'authority_contact',
     content:
-      'Amt für Landwirtschaft und Natur (LANAT) / Fischereibehörde Kanton Bern, Wirtschaft, Energie und Umwelt (WEU). Website: weu.be.ch/fischerei. Zuständig für Fischereipatente und -vorschriften.',
-    sourceUrl: 'https://www.weu.be.ch/de/start/themen/fischerei.html',
+      'Zuständige Stelle ist die Fischereibehörde des Kantons Bern (WEU / LANAT). Auf der offiziellen Fischerei-Seite finden Fischer Vorschriften, Kontakte und weiterführende Dokumente.',
+    sourceUrl: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei.html',
     extractedDate: '2026-04-15',
     effectiveYear: 2026,
     confidence: 'high',

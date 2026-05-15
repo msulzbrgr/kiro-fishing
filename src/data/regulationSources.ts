@@ -39,7 +39,7 @@ export const REGULATION_SOURCES: RegulationSource[] = [
   // ── Bern ───────────────────────────────────────────────────────────────────
   {
     canton: 'BE',
-    url: 'https://www.weu.be.ch/de/start/themen/fischerei.html',
+    url: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei.html',
     type: 'official_authority',
     language: 'de',
     trustLevel: 'high',
@@ -50,7 +50,7 @@ export const REGULATION_SOURCES: RegulationSource[] = [
   },
   {
     canton: 'BE',
-    url: 'https://www.weu.be.ch/de/start/themen/fischerei/fischerpatent-kaufen.html',
+    url: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei/fischerpatent-kaufen.html',
     type: 'permit_portal',
     language: 'de',
     trustLevel: 'high',

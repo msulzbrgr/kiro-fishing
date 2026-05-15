@@ -37,15 +37,15 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
     canton: 'Bern',
     cantonCode: 'BE',
     generalInfo:
-      'Kanton Bern verfügt über ausgedehnte Fischereigewässer, darunter Thuner- und Brienzersee sowie zahlreiche Flüsse. Die Fischerei wird durch das kantonale Fischereigesetz geregelt.',
+      'Kanton Bern bietet Fischerei auf grossen Seen und Fliessgewässern. Für Freizeitfischer sind Patentpflicht, Schonzeiten, Mindestmasse und gewässerspezifische Regeln zentral.',
     permitInfo:
-      'Fischereikarten erhältlich bei kantonalen Behörden. Für Seen und Fliessgewässer gelten unterschiedliche Patente.',
+      'Fischerpatente (Tages- und Jahrespatente) sind für Bern obligatorisch. Für Seen und Fliessgewässer gelten unterschiedliche Patentkategorien; Kauf erfolgt über die offizielle WEU-Plattform.',
     laws: [
       {
         title: 'Fischereigesetz Kanton Bern (FiG)',
         description:
           'Kantonales Gesetz für sämtliche Fischereiaktivitäten, Patente und Artenschutz in Bern.',
-        url: 'https://www.be.ch/de/start/dienstleistungen/sport-freizeit/jagen-und-fischen/fischerei.html',
+        url: 'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei.html',
       },
       {
         title: 'Bundesgesetz über die Fischerei (BGF)',
@@ -60,7 +60,8 @@ export const CANTON_LAWS: Record<string, CantonLaw> = {
       { species: 'Seesaibling (Arctic Char)', sizeCm: 25 },
       { species: 'Felchen (Whitefish)', sizeCm: 20 },
     ],
-    permitPurchaseUrl: 'https://www.weu.be.ch/de/start/themen/fischerei/fischerpatent-kaufen.html',
+    permitPurchaseUrl:
+      'https://www.weu.be.ch/de/start/themen/jagd-fischerei/fischerei/fischerpatent-kaufen.html',
     lastVerified: '2026-04-15',
     regulationYear: 2026,
   },
