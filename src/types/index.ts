@@ -32,7 +32,7 @@ export interface Catch {
   recognition?: CatchRecognitionMetadata;
 }
 
-export type CatchSpeciesSelectionSource = 'manual' | 'ai' | 'heuristic';
+export type CatchSpeciesSelectionSource = 'manual' | 'ai';
 
 export type CatchRecognitionErrorCode =
   | 'unsupported_format'
