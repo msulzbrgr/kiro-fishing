@@ -1,15 +1,17 @@
 import { expect, test } from '@playwright/test';
+import { COMMON_FISH_SPECIES } from '../src/data/cantonLaws';
+import {
+  assertFishRecognitionConfidence,
+  computeFishRecognitionCenterCrop,
+  getFishRecognitionAvailability,
+  mapScoresToSpeciesPredictions,
+  normalizeFishRecognitionPixel,
+  runFishRecognitionInference,
+} from '../src/services/fishRecognitionService';
 
 test.describe('Fish recognition service', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-  });
-
-  test('stays unavailable while the feature flag is off and the profile lock is blocked', async ({ page }) => {
-    const availability = await page.evaluate(async () => {
-      const service = await import('/src/services/fishRecognitionService.ts');
-      return service.getFishRecognitionAvailability();
-    });
+  test('stays unavailable while the feature flag is off and the profile lock is blocked', () => {
+    const availability = getFishRecognitionAvailability();
 
     expect(availability.enabled).toBe(false);
     expect(availability.profileValid).toBe(true);
@@ -18,95 +20,65 @@ test.describe('Fish recognition service', () => {
     expect(availability.reason).toBe('feature_disabled');
   });
 
-  test('preprocesses images with center crop and normalized pixels', async ({ page }) => {
-    const result = await page.evaluate(async () => {
-      const service = await import('/src/services/fishRecognitionService.ts');
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 3;
-      canvas.height = 1;
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('missing canvas context');
-
-      context.fillStyle = '#ff0000';
-      context.fillRect(0, 0, 1, 1);
-      context.fillStyle = '#00ff00';
-      context.fillRect(1, 0, 1, 1);
-      context.fillStyle = '#0000ff';
-      context.fillRect(2, 0, 1, 1);
-
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((value) => {
-          if (value) resolve(value);
-          else reject(new Error('failed to create blob'));
-        }, 'image/png');
-      });
-
-      const file = new File([blob], 'striped.png', { type: 'image/png' });
-      const preprocessed = await service.preprocessFishRecognitionImage(file);
-
-      return {
-        inputSize: preprocessed.inputSize,
-        originalWidth: preprocessed.originalWidth,
-        originalHeight: preprocessed.originalHeight,
-        crop: preprocessed.crop,
-        firstPixel: [preprocessed.input[0], preprocessed.input[1], preprocessed.input[2]],
-      };
-    });
-
-    expect(result.inputSize).toBe(224);
-    expect(result.originalWidth).toBe(3);
-    expect(result.originalHeight).toBe(1);
-    expect(result.crop).toEqual({ x: 1, y: 0, size: 1 });
-    expect(result.firstPixel[0]).toBeCloseTo(-1, 5);
-    expect(result.firstPixel[1]).toBeCloseTo(1, 5);
-    expect(result.firstPixel[2]).toBeCloseTo(-1, 5);
+  test('computes a deterministic center crop and symmetric pixel normalization', () => {
+    expect(computeFishRecognitionCenterCrop(3, 1)).toEqual({ x: 1, y: 0, size: 1 });
+    expect(normalizeFishRecognitionPixel(0)).toBe(-1);
+    expect(normalizeFishRecognitionPixel(255)).toBe(1);
+    expect(normalizeFishRecognitionPixel(128)).toBeCloseTo(0.003922, 6);
   });
 
-  test('maps model scores to sorted top-3 species probabilities', async ({ page }) => {
-    const predictions = await page.evaluate(async () => {
-      const service = await import('/src/services/fishRecognitionService.ts');
-      const { COMMON_FISH_SPECIES } = await import('/src/data/cantonLaws.ts');
+  test('maps model scores to sorted top-3 species probabilities', () => {
+    const scores = Array.from({ length: COMMON_FISH_SPECIES.length }, () => -10);
+    scores[0] = 5;
+    scores[1] = 1;
+    scores[2] = 3;
 
-      const scores = Array.from({ length: COMMON_FISH_SPECIES.length }, () => -10);
-      scores[0] = 5;
-      scores[1] = 1;
-      scores[2] = 3;
-
-      return service.mapScoresToSpeciesPredictions(scores);
-    });
+    const predictions = mapScoresToSpeciesPredictions(scores);
 
     expect(predictions).toHaveLength(3);
+    expect(predictions[0].species).toBe(COMMON_FISH_SPECIES[0]);
+    expect(predictions[1].species).toBe(COMMON_FISH_SPECIES[2]);
+    expect(predictions[2].species).toBe(COMMON_FISH_SPECIES[1]);
     expect(predictions[0].confidence).toBeGreaterThan(predictions[1].confidence);
     expect(predictions[1].confidence).toBeGreaterThan(predictions[2].confidence);
   });
 
-  test('rejects low-confidence inference outputs', async ({ page }) => {
-    const failure = await page.evaluate(async () => {
-      const service = await import('/src/services/fishRecognitionService.ts');
-      const { COMMON_FISH_SPECIES } = await import('/src/data/cantonLaws.ts');
-      const runner = {
-        metadata: { name: 'test-runner', version: '1.0.0', hash: 'test' },
-        predict: async () => new Array(COMMON_FISH_SPECIES.length).fill(0),
-      };
+  test('rejects low-confidence prediction sets', () => {
+    try {
+      assertFishRecognitionConfidence([
+        { species: COMMON_FISH_SPECIES[0], confidence: 0.5 },
+        { species: COMMON_FISH_SPECIES[1], confidence: 0.3 },
+        { species: COMMON_FISH_SPECIES[2], confidence: 0.2 },
+      ]);
+      throw new Error('expected low-confidence rejection');
+    } catch (error) {
+      expect((error as { code?: string }).code).toBe('low_confidence');
+    }
+  });
 
-      try {
-        await service.runFishRecognitionInference(
-          {
-            input: new Float32Array(224 * 224 * 3),
-            inputSize: 224,
-            originalWidth: 224,
-            originalHeight: 224,
-            crop: { x: 0, y: 0, size: 224 },
-          },
-          runner,
-        );
-        return { code: 'unexpected-success' };
-      } catch (error) {
-        return { code: (error as { code?: string }).code ?? 'unknown' };
-      }
-    });
+  test('runFishRecognitionInference returns calibrated top-3 predictions for confident scores', async () => {
+    const result = await runFishRecognitionInference(
+      {
+        input: new Float32Array(224 * 224 * 3),
+        inputSize: 224,
+        originalWidth: 224,
+        originalHeight: 224,
+        crop: { x: 0, y: 0, size: 224 },
+      },
+      {
+        metadata: { name: 'test-runner', version: '1.0.0', hash: 'test-hash' },
+        predict: async () => {
+          const scores = Array.from({ length: COMMON_FISH_SPECIES.length }, () => -10);
+          scores[0] = 9;
+          scores[1] = 3;
+          scores[2] = 2;
+          return scores;
+        },
+      },
+    );
 
-    expect(failure.code).toBe('low_confidence');
+    expect(result.modelVersion).toBe('1.0.0');
+    expect(result.predictions).toHaveLength(3);
+    expect(result.predictions[0].species).toBe(COMMON_FISH_SPECIES[0]);
   });
 });

@@ -17,6 +17,8 @@ export const MAX_FISH_RECOGNITION_IMAGE_BYTES = 5 * 1024 * 1024;
 export const SUPPORTED_FISH_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
 type FishRecognitionRuntimeBackend = 'webgpu' | 'wasm' | 'unavailable';
+type FishRecognitionCanvas = OffscreenCanvas | HTMLCanvasElement;
+type FishRecognition2DContext = OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
 
 export interface FishRecognitionInput {
   file: File;
@@ -62,8 +64,8 @@ let inferenceRunnerLoader: InferenceRunnerLoader | null = null;
 export class FishRecognitionError extends Error {
   code: CatchRecognitionErrorCode;
 
-  constructor(code: CatchRecognitionErrorCode, message = code) {
-    super(message);
+  constructor(code: CatchRecognitionErrorCode, message?: string) {
+    super(message ?? code);
     this.code = code;
     this.name = 'FishRecognitionError';
   }
@@ -83,6 +85,19 @@ export function normalizeFishRecognitionPixel(value: number): number {
 
 export function normalizeFishRecognitionConfidence(value: number): number {
   return Math.round(value * 10000) / 10000;
+}
+
+export function computeFishRecognitionCenterCrop(width: number, height: number): {
+  x: number;
+  y: number;
+  size: number;
+} {
+  const size = Math.min(width, height);
+  return {
+    x: Math.max(Math.floor((width - size) / 2), 0),
+    y: Math.max(Math.floor((height - size) / 2), 0),
+    size,
+  };
 }
 
 function hasBrowserCanvasRuntime(): boolean {
@@ -168,7 +183,7 @@ function validateFishRecognitionInput(file: File): void {
   }
 }
 
-function createWorkingCanvas(size: number): OffscreenCanvas | HTMLCanvasElement {
+function createWorkingCanvas(size: number): FishRecognitionCanvas {
   if (typeof OffscreenCanvas !== 'undefined') {
     return new OffscreenCanvas(size, size);
   }
@@ -181,6 +196,14 @@ function createWorkingCanvas(size: number): OffscreenCanvas | HTMLCanvasElement 
   canvas.width = size;
   canvas.height = size;
   return canvas;
+}
+
+function getCanvas2DContext(canvas: FishRecognitionCanvas): FishRecognition2DContext {
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context || !('drawImage' in context) || !('getImageData' in context)) {
+    throw new FishRecognitionError('processing_failed');
+  }
+  return context as FishRecognition2DContext;
 }
 
 async function decodeFishImage(file: File): Promise<{
@@ -238,11 +261,8 @@ async function decodeFishImage(file: File): Promise<{
   }
 }
 
-function getCanvasImageData(canvas: OffscreenCanvas | HTMLCanvasElement): ImageData {
-  const context = canvas.getContext('2d', { willReadFrequently: true });
-  if (!context) {
-    throw new FishRecognitionError('processing_failed');
-  }
+function getCanvasImageData(canvas: FishRecognitionCanvas): ImageData {
+  const context = getCanvas2DContext(canvas);
   return context.getImageData(0, 0, canvas.width, canvas.height);
 }
 
@@ -252,22 +272,16 @@ export async function preprocessFishRecognitionImage(file: File): Promise<Prepro
   const decoded = await decodeFishImage(file);
   try {
     const inputSize = FISH_RECOGNITION_INPUT_SIZE;
-    const cropSize = Math.min(decoded.width, decoded.height);
-    const cropX = Math.max(Math.floor((decoded.width - cropSize) / 2), 0);
-    const cropY = Math.max(Math.floor((decoded.height - cropSize) / 2), 0);
+    const crop = computeFishRecognitionCenterCrop(decoded.width, decoded.height);
     const canvas = createWorkingCanvas(inputSize);
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-
-    if (!context) {
-      throw new FishRecognitionError('processing_failed');
-    }
+    const context = getCanvas2DContext(canvas);
 
     context.drawImage(
       decoded.source,
-      cropX,
-      cropY,
-      cropSize,
-      cropSize,
+      crop.x,
+      crop.y,
+      crop.size,
+      crop.size,
       0,
       0,
       inputSize,
@@ -289,11 +303,7 @@ export async function preprocessFishRecognitionImage(file: File): Promise<Prepro
       inputSize,
       originalWidth: decoded.width,
       originalHeight: decoded.height,
-      crop: {
-        x: cropX,
-        y: cropY,
-        size: cropSize,
-      },
+      crop,
     };
   } catch (err) {
     throw mapToRecognitionError(err);

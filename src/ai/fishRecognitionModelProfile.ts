@@ -1,5 +1,3 @@
-import modelProfileLock from './model-profile-lock.json';
-
 export interface FishRecognitionModelProfileLock {
   schemaVersion: number;
   feature: string;
@@ -46,7 +44,45 @@ export interface FishRecognitionModelMetadata {
   hash: string;
 }
 
-export const FISH_RECOGNITION_MODEL_PROFILE_LOCK = modelProfileLock as FishRecognitionModelProfileLock;
+export const FISH_RECOGNITION_MODEL_PROFILE_LOCK: FishRecognitionModelProfileLock = {
+  schemaVersion: 1,
+  feature: 'fish-recognition',
+  lockedAt: '2026-05-19T19:52:33.358Z',
+  defaultEnabled: false,
+  gate: {
+    passed: false,
+    reason: 'Blocked pending a browser-compatible trained species model artifact, calibrated validation report, and benchmark evidence for target devices.',
+  },
+  selectedModel: {
+    name: 'mobilenetv3-small-species-head',
+    fallbackName: 'efficientnet-lite0-species-head',
+    version: 'pending-feasibility-gate',
+    hash: 'pending-model-artifact',
+    inputSize: 224,
+    normalization: 'imagenet-symmetric-minus-one-to-one',
+    topK: 3,
+  },
+  thresholds: {
+    minConfidence: 0.72,
+    p95LatencyMs: {
+      webgpu: 120,
+      wasm: 350,
+    },
+    peakMemoryMb: 180,
+    top1Accuracy: 0.75,
+    top3Accuracy: 0.92,
+    expectedCalibrationError: 0.08,
+  },
+  benchmark: {
+    command: 'npm run benchmark:fish-recognition',
+    outputPath: '/tmp/fish-recognition-benchmark.json',
+  },
+  calibration: {
+    method: 'temperature-scaling',
+    thresholdSource: 'validation-reliability-bins',
+    status: 'pending',
+  },
+};
 
 export function hasValidFishRecognitionModelProfileLock(): boolean {
   const profile = FISH_RECOGNITION_MODEL_PROFILE_LOCK;

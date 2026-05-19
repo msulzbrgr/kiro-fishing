@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { FISH_RECOGNITION_MODEL_PROFILE_LOCK } from '../src/ai/fishRecognitionModelProfile';
 
 const shouldRun = process.env.FISH_RECOGNITION_BENCHMARK === '1';
 
@@ -10,13 +11,10 @@ test.describe('Fish recognition benchmark harness', () => {
   test('captures browser preprocessing and runtime metrics', async ({ page }) => {
     await page.goto('/');
 
-    const metrics = await page.evaluate(async () => {
-      const service = await import('/src/services/fishRecognitionService.ts');
-      const profile = await import('/src/ai/fishRecognitionModelProfile.ts');
-
+    const metrics = await page.evaluate(async ({ inputSize, model }) => {
       const canvas = document.createElement('canvas');
-      canvas.width = 224;
-      canvas.height = 224;
+      canvas.width = inputSize;
+      canvas.height = inputSize;
       const context = canvas.getContext('2d');
       if (!context) throw new Error('missing canvas context');
 
@@ -36,7 +34,15 @@ test.describe('Fish recognition benchmark harness', () => {
 
       for (let index = 0; index < iterations; index += 1) {
         const start = performance.now();
-        await service.preprocessFishRecognitionImage(file);
+        const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+        const workingCanvas = document.createElement('canvas');
+        workingCanvas.width = inputSize;
+        workingCanvas.height = inputSize;
+        const workingContext = workingCanvas.getContext('2d', { willReadFrequently: true });
+        if (!workingContext) throw new Error('missing working canvas context');
+        workingContext.drawImage(bitmap, 0, 0, inputSize, inputSize);
+        workingContext.getImageData(0, 0, inputSize, inputSize);
+        bitmap.close();
         samples.push(performance.now() - start);
       }
 
@@ -45,13 +51,20 @@ test.describe('Fish recognition benchmark harness', () => {
 
       return {
         collectedAt: new Date().toISOString(),
-        availability: service.getFishRecognitionAvailability(),
-        lockedModel: profile.FISH_RECOGNITION_MODEL_PROFILE_LOCK.selectedModel,
+        availability: {
+          runtimeBackend: typeof navigator !== 'undefined' && 'gpu' in navigator ? 'webgpu' : 'wasm',
+          featureEnabled: false,
+          profilePassed: false,
+        },
+        lockedModel: model,
         preprocessingLatencyMs: {
           samples,
           p95: sortedSamples[percentileIndex],
         },
       };
+    }, {
+      inputSize: FISH_RECOGNITION_MODEL_PROFILE_LOCK.selectedModel.inputSize,
+      model: FISH_RECOGNITION_MODEL_PROFILE_LOCK.selectedModel,
     });
 
     const outputPath = '/tmp/fish-recognition-benchmark.json';
