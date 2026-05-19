@@ -1,44 +1,34 @@
 # generated: 2026-04-30T21:55:20.851+00:00
-# last_updated: 2026-04-30T21:55:20.851+00:00
+# last_updated: 2026-05-19T15:12:05.696+00:00
 # project: kiro-fishing
 # project_key: NOKEY
 # tracking_system: file-system
 # story_location: /home/runner/work/kiro-fishing/kiro-fishing/_bmad-output/implementation-artifacts
 
-# STATUS DEFINITIONS:
-# ==================
-# Epic Status:
-#   - backlog: Epic not yet started
-#   - in-progress: Epic actively being worked on
-#   - done: All stories in epic completed
-#
-# Epic Status Transitions:
-#   - backlog → in-progress: Automatically when first story is created (via create-story)
-#   - in-progress → done: Manually when all stories reach 'done' status
-#
-# Story Status:
-#   - backlog: Story only exists in epic file
-#   - ready-for-dev: Story file created in stories folder
-#   - in-progress: Developer actively working on implementation
-#   - review: Ready for code review (via Dev's code-review workflow)
-#   - done: Story completed
-#
-# Retrospective Status:
-#   - optional: Can be completed but not required
-#   - done: Retrospective has been completed
-#
-# WORKFLOW NOTES:
-# ===============
-# - Epic transitions to 'in-progress' automatically when first story is created
-# - Stories can be worked in parallel if team capacity allows
-# - Developer typically creates next story after previous one is 'done' to incorporate learnings
-# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
-
 generated: 2026-04-30T21:55:20.851+00:00
-last_updated: 2026-04-30T21:55:20.851+00:00
+last_updated: 2026-05-19T15:12:05.696+00:00
 project: kiro-fishing
 project_key: NOKEY
 tracking_system: file-system
 story_location: /home/runner/work/kiro-fishing/kiro-fishing/_bmad-output/implementation-artifacts
 
-development_status: {}
+development_status:
+  E5-local-fish-species-recognition:
+    title: "Local Fish Species Recognition"
+    status: backlog
+    stories:
+      E5-S1-feasibility-gate-model-profile-lock:
+        title: "Feasibility Gate and Model Profile Lock"
+        status: backlog
+      E5-S2-local-recognition-service-pipeline:
+        title: "Local Fish Recognition Service Pipeline"
+        status: backlog
+      E5-S3-catch-log-ux-integration-manual-override:
+        title: "Catch Log UX Integration and Manual Override"
+        status: backlog
+      E5-S4-persistence-and-schema-extension:
+        title: "Persistence and Schema Extension"
+        status: backlog
+      E5-S5-hardening-i18n-offline-privacy-performance:
+        title: "Hardening, i18n, Offline/Privacy and Performance Validation"
+        status: backlog
