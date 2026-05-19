@@ -193,7 +193,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
             setForm((prev) => ({
               ...prev,
               species: topCandidate.species,
-              selectedSpeciesSource: 'heuristic',
+              selectedSpeciesSource: 'ai',
             }));
             setRecognitionState(
               topCandidate.confidence < LOW_CONFIDENCE_THRESHOLD ? 'low_confidence' : 'success',
