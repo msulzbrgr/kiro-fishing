@@ -42,7 +42,7 @@ releaseMode: 'phased'
 
 KiroFishing is a local-first Swiss fishing companion app (React 19 + TypeScript + Vite) that detects the user's canton from their map location and displays fishing regulation summaries for all 26 Swiss cantons. The app has a working Maps view with Leaflet integration, a Laws tab with regulation summaries, a Catch logging feature, and full EN/DE/FR/IT internationalisation.
 
-The next major capability phase delivers two closely coupled features: a **Regulation Data Layer** (structured, source-tracked, freshness-dated regulation records) and an **AI Regulation Assistant** (a retrieval-augmented LLM Q&A feature grounded exclusively in the curated regulation data). A newly approved scope extension adds **Local Fish Species Recognition** in the catch-photo workflow, running fully on-device with no cloud processing. Together these transform the app from a map-with-links into the most trusted, legally-responsible Swiss fishing compliance companion available.
+The next major capability phase delivers two closely coupled features: a **Regulation Data Layer** (structured, source-tracked, freshness-dated regulation records) and an **AI Regulation Assistant** (a retrieval-augmented LLM Q&A feature grounded exclusively in the curated regulation data). Together these transform the app from a map-with-links into the most trusted, legally-responsible Swiss fishing compliance companion available.
 
 Switzerland's 500,000+ anglers must hold a valid canton-specific *Fischereipatent* before fishing — failure to do so is an administrative offence under Art. 22 BGF. Yet the information they need is scattered across 26 cantonal websites, annual PDF booklets, and secondary blogs with no shared schema, no API, and no structured Q&A. KiroFishing is uniquely positioned to solve this: it already knows the user's canton, and it already holds a regulation dataset. The missing pieces are (1) structured source provenance with permit purchase links and freshness dates, and (2) the ability to answer free-form questions responsibly.
 
@@ -148,22 +148,6 @@ No Swiss fishing app today offers location-aware, canton-specific regulation loo
 - Source diff detection: when official source content changes, invalidate LLM cache
 - In-app notification: "Regulations updated for Solothurn — check what changed"
 - Annual regulation update reminder workflow
-
-### Phase 5 — Local Fish Species Recognition (Scope Extension)
-
-**What ships:**
-- Automatic fish recognition starts after users add a photo in Catch Log
-- Top-3 species suggestions with confidence scores from local inference
-- Species field prefilled with top prediction; user can override before saving
-- Prediction metadata persisted per catch (`predictedSpecies`, `confidence`, `modelVersion`, timestamp)
-- Strict local-only inference path with no cloud/network calls
-- Error handling for unsupported format, malformed image, and low-memory conditions
-- Fish-ID UX strings localised in EN/DE/FR/IT/JA
-
-**What does NOT ship in Phase 5:**
-- Server-side model inference
-- Cloud vector storage
-- Any mandatory replacement of manual species entry
 
 **Explicitly out of scope (all phases):**
 - Legal advice or completeness guarantees
@@ -435,21 +419,6 @@ Delivery is explicitly phased because the data layer (Phase 1) delivers standalo
 - Diff detection: if extracted content changes, invalidate LLM answer cache for that canton
 - In-app notification: "Regulations updated for [canton] — what changed"
 
-### Phase 5 — Local Fish Species Recognition
-
-**Core journeys supported:** Catch logging with photo evidence and assisted species entry  
-**Resource requirements:** 1 developer, ~2-3 sprints  
-**Prerequisite:** Feasibility Gate complete (deployable local model profile approved)
-
-**Must-have capabilities:**
-- Feasibility Gate: validate candidate local model/runtime profiles against realistic device tiers before implementation
-- `src/services/fishRecognitionService.ts` runtime abstraction for local inference
-- Catch-photo pipeline: capture → normalization → embedding/inference → top-3 ranking
-- Catch form integration: loading, success, low-confidence, failure, and manual-override states
-- Local persistence of fish-ID prediction metadata and model version
-- Offline-first behavior: fish recognition remains local and does not require connectivity
-- Fish-ID UI strings in EN/DE/FR/IT/JA
-
 ### Risk Mitigation
 
 | Risk | Mitigation |
@@ -503,19 +472,6 @@ Delivery is explicitly phased because the data layer (Phase 1) delivers standalo
 - FR25: Users can select their preferred LLM provider (OpenAI or Anthropic) in app settings
 - FR26: The app supports a proxy URL configuration as an alternative to a user-provided API key (Phase 3)
 
-### Local Fish Species Recognition
-
-- FR32: After at least one photo is attached in Catch Log, the app automatically starts local fish recognition before catch save
-- FR33: The app returns up to three candidate species and confidence scores for each recognition attempt
-- FR34: The app pre-fills the species field with the top prediction while allowing full manual override
-- FR35: If confidence is below the configured threshold, the app keeps suggestions visible and explicitly asks the user to confirm species manually
-- FR36: Recognition accepts only supported image formats and size limits; unsupported files are rejected with a user-friendly error
-- FR37: The app stores fish-ID metadata with each catch: predicted species list, selected species source (AI/manual), confidence, model version, and recognition timestamp
-- FR38: Recognition must execute fully on-device; no network calls are permitted during image processing, embedding, ranking, or metadata persistence
-- FR39: If recognition fails (format, corruption, memory, runtime), catch logging still works with manual species selection
-- FR40: The app records feasibility-gate-selected model profile metadata and exposes it in diagnostics/settings for supportability
-- FR41: Fish-ID UI strings (loading, error, low-confidence, suggestions, override guidance) are localised in EN/DE/FR/IT/JA
-
 ### Internationalisation
 
 - FR27: All regulation panel UI strings (permit purchase labels, disclaimer, staleness warning, freshness date label) are available in EN, DE, FR, and IT via i18next
@@ -537,8 +493,6 @@ Delivery is explicitly phased because the data layer (Phase 1) delivers standalo
 - AI assistant response (from API call initiation to rendered answer): < 8 seconds on a standard mobile connection
 - LLM answer cache lookup: < 50ms (localStorage read)
 - App startup with regulation records loaded: no measurable increase from baseline (static JSON is bundled)
-- Fish recognition feasibility gate must define and lock tiered targets (low/mid/high devices) for cold start, warm inference, and memory footprint before implementation begins
-- Fish recognition benchmark evidence must be captured and stored with the selected model profile before release
 
 ### Security and Privacy
 
@@ -548,15 +502,12 @@ Delivery is explicitly phased because the data layer (Phase 1) delivers standalo
 - Only canton code transmitted to LLM API — no GPS coordinates, no user identifiers
 - If proxy mode is used, the proxy must not log question content; only canton code and timestamp may be logged
 - LLM response JSON parsed strictly; malformed responses must be rejected and error surfaced to user
-- Fish recognition image bytes, embeddings, and prediction metadata must remain on-device only
-- Fish recognition flow must block network activity for inference-related processing paths
 
 ### Reliability
 
 - LLM API call failures must surface a user-friendly error with a link to the official cantonal authority — never a raw error message
 - If LLM API is unavailable, the structured regulation records (Phase 1) remain fully functional and accessible
 - App must work fully offline for regulation browsing (structured records, permit purchase links, freshness dates) — only the AI assistant requires connectivity
-- If fish recognition is unavailable on a device/runtime, users must retain the full manual catch logging flow without data loss
 
 ### Accessibility
 
@@ -568,7 +519,6 @@ Delivery is explicitly phased because the data layer (Phase 1) delivers standalo
 
 - All user-visible strings related to regulation display and AI assistant feature must be localised in EN, DE, FR, IT
 - Regulation record content (sourced from German-language official documents) is displayed in German by default; the `contentDe` field provides German-language fallback for FR/IT records if available
-- All user-visible fish-recognition strings must be localised in EN, DE, FR, IT, and JA
 
 ---
 

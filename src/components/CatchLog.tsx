@@ -23,6 +23,7 @@ import type {
 import { COMMON_FISH_SPECIES } from '../data/cantonLaws';
 import { generateId, saveSession } from '../utils/storage';
 import {
+  FISH_RECOGNITION_ENABLED,
   FISH_RECOGNITION_MODEL_VERSION,
   FishRecognitionError,
   identifyFishSpecies,
@@ -83,6 +84,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const MAX_PHOTOS = 10;
+  const MAX_BYTES = 5 * 1024 * 1024;
   const LOW_CONFIDENCE_THRESHOLD = 0.6;
 
   const closeGallery = () => setGalleryCatchId(null);
@@ -121,16 +123,26 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     }
 
     const acceptedFiles = files
-      .filter((file) => isSupportedFishImage(file) && file.size <= MAX_FISH_RECOGNITION_IMAGE_BYTES)
+      .filter((file) => {
+        const isSupported = FISH_RECOGNITION_ENABLED
+          ? isSupportedFishImage(file)
+          : file.type.startsWith('image/');
+        const maxBytes = FISH_RECOGNITION_ENABLED
+          ? MAX_FISH_RECOGNITION_IMAGE_BYTES
+          : MAX_BYTES;
+        return isSupported && file.size <= maxBytes;
+      })
       .slice(0, MAX_PHOTOS - form.photos.length);
 
     if (acceptedFiles.length === 0) {
-      const hasUnsupported = files.some((file) => !isSupportedFishImage(file));
-      const hasOversized = files.some((file) => file.size > MAX_FISH_RECOGNITION_IMAGE_BYTES);
-      if (hasUnsupported) {
-        setPhotoValidationError(t('catch.recognition.error_unsupported_format'));
-      } else if (hasOversized) {
-        setPhotoValidationError(t('catch.recognition.error_image_too_large'));
+      if (FISH_RECOGNITION_ENABLED) {
+        const hasUnsupported = files.some((file) => !isSupportedFishImage(file));
+        const hasOversized = files.some((file) => file.size > MAX_FISH_RECOGNITION_IMAGE_BYTES);
+        if (hasUnsupported) {
+          setPhotoValidationError(t('catch.recognition.error_unsupported_format'));
+        } else if (hasOversized) {
+          setPhotoValidationError(t('catch.recognition.error_image_too_large'));
+        }
       }
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
@@ -167,7 +179,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       }
 
       const primaryFile = acceptedFiles[0];
-      if (primaryFile) {
+      if (FISH_RECOGNITION_ENABLED && primaryFile) {
         setRecognitionState('processing');
         setRecognitionAttempted(true);
         setRecognitionErrorCode(null);
@@ -181,7 +193,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
             setForm((prev) => ({
               ...prev,
               species: topCandidate.species,
-              selectedSpeciesSource: 'ai',
+              selectedSpeciesSource: 'heuristic',
             }));
             setRecognitionState(
               topCandidate.confidence < LOW_CONFIDENCE_THRESHOLD ? 'low_confidence' : 'success',
@@ -226,7 +238,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       released: form.released,
       notes: form.notes.trim() || undefined,
       photos: form.photos.length > 0 ? form.photos : undefined,
-      recognition: recognitionAttempted
+      recognition: FISH_RECOGNITION_ENABLED && recognitionAttempted
         ? {
             predictedSpecies: recognitionCandidates,
             selectedSpeciesSource: form.selectedSpeciesSource,
@@ -417,18 +429,19 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={FISH_RECOGNITION_ENABLED ? 'image/jpeg,image/png,image/webp' : 'image/*'}
                 multiple
                 className="catch-photo-input"
                 onChange={handlePhotoChange}
                 data-testid="catch-photo-input"
               />
-              {recognitionState === 'processing' && (
+              {FISH_RECOGNITION_ENABLED && recognitionState === 'processing' && (
                 <div className="catch-recognition-status" data-testid="catch-recognition-processing">
                   <RefreshCw size={14} className="spin" /> {t('catch.recognition.processing')}
                 </div>
               )}
-              {(recognitionState === 'success' || recognitionState === 'low_confidence') && (
+              {FISH_RECOGNITION_ENABLED
+                && (recognitionState === 'success' || recognitionState === 'low_confidence') && (
                 <div className="catch-recognition-status" data-testid="catch-recognition-status">
                   <div className="catch-recognition-title">
                     {recognitionState === 'low_confidence'
@@ -456,7 +469,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   <div className="settings-hint">{t('catch.recognition.override_hint')}</div>
                 </div>
               )}
-              {recognitionState === 'failed' && recognitionErrorCode && (
+              {FISH_RECOGNITION_ENABLED && recognitionState === 'failed' && recognitionErrorCode && (
                 <div className="form-error" role="alert" data-testid="catch-recognition-error">
                   <AlertTriangle size={14} /> {getRecognitionErrorMessage(recognitionErrorCode)}
                 </div>
