@@ -29,6 +29,30 @@ export interface Catch {
   notes?: string;
   photoIds?: string[]; // IndexedDB photo references
   photos?: string[]; // base64 data URLs
+  recognition?: CatchRecognitionMetadata;
+}
+
+export type CatchSpeciesSelectionSource = 'manual' | 'ai';
+
+export type CatchRecognitionErrorCode =
+  | 'unsupported_format'
+  | 'image_too_large'
+  | 'malformed_image'
+  | 'processing_failed'
+  | 'out_of_memory';
+
+export interface SpeciesPrediction {
+  species: string;
+  confidence: number;
+}
+
+export interface CatchRecognitionMetadata {
+  predictedSpecies: SpeciesPrediction[];
+  selectedSpeciesSource: CatchSpeciesSelectionSource;
+  selectedSpeciesConfidence?: number;
+  modelVersion: string;
+  recognizedAt: string;
+  errorCode?: CatchRecognitionErrorCode;
 }
 
 export interface FishingLocation {

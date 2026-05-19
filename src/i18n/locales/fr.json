@@ -111,7 +111,18 @@
     "remove_photo": "Supprimer",
     "photos": "Photos",
     "view_all_photos": "Tout voir",
-    "close": "Fermer"
+    "close": "Fermer",
+    "recognition": {
+      "processing": "Identification de l’espèce à partir de la photo…",
+      "suggestions_title": "Espèces suggérées (top 3)",
+      "low_confidence": "Confiance faible — veuillez confirmer l’espèce manuellement",
+      "override_hint": "Vous pouvez remplacer l’espèce suggérée avant l’enregistrement.",
+      "error_unsupported_format": "Format d’image non pris en charge. Utilisez JPEG, PNG ou WebP.",
+      "error_image_too_large": "L’image est trop grande. Taille maximale : 5 Mo.",
+      "error_malformed_image": "Impossible de traiter l’image. Essayez une autre photo.",
+      "error_out_of_memory": "Mémoire insuffisante pour traiter cette image sur cet appareil.",
+      "error_processing_failed": "Échec de l’identification. Veuillez sélectionner l’espèce manuellement."
+    }
   },
   "conditions": {
     "weather_title": "Conditions météo",
