@@ -1,7 +1,8 @@
 import { COMMON_FISH_SPECIES } from '../data/cantonLaws';
 import type { CatchRecognitionErrorCode, SpeciesPrediction } from '../types';
 
-export const FISH_RECOGNITION_MODEL_VERSION = 'local-vision-lite-v1';
+export const FISH_RECOGNITION_ENABLED = false;
+export const FISH_RECOGNITION_MODEL_VERSION = 'local-heuristic-stub-v0';
 export const MAX_FISH_RECOGNITION_IMAGE_BYTES = 5 * 1024 * 1024;
 export const SUPPORTED_FISH_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 const MAX_HASH_BYTES = 64 * 1024;
@@ -86,6 +87,9 @@ function mapToRecognitionError(err: unknown): FishRecognitionError {
 }
 
 export async function identifyFishSpecies({ file }: FishRecognitionInput): Promise<FishRecognitionResult> {
+  if (!FISH_RECOGNITION_ENABLED) {
+    throw new FishRecognitionError('processing_failed');
+  }
   if (!isSupportedFishImage(file)) {
     throw new FishRecognitionError('unsupported_format');
   }

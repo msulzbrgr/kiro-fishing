@@ -216,7 +216,7 @@ test.describe('Catch Log', () => {
     await expect(page.getByTestId('catch-photo-full')).toHaveCount(0);
   });
 
-  test('photo upload auto-suggests species and stores recognition metadata', async ({ page }) => {
+  test('photo upload keeps manual species selection while recognition is gated off', async ({ page }) => {
     await page.getByTestId('log-catch-btn').click();
     await page.getByTestId('catch-photo-input').setInputFiles({
       name: 'fish.png',
@@ -224,13 +224,12 @@ test.describe('Catch Log', () => {
       buffer: MINIMAL_PNG,
     });
 
-    await expect(page.getByTestId('catch-recognition-status')).toBeVisible();
-    await expect(page.getByTestId('catch-recognition-suggestion-0')).toBeVisible();
-    await expect(page.getByTestId('catch-recognition-suggestion-1')).toBeVisible();
-    await expect(page.getByTestId('catch-recognition-suggestion-2')).toBeVisible();
-
+    await expect(page.getByTestId('catch-recognition-status')).toHaveCount(0);
+    await expect(page.getByTestId('catch-recognition-processing')).toHaveCount(0);
     const selectedSpecies = await page.getByTestId('species-select').inputValue();
-    expect(selectedSpecies).not.toBe('');
+    expect(selectedSpecies).toBe('');
+
+    await page.getByTestId('species-select').selectOption({ index: 1 });
 
     await page.getByTestId('add-catch-btn').click();
     await expect(page.locator('.catch-item')).toHaveCount(1);
@@ -253,13 +252,11 @@ test.describe('Catch Log', () => {
       return records;
     });
 
-    const catchEntry = (sessions[0] as { catches: Array<{ recognition?: { predictedSpecies: unknown[]; selectedSpeciesSource: string; modelVersion: string } }> }).catches[0];
-    expect(catchEntry.recognition?.predictedSpecies).toHaveLength(3);
-    expect(catchEntry.recognition?.selectedSpeciesSource).toBe('ai');
-    expect(catchEntry.recognition?.modelVersion).toBe('local-vision-lite-v1');
+    const catchEntry = (sessions[0] as { catches: Array<{ recognition?: unknown }> }).catches[0];
+    expect(catchEntry.recognition).toBeUndefined();
   });
 
-  test('manual species override remains supported after recognition', async ({ page }) => {
+  test('manual species selection remains supported with photo upload', async ({ page }) => {
     await page.getByTestId('log-catch-btn').click();
     await page.getByTestId('catch-photo-input').setInputFiles({
       name: 'fish.png',
@@ -267,7 +264,6 @@ test.describe('Catch Log', () => {
       buffer: MINIMAL_PNG,
     });
 
-    await expect(page.getByTestId('catch-recognition-status')).toBeVisible();
     await page.getByTestId('species-select').selectOption({ index: 2 });
     await page.getByTestId('add-catch-btn').click();
     await expect(page.locator('.catch-item')).toHaveCount(1);
@@ -290,8 +286,8 @@ test.describe('Catch Log', () => {
       return records;
     });
 
-    const catchEntry = (sessions[0] as { catches: Array<{ species: string; recognition?: { selectedSpeciesSource: string } }> }).catches[0];
+    const catchEntry = (sessions[0] as { catches: Array<{ species: string; recognition?: unknown }> }).catches[0];
     expect(catchEntry.species).not.toBe('');
-    expect(catchEntry.recognition?.selectedSpeciesSource).toBe('manual');
+    expect(catchEntry.recognition).toBeUndefined();
   });
 });
