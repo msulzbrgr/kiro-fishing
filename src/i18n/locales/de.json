@@ -111,7 +111,18 @@
     "remove_photo": "Entfernen",
     "photos": "Fotos",
     "view_all_photos": "Alle anzeigen",
-    "close": "Schliessen"
+    "close": "Schliessen",
+    "recognition": {
+      "processing": "Fischart wird aus dem Foto erkannt…",
+      "suggestions_title": "Vorgeschlagene Arten (Top 3)",
+      "low_confidence": "Niedrige Sicherheit — bitte Art manuell bestätigen",
+      "override_hint": "Du kannst die vorgeschlagene Art vor dem Speichern ändern.",
+      "error_unsupported_format": "Nicht unterstütztes Bildformat. Bitte JPEG, PNG oder WebP verwenden.",
+      "error_image_too_large": "Bild ist zu groß. Maximal 5 MB.",
+      "error_malformed_image": "Bild konnte nicht verarbeitet werden. Bitte anderes Foto versuchen.",
+      "error_out_of_memory": "Nicht genug Speicher, um dieses Bild auf dem Gerät zu verarbeiten.",
+      "error_processing_failed": "Arterkennung fehlgeschlagen. Bitte Art manuell auswählen."
+    }
   },
   "conditions": {
     "weather_title": "Wetter",

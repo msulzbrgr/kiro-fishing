@@ -215,4 +215,83 @@ test.describe('Catch Log', () => {
     await page.locator('.catch-item .catch-header').click();
     await expect(page.getByTestId('catch-photo-full')).toHaveCount(0);
   });
+
+  test('photo upload auto-suggests species and stores recognition metadata', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'fish.png',
+      mimeType: 'image/png',
+      buffer: MINIMAL_PNG,
+    });
+
+    await expect(page.getByTestId('catch-recognition-status')).toBeVisible();
+    await expect(page.getByTestId('catch-recognition-suggestion-0')).toBeVisible();
+    await expect(page.getByTestId('catch-recognition-suggestion-1')).toBeVisible();
+    await expect(page.getByTestId('catch-recognition-suggestion-2')).toBeVisible();
+
+    const selectedSpecies = await page.getByTestId('species-select').inputValue();
+    expect(selectedSpecies).not.toBe('');
+
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const sessions = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const tx = db.transaction('sessions', 'readonly');
+      const store = tx.objectStore('sessions');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result as unknown[]);
+      });
+      db.close();
+      return records;
+    });
+
+    const catchEntry = (sessions[0] as { catches: Array<{ recognition?: { predictedSpecies: unknown[]; selectedSpeciesSource: string; modelVersion: string } }> }).catches[0];
+    expect(catchEntry.recognition?.predictedSpecies).toHaveLength(3);
+    expect(catchEntry.recognition?.selectedSpeciesSource).toBe('ai');
+    expect(catchEntry.recognition?.modelVersion).toBe('local-vision-lite-v1');
+  });
+
+  test('manual species override remains supported after recognition', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'fish.png',
+      mimeType: 'image/png',
+      buffer: MINIMAL_PNG,
+    });
+
+    await expect(page.getByTestId('catch-recognition-status')).toBeVisible();
+    await page.getByTestId('species-select').selectOption({ index: 2 });
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const sessions = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const tx = db.transaction('sessions', 'readonly');
+      const store = tx.objectStore('sessions');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result as unknown[]);
+      });
+      db.close();
+      return records;
+    });
+
+    const catchEntry = (sessions[0] as { catches: Array<{ species: string; recognition?: { selectedSpeciesSource: string } }> }).catches[0];
+    expect(catchEntry.species).not.toBe('');
+    expect(catchEntry.recognition?.selectedSpeciesSource).toBe('manual');
+  });
 });

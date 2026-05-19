@@ -10,11 +10,25 @@ import {
   Clock,
   RefreshCw,
   Camera,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { Catch, FishingSession } from '../types';
+import type {
+  Catch,
+  CatchRecognitionErrorCode,
+  CatchSpeciesSelectionSource,
+  FishingSession,
+  SpeciesPrediction,
+} from '../types';
 import { COMMON_FISH_SPECIES } from '../data/cantonLaws';
 import { generateId, saveSession } from '../utils/storage';
+import {
+  FISH_RECOGNITION_MODEL_VERSION,
+  FishRecognitionError,
+  identifyFishSpecies,
+  isSupportedFishImage,
+  MAX_FISH_RECOGNITION_IMAGE_BYTES,
+} from '../services/fishRecognitionService';
 
 interface CatchLogProps {
   session: FishingSession;
@@ -23,6 +37,7 @@ interface CatchLogProps {
 
 interface CatchFormState {
   species: string;
+  selectedSpeciesSource: CatchSpeciesSelectionSource;
   weight: string;
   length: string;
   released: boolean;
@@ -32,12 +47,15 @@ interface CatchFormState {
 
 const EMPTY_FORM: CatchFormState = {
   species: '',
+  selectedSpeciesSource: 'manual',
   weight: '',
   length: '',
   released: true,
   notes: '',
   photos: [],
 };
+
+type RecognitionState = 'idle' | 'processing' | 'success' | 'low_confidence' | 'failed';
 
 function isQuotaExceededError(err: unknown): boolean {
   if (!err || typeof err !== 'object') return false;
@@ -55,11 +73,43 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [activePhotoIndexByCatch, setActivePhotoIndexByCatch] = useState<Record<string, number>>({});
   const [galleryCatchId, setGalleryCatchId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string>('');
+  const [photoValidationError, setPhotoValidationError] = useState<string>('');
+  const [recognitionState, setRecognitionState] = useState<RecognitionState>('idle');
+  const [recognitionAttempted, setRecognitionAttempted] = useState(false);
+  const [recognitionCandidates, setRecognitionCandidates] = useState<SpeciesPrediction[]>([]);
+  const [recognitionModelVersion, setRecognitionModelVersion] = useState('');
+  const [recognizedAt, setRecognizedAt] = useState('');
+  const [recognitionErrorCode, setRecognitionErrorCode] = useState<CatchRecognitionErrorCode | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const MAX_PHOTOS = 10;
+  const LOW_CONFIDENCE_THRESHOLD = 0.6;
 
   const closeGallery = () => setGalleryCatchId(null);
+
+  const resetRecognition = () => {
+    setRecognitionState('idle');
+    setRecognitionAttempted(false);
+    setRecognitionCandidates([]);
+    setRecognitionModelVersion('');
+    setRecognizedAt('');
+    setRecognitionErrorCode(null);
+  };
+
+  const getRecognitionErrorMessage = (code: CatchRecognitionErrorCode): string => {
+    switch (code) {
+      case 'unsupported_format':
+        return t('catch.recognition.error_unsupported_format');
+      case 'image_too_large':
+        return t('catch.recognition.error_image_too_large');
+      case 'malformed_image':
+        return t('catch.recognition.error_malformed_image');
+      case 'out_of_memory':
+        return t('catch.recognition.error_out_of_memory');
+      default:
+        return t('catch.recognition.error_processing_failed');
+    }
+  };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -70,16 +120,22 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       return;
     }
 
-    const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
-
     const acceptedFiles = files
-      .filter((file) => file.size <= MAX_BYTES)
+      .filter((file) => isSupportedFishImage(file) && file.size <= MAX_FISH_RECOGNITION_IMAGE_BYTES)
       .slice(0, MAX_PHOTOS - form.photos.length);
 
     if (acceptedFiles.length === 0) {
+      const hasUnsupported = files.some((file) => !isSupportedFishImage(file));
+      const hasOversized = files.some((file) => file.size > MAX_FISH_RECOGNITION_IMAGE_BYTES);
+      if (hasUnsupported) {
+        setPhotoValidationError(t('catch.recognition.error_unsupported_format'));
+      } else if (hasOversized) {
+        setPhotoValidationError(t('catch.recognition.error_image_too_large'));
+      }
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
+    setPhotoValidationError('');
 
     let canceled = false;
     const readers: FileReader[] = [];
@@ -110,6 +166,40 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
         }));
       }
 
+      const primaryFile = acceptedFiles[0];
+      if (primaryFile) {
+        setRecognitionState('processing');
+        setRecognitionAttempted(true);
+        setRecognitionErrorCode(null);
+        try {
+          const result = await identifyFishSpecies({ file: primaryFile });
+          setRecognitionCandidates(result.predictions);
+          setRecognitionModelVersion(result.modelVersion);
+          setRecognizedAt(result.recognizedAt);
+          const topCandidate = result.predictions[0];
+          if (topCandidate) {
+            setForm((prev) => ({
+              ...prev,
+              species: topCandidate.species,
+              selectedSpeciesSource: 'ai',
+            }));
+            setRecognitionState(
+              topCandidate.confidence < LOW_CONFIDENCE_THRESHOLD ? 'low_confidence' : 'success',
+            );
+          } else {
+            setRecognitionState('failed');
+            setRecognitionErrorCode('processing_failed');
+          }
+        } catch (err) {
+          const code = err instanceof FishRecognitionError ? err.code : 'processing_failed';
+          setRecognitionCandidates([]);
+          setRecognitionModelVersion(FISH_RECOGNITION_MODEL_VERSION);
+          setRecognizedAt(new Date().toISOString());
+          setRecognitionState('failed');
+          setRecognitionErrorCode(code);
+        }
+      }
+
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
@@ -136,6 +226,16 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       released: form.released,
       notes: form.notes.trim() || undefined,
       photos: form.photos.length > 0 ? form.photos : undefined,
+      recognition: recognitionAttempted
+        ? {
+            predictedSpecies: recognitionCandidates,
+            selectedSpeciesSource: form.selectedSpeciesSource,
+            selectedSpeciesConfidence: recognitionCandidates.find((p) => p.species === form.species)?.confidence,
+            modelVersion: recognitionModelVersion || FISH_RECOGNITION_MODEL_VERSION,
+            recognizedAt: recognizedAt || new Date().toISOString(),
+            errorCode: recognitionState === 'failed' ? recognitionErrorCode ?? 'processing_failed' : undefined,
+          }
+        : undefined,
     };
 
     const updated: FishingSession = {
@@ -146,6 +246,8 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     try {
       const savedSession = await saveSession(updated);
       setSaveError('');
+      setPhotoValidationError('');
+      resetRecognition();
       await onSessionUpdate(savedSession);
       setForm(EMPTY_FORM);
       setShowForm(false);
@@ -195,7 +297,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               <label>{t('catch.species')}</label>
               <select
                 value={form.species}
-                onChange={(e) => setForm({ ...form, species: e.target.value })}
+                onChange={(e) => setForm({ ...form, species: e.target.value, selectedSpeciesSource: 'manual' })}
                 data-testid="species-select"
               >
                 <option value="">{t('catch.select_species')}</option>
@@ -260,6 +362,11 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               <label>
                 <Camera size={14} /> {t('catch.photo_label')}
               </label>
+              {photoValidationError && (
+                <div className="form-error" role="alert" data-testid="catch-photo-error">
+                  {photoValidationError}
+                </div>
+              )}
               {form.photos.length > 0 ? (
                 <div className="catch-photo-preview">
                   <div className="catch-photo-thumb-grid" data-testid="catch-photo-preview">
@@ -310,12 +417,50 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 multiple
                 className="catch-photo-input"
                 onChange={handlePhotoChange}
                 data-testid="catch-photo-input"
               />
+              {recognitionState === 'processing' && (
+                <div className="catch-recognition-status" data-testid="catch-recognition-processing">
+                  <RefreshCw size={14} className="spin" /> {t('catch.recognition.processing')}
+                </div>
+              )}
+              {(recognitionState === 'success' || recognitionState === 'low_confidence') && (
+                <div className="catch-recognition-status" data-testid="catch-recognition-status">
+                  <div className="catch-recognition-title">
+                    {recognitionState === 'low_confidence'
+                      ? t('catch.recognition.low_confidence')
+                      : t('catch.recognition.suggestions_title')}
+                  </div>
+                  <div className="catch-recognition-suggestions">
+                    {recognitionCandidates.map((candidate, index) => (
+                      <button
+                        key={`${candidate.species}-${index}`}
+                        type="button"
+                        className={`pill ${form.species === candidate.species ? 'active' : ''}`}
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            species: candidate.species,
+                            selectedSpeciesSource: 'manual',
+                          }))}
+                        data-testid={`catch-recognition-suggestion-${index}`}
+                      >
+                        {candidate.species} ({Math.round(candidate.confidence * 100)}%)
+                      </button>
+                    ))}
+                  </div>
+                  <div className="settings-hint">{t('catch.recognition.override_hint')}</div>
+                </div>
+              )}
+              {recognitionState === 'failed' && recognitionErrorCode && (
+                <div className="form-error" role="alert" data-testid="catch-recognition-error">
+                  <AlertTriangle size={14} /> {getRecognitionErrorMessage(recognitionErrorCode)}
+                </div>
+              )}
             </div>
           </div>
 
@@ -325,6 +470,8 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
               onClick={() => {
                 setShowForm(false);
                 setForm(EMPTY_FORM);
+                setPhotoValidationError('');
+                resetRecognition();
               }}
             >
               {t('catch.cancel')}
