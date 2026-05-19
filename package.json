@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "benchmark:fish-recognition": "FISH_RECOGNITION_BENCHMARK=1 playwright test tests/fishRecognition.benchmark.spec.ts --project=chromium",
     "preview": "vite preview",
     "test": "playwright test",
     "test:ui": "playwright test --ui"

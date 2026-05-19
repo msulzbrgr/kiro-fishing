@@ -34,9 +34,12 @@ export interface Catch {
 
 export type CatchSpeciesSelectionSource = 'manual' | 'ai';
 
+export type CatchRecognitionUserDecision = 'accepted_suggestion' | 'manual_override';
+
 export type CatchRecognitionErrorCode =
-  | 'unsupported_format'
-  | 'image_too_large'
+  | 'unsupported_image'
+  | 'inference_unavailable'
+  | 'low_confidence'
   | 'malformed_image'
   | 'processing_failed'
   | 'out_of_memory';
@@ -49,10 +52,10 @@ export interface SpeciesPrediction {
 export interface CatchRecognitionMetadata {
   predictedSpecies: SpeciesPrediction[];
   selectedSpeciesSource: CatchSpeciesSelectionSource;
+  userDecision: CatchRecognitionUserDecision;
   selectedSpeciesConfidence?: number;
   modelVersion: string;
   recognizedAt: string;
-  errorCode?: CatchRecognitionErrorCode;
 }
 
 export interface FishingLocation {
