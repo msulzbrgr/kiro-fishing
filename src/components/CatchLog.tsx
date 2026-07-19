@@ -232,16 +232,12 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     }
     setPhotoValidationError('');
 
-    let canceled = false;
-    const readers: FileReader[] = [];
-
     const readFiles = async () => {
       const dataUrls: string[] = [];
 
       for (const file of acceptedFiles) {
         const dataUrl = await new Promise<string | null>((resolve) => {
           const reader = new FileReader();
-          readers.push(reader);
           reader.onload = (ev) => {
             const result = ev.target?.result;
             resolve(typeof result === 'string' ? result : null);
@@ -250,7 +246,6 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
           reader.readAsDataURL(file);
         });
 
-        if (canceled) return;
         if (dataUrl) dataUrls.push(dataUrl);
       }
 
@@ -305,11 +300,6 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     };
 
     void readFiles();
-
-    return () => {
-      canceled = true;
-      readers.forEach((reader) => reader.readyState === reader.LOADING && reader.abort());
-    };
   };
 
   const buildRecognitionForSave = (existingCatch?: Catch) => {
