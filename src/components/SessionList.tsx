@@ -4,6 +4,7 @@ import {
   MapPin,
   Fish,
   Clock,
+  Camera,
   ChevronDown,
   ChevronUp,
   Trash2,
@@ -18,6 +19,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import type { FishingLocation, FishingSession, RegulationCheckpoint } from '../types';
 import { deleteSession, saveSession } from '../utils/storage';
+import { exportSessionStoryImages } from '../utils/storyImages';
 import {
   createRegulationCheckpoint,
   createRegulationSnapshot,
@@ -64,6 +66,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
+  const [isStoryGenerating, setIsStoryGenerating] = useState(false);
   const pendingCheckpoint = getPendingCheckpoint(session);
   const latestInfoCheckpoint = getLatestInfoCheckpoint(session);
   const displayedCheckpoint = pendingCheckpoint ?? latestInfoCheckpoint;
@@ -320,6 +323,23 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                   <StopCircle size={14} /> {t('sessions.finish')}
                 </button>
               )}
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={async () => {
+                  setIsStoryGenerating(true);
+                  try {
+                    await exportSessionStoryImages(session, t);
+                  } catch (err) {
+                    console.error('Failed to generate session story images', err);
+                  } finally {
+                    setIsStoryGenerating(false);
+                  }
+                }}
+                disabled={isStoryGenerating}
+                data-testid={`create-story-btn-${session.id}`}
+              >
+                <Camera size={14} /> {t(isStoryGenerating ? 'sessions.creating_story' : 'sessions.create_story')}
+              </button>
               <button
                 className="btn btn-danger btn-sm"
                 onClick={() => {

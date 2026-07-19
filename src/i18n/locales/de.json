@@ -76,7 +76,9 @@
     "tab_map": "Karte",
     "finish": "Ausfahrt beenden",
     "delete": "Ausfahrt löschen",
-    "loading": "Sitzungen werden geladen…"
+    "loading": "Sitzungen werden geladen…",
+    "create_story": "Story erstellen",
+    "creating_story": "Story wird erstellt…"
   },
   "new_session": {
     "title": "Neue Angelausfahrt",
@@ -249,5 +251,25 @@
     "topic_legal_basis": "Rechtsgrundlage",
     "topic_authority_contact": "Behördenkontakt",
     "topic_inter_cantonal": "Interkantonale Regelungen"
+  },
+  "story": {
+    "summary_title": "Fishing Session Story",
+    "summary_map": "Catch Map Batches",
+    "summary_conditions": "Conditions",
+    "summary_catches": "Catches",
+    "no_catches": "No catches logged.",
+    "no_map_points": "No catch locations available for map batches.",
+    "session_location": "Session location",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "weather": "Weather",
+    "catch_title": "Catch",
+    "catch_time": "Catch time",
+    "catch_released": "Released",
+    "catch_kept": "Kept",
+    "catch_notes": "Notes",
+    "catch_location": "Catch location",
+    "catch_photo_missing": "No uploaded image for this catch."
   }
 }

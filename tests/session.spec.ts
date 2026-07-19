@@ -89,6 +89,15 @@ test.describe('Session Management', () => {
     expect(storedSession.regulationState).toBe('active_current');
   });
 
+  test('session card shows create story button', async ({ page }) => {
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    await page.locator('.session-card .session-header').click();
+    const storedSessions = await loadStoredSessions(page);
+    const sessionId = (storedSessions[0] as { id: string }).id;
+    await expect(page.getByTestId(`create-story-btn-${sessionId}`)).toBeVisible();
+  });
+
   test('Finland location shows a research prompt and can be saved', async ({ page }) => {
     await selectFinnishLocation(page);
 

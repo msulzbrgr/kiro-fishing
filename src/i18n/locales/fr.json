@@ -76,7 +76,9 @@
     "tab_map": "Carte",
     "finish": "Terminer la sortie",
     "delete": "Supprimer la sortie",
-    "loading": "Chargement des sessions…"
+    "loading": "Chargement des sessions…",
+    "create_story": "Créer une story",
+    "creating_story": "Création de la story…"
   },
   "new_session": {
     "title": "Nouvelle sortie de pêche",
@@ -249,5 +251,25 @@
     "topic_legal_basis": "Base légale",
     "topic_authority_contact": "Contact de l'autorité",
     "topic_inter_cantonal": "Règles intercantonales"
+  },
+  "story": {
+    "summary_title": "Fishing Session Story",
+    "summary_map": "Catch Map Batches",
+    "summary_conditions": "Conditions",
+    "summary_catches": "Catches",
+    "no_catches": "No catches logged.",
+    "no_map_points": "No catch locations available for map batches.",
+    "session_location": "Session location",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "weather": "Weather",
+    "catch_title": "Catch",
+    "catch_time": "Catch time",
+    "catch_released": "Released",
+    "catch_kept": "Kept",
+    "catch_notes": "Notes",
+    "catch_location": "Catch location",
+    "catch_photo_missing": "No uploaded image for this catch."
   }
 }
