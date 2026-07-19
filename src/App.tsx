@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Map, List, Plus, Home, Settings } from 'lucide-react';
+import { Map, List, Plus, Home, Settings, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { FishingSession } from './types';
-import { loadSessions, saveSession } from './utils/storage';
+import type { FishingSession, Profile } from './types';
+import { loadProfiles, loadSessions, saveSession } from './utils/storage';
 import MapView from './components/MapView';
 import SessionList from './components/SessionList';
 import NewSessionForm from './components/NewSessionForm';
@@ -10,10 +10,11 @@ import LandingPage from './components/LandingPage';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import SettingsView from './components/SettingsView';
 import CantonOverview from './components/CantonOverview';
+import ProfilesView from './components/ProfilesView';
 import logoApp from './assets/KiroFishingLogoApp.png';
 import './App.css';
 
-type Tab = 'home' | 'map' | 'sessions' | 'new' | 'settings';
+type Tab = 'home' | 'map' | 'sessions' | 'new' | 'settings' | 'profiles';
 
 function App() {
   const { t } = useTranslation();
@@ -22,6 +23,12 @@ function App() {
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [sessionsError, setSessionsError] = useState<string | null>(null);
   const [showSettingsBadge, setShowSettingsBadge] = useState(false);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+
+  const refreshProfiles = useCallback(async () => {
+    const loaded = await loadProfiles();
+    setProfiles(loaded);
+  }, []);
 
   const refreshSessions = useCallback(async () => {
     try {
@@ -41,9 +48,10 @@ function App() {
     void (async () => {
       try {
         setSessionsError(null);
-        const loaded = await loadSessions();
+        const [loaded, loadedProfiles] = await Promise.all([loadSessions(), loadProfiles()]);
         if (!cancelled) {
           setSessions(loaded);
+          setProfiles(loadedProfiles);
         }
       } catch (err) {
         console.error('Failed to load sessions', err);
@@ -77,9 +85,9 @@ function App() {
   }, []);
 
   const handleImportSuccess = useCallback(async () => {
-    await refreshSessions();
+    await Promise.all([refreshSessions(), refreshProfiles()]);
     setActiveTab('sessions');
-  }, [refreshSessions]);
+  }, [refreshSessions, refreshProfiles]);
 
   const handleSettingsBadgeChange = useCallback((shouldShow: boolean) => {
     setShowSettingsBadge(shouldShow);
@@ -130,6 +138,7 @@ function App() {
               sessions={sessions}
               onSessionUpdate={handleSessionUpdate}
               onSessionDelete={handleSessionDelete}
+              profiles={profiles}
             />
           </div>
         )}
@@ -148,6 +157,20 @@ function App() {
             <SettingsView
               onImportSuccess={handleImportSuccess}
               onBadgeChange={handleSettingsBadgeChange}
+            />
+          </div>
+        )}
+
+        {activeTab === 'profiles' && (
+          <div className="page">
+            <div className="page-header">
+              <h2>{t('profiles.title')}</h2>
+              <p>{t('profiles.subtitle')}</p>
+            </div>
+            <ProfilesView
+              profiles={profiles}
+              sessions={sessions}
+              onProfilesChange={refreshProfiles}
             />
           </div>
         )}
@@ -177,6 +200,14 @@ function App() {
         >
           <Plus size={26} />
           <span>{t('nav.new')}</span>
+        </button>
+        <button
+          className={`nav-item ${activeTab === 'profiles' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profiles')}
+          data-testid="nav-profiles"
+        >
+          <User size={22} />
+          <span>{t('nav.profiles')}</span>
         </button>
         <button
           className={`nav-item ${activeTab === 'map' ? 'active' : ''}`}

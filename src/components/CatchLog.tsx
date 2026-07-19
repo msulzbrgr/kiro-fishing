@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   MapPin,
   Locate,
+  User,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -22,6 +23,7 @@ import type {
   CatchSpeciesSelectionSource,
   FishingLocation,
   FishingSession,
+  Profile,
   SpeciesPrediction,
 } from '../types';
 import { COMMON_FISH_SPECIES } from '../data/cantonLaws';
@@ -39,6 +41,7 @@ import MapView from './MapView';
 interface CatchLogProps {
   session: FishingSession;
   onSessionUpdate: (session: FishingSession) => Promise<void>;
+  profiles?: Profile[];
 }
 
 interface CatchFormState {
@@ -50,6 +53,7 @@ interface CatchFormState {
   notes: string;
   photos: CatchPhotoFormEntry[];
   location?: FishingLocation;
+  profileId?: string;
 }
 
 interface CatchPhotoFormEntry {
@@ -69,6 +73,7 @@ const EMPTY_FORM: CatchFormState = {
   notes: '',
   photos: [],
   location: undefined,
+  profileId: undefined,
 };
 
 function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
@@ -102,6 +107,7 @@ function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
     notes: catchEntry.notes ?? '',
     photos: [...persistedPhotos, ...newPhotos],
     location: catchEntry.location,
+    profileId: catchEntry.profileId,
   };
 }
 
@@ -119,7 +125,7 @@ function isQuotaExceededError(err: unknown): boolean {
   return anyErr.code === 22 || anyErr.code === 1014;
 }
 
-export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
+export default function CatchLog({ session, onSessionUpdate, profiles = [] }: CatchLogProps) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CatchFormState>(EMPTY_FORM);
@@ -387,6 +393,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       photos: newPhotos.length > 0 ? newPhotos : undefined,
       recognition: buildRecognitionForSave(existingCatch),
       location: form.location,
+      profileId: form.profileId || undefined,
     };
 
     const updated: FishingSession = {
@@ -465,6 +472,24 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                 ))}
               </select>
             </div>
+
+            {profiles.length > 0 && (
+              <div className="form-group">
+                <label>
+                  <User size={14} /> {t('profiles.profile_label')}
+                </label>
+                <select
+                  value={form.profileId ?? ''}
+                  onChange={(e) => setForm({ ...form, profileId: e.target.value || undefined })}
+                  data-testid="catch-profile-select"
+                >
+                  <option value="">{t('profiles.select_profile')}</option>
+                  {profiles.map((p) => (
+                    <option key={p.id} value={p.id}>{p.nickname}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="form-group">
               <label>
@@ -756,6 +781,17 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                       <MapPin size={11} />
                     </span>
                   )}
+                  {c.profileId && (() => {
+                    const profile = profiles.find((p) => p.id === c.profileId);
+                    return profile ? (
+                      <span className="badge badge-profile" data-testid={`catch-profile-badge-${c.id}`}>
+                        {profile.photo
+                          ? <img src={profile.photo} alt={profile.nickname} className="catch-profile-badge-img" />
+                          : <User size={11} />}
+                        {profile.nickname}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
               </div>
               <div className="catch-actions">
