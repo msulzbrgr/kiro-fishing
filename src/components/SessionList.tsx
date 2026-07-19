@@ -335,7 +335,7 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
                   setStoryError(null);
                   setIsStoryGenerating(true);
                   try {
-                    await exportSessionStoryImages(session, t);
+                    await exportSessionStoryImages(session, t, profiles);
                   } catch (err) {
                     console.error('Failed to generate session story images', err);
                     setStoryError(t('sessions.create_story_failed'));
