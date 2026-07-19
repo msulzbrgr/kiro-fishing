@@ -513,17 +513,6 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                       </div>
                     ))}
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => {
-                      setForm((prev) => ({ ...prev, photos: [] }));
-                      clearFileInput();
-                    }}
-                    data-testid="remove-all-photos-btn"
-                  >
-                    <X size={14} /> {t('catch.remove_photo')}
-                  </button>
                 </div>
               ) : (
                 <button
@@ -533,6 +522,19 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   data-testid="add-photo-btn"
                 >
                   <Camera size={14} /> {t('catch.add_photo')}
+                </button>
+              )}
+              {form.photos.length > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setForm((prev) => ({ ...prev, photos: [] }));
+                    clearFileInput();
+                  }}
+                  data-testid="remove-all-photos-btn"
+                >
+                  <X size={14} /> {t('catch.remove_photo')}
                 </button>
               )}
               <input
