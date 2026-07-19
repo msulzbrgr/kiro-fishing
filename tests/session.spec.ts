@@ -323,7 +323,7 @@ test.describe('Catch Log', () => {
     const editButton = page.getByTestId(`edit-catch-btn-${catchId}`);
     await editButton.click();
 
-    await expect(page.locator('.catch-form h4')).toContainText('Edit Catch');
+    await expect(page.locator('.catch-form textarea')).toHaveValue('initial catch note');
     await page.getByTestId('species-select').selectOption({ index: 2 });
     const notesField = page.locator('.catch-form textarea');
     await notesField.fill('updated catch note');
