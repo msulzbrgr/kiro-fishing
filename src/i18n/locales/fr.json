@@ -106,7 +106,15 @@
     "loading": "Chargement des sessions…",
     "create_story": "Créer une story",
     "creating_story": "Création de la story…",
-    "create_story_failed": "Impossible de créer les images de story. Veuillez réessayer."
+    "create_story_failed": "Impossible de créer les images de story. Veuillez réessayer.",
+    "edit": "Modifier la sortie",
+    "edit_title": "Modifier la sortie",
+    "edit_date": "Date",
+    "edit_start_time": "Heure de début",
+    "edit_end_time": "Heure de fin (optionnel)",
+    "edit_notes": "Notes (optionnel)",
+    "edit_save": "Enregistrer les modifications",
+    "edit_cancel": "Annuler"
   },
   "new_session": {
     "title": "Nouvelle sortie de pêche",

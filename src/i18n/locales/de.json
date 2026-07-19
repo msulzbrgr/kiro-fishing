@@ -106,7 +106,15 @@
     "loading": "Sitzungen werden geladen…",
     "create_story": "Story erstellen",
     "creating_story": "Story wird erstellt…",
-    "create_story_failed": "Story-Bilder konnten nicht erstellt werden. Bitte erneut versuchen."
+    "create_story_failed": "Story-Bilder konnten nicht erstellt werden. Bitte erneut versuchen.",
+    "edit": "Ausfahrt bearbeiten",
+    "edit_title": "Ausfahrt bearbeiten",
+    "edit_date": "Datum",
+    "edit_start_time": "Startzeit",
+    "edit_end_time": "Endzeit (optional)",
+    "edit_notes": "Notizen (optional)",
+    "edit_save": "Änderungen speichern",
+    "edit_cancel": "Abbrechen"
   },
   "new_session": {
     "title": "Neue Angelausfahrt",
