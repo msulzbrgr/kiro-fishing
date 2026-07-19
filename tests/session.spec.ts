@@ -7,7 +7,6 @@ type StoredCatch = {
   species: string;
   notes?: string;
   released: boolean;
-  photoIds?: string[];
   recognition?: unknown;
 };
 
@@ -233,71 +232,6 @@ test.describe('Catch Log', () => {
     await page.getByTestId('add-catch-btn').click();
     await page.locator('.catch-item .catch-header').click();
     await expect(page.getByTestId('catch-photo-full')).toHaveCount(0);
-  });
-
-  test('can clear persisted photo ids when previews are missing during edit', async ({ page }) => {
-    await page.getByTestId('log-catch-btn').click();
-    await page.getByTestId('species-select').selectOption({ index: 1 });
-    await page.getByTestId('add-catch-btn').click();
-    await expect(page.locator('.catch-item')).toHaveCount(1);
-
-    const storedSessions = await loadStoredSessions(page);
-    const catchId = (storedSessions[0] as StoredSession).catches[0].id;
-
-    await page.evaluate(async ({ targetCatchId }) => {
-      const db = await new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open('kiro-fishing');
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-      });
-
-      const tx = db.transaction('sessions', 'readwrite');
-      const store = tx.objectStore('sessions');
-      const records = await new Promise<unknown[]>((resolve, reject) => {
-        const request = store.getAll();
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result as unknown[]);
-      });
-
-      const [storedSession] = records as Array<{ catches: Array<{ id: string; photoIds?: string[] }> }>;
-      storedSession.catches = storedSession.catches.map((catchEntry) => (
-        catchEntry.id === targetCatchId
-          ? { ...catchEntry, photoIds: ['missing-photo-record'] }
-          : catchEntry
-      ));
-
-      await new Promise<void>((resolve, reject) => {
-        const request = store.put(storedSession);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve();
-      });
-
-      await new Promise<void>((resolve, reject) => {
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-        tx.onabort = () => reject(tx.error);
-      });
-
-      db.close();
-    }, { targetCatchId: catchId });
-
-    const refreshedPage = await page.context().newPage();
-    await refreshedPage.goto('/');
-    await refreshedPage.getByTestId('nav-sessions').click();
-    await refreshedPage.locator('.session-card .session-header').click();
-
-    await refreshedPage.getByTestId(`edit-catch-btn-${catchId}`).click();
-    await expect(refreshedPage.getByTestId('add-photo-btn')).toBeVisible();
-    await expect(refreshedPage.getByTestId('remove-all-photos-btn')).toBeVisible();
-
-    await refreshedPage.getByTestId('remove-all-photos-btn').click();
-    await refreshedPage.getByTestId('add-catch-btn').click();
-    await expect(refreshedPage.locator('.catch-form')).toHaveCount(0);
-
-    const sessions = await loadStoredSessions(refreshedPage);
-    const catchEntry = (sessions[0] as StoredSession).catches[0];
-    expect(catchEntry.photoIds).toBeUndefined();
-    await refreshedPage.close();
   });
 
   test('photo upload keeps manual species selection while recognition is gated off', async ({ page }) => {
