@@ -53,6 +53,17 @@ test.describe('Language Switcher (i18n)', () => {
   });
 
   test('catch edit labels are translated when switching language', async ({ page }) => {
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          const request = indexedDB.deleteDatabase('kiro-fishing');
+          request.onsuccess = () => resolve();
+          request.onerror = () => resolve();
+          request.onblocked = () => resolve();
+        }),
+    );
+    await page.reload();
+
     await page.getByTestId('nav-new').click();
     await selectSwissLocation(page);
     await page.getByTestId('create-session-btn').click();
