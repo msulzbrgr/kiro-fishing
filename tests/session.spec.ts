@@ -299,8 +299,25 @@ test.describe('Catch Log', () => {
 
     await expect(page.locator('.catch-item')).toHaveCount(1);
 
-    // This test creates exactly one catch, so the first edit button is the one under test.
-    const editButton = page.locator('[data-testid^="edit-catch-btn-"]').first();
+    const catchId = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const tx = db.transaction('sessions', 'readonly');
+      const store = tx.objectStore('sessions');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result as unknown[]);
+      });
+      db.close();
+      return (records[0] as { catches: Array<{ id: string }> }).catches[0].id;
+    });
+
+    const editButton = page.getByTestId(`edit-catch-btn-${catchId}`);
     await editButton.click();
 
     await expect(page.locator('.catch-form h4')).toContainText('Edit Catch');

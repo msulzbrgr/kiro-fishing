@@ -66,12 +66,21 @@ const EMPTY_FORM: CatchFormState = {
 };
 
 function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
+  const previewPhotos = catchEntry.photos ?? [];
+  if (catchEntry.photoIds && previewPhotos.length > 0 && catchEntry.photoIds.length !== previewPhotos.length) {
+    console.warn('Catch photo preview count does not match persisted photo ids.', {
+      catchId: catchEntry.id,
+      photoIds: catchEntry.photoIds.length,
+      previews: previewPhotos.length,
+    });
+  }
+
   const persistedPhotos = (catchEntry.photoIds ?? []).map((photoId, index) => ({
     photoId,
-    previewUrl: catchEntry.photos?.[index] ?? '',
-  })).filter((photo) => photo.previewUrl);
+    previewUrl: previewPhotos[index] ?? '',
+  }));
 
-  const newPhotos = (catchEntry.photos ?? [])
+  const newPhotos = previewPhotos
     .slice(persistedPhotos.length)
     .map((previewUrl) => ({
       previewUrl,
@@ -390,7 +399,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
         <button
           className="btn btn-primary btn-sm"
           onClick={() => {
-            if (showForm && !editingCatchId) {
+            if (showForm) {
               resetFormState();
               return;
             }
@@ -485,10 +494,11 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   {photoValidationError}
                 </div>
               )}
-              {form.photos.length > 0 ? (
+              {form.photos.some((photo) => photo.previewUrl) ? (
                 <div className="catch-photo-preview">
                   <div className="catch-photo-thumb-grid" data-testid="catch-photo-preview">
                     {form.photos.map((photo, idx) => (
+                      photo.previewUrl ? (
                       <div key={idx} className="catch-photo-thumb-wrapper">
                         <img src={photo.previewUrl} alt="" className="catch-photo-thumb" />
                         <button
@@ -508,6 +518,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                           <X size={12} />
                         </button>
                       </div>
+                      ) : null
                     ))}
                   </div>
                   <button
