@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Map, List, Plus, Home, Settings, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingSession, Profile } from './types';
@@ -24,9 +24,14 @@ function App() {
   const [sessionsError, setSessionsError] = useState<string | null>(null);
   const [showSettingsBadge, setShowSettingsBadge] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const profilePhotoUrlsRef = useRef<string[]>([]);
 
   const refreshProfiles = useCallback(async () => {
+    for (const url of profilePhotoUrlsRef.current) {
+      URL.revokeObjectURL(url);
+    }
     const loaded = await loadProfiles();
+    profilePhotoUrlsRef.current = loaded.flatMap((p) => (p.photo ? [p.photo] : []));
     setProfiles(loaded);
   }, []);
 
@@ -51,6 +56,7 @@ function App() {
         const [loaded, loadedProfiles] = await Promise.all([loadSessions(), loadProfiles()]);
         if (!cancelled) {
           setSessions(loaded);
+          profilePhotoUrlsRef.current = loadedProfiles.flatMap((p) => (p.photo ? [p.photo] : []));
           setProfiles(loadedProfiles);
         }
       } catch (err) {
@@ -67,6 +73,9 @@ function App() {
 
     return () => {
       cancelled = true;
+      for (const url of profilePhotoUrlsRef.current) {
+        URL.revokeObjectURL(url);
+      }
     };
   }, []);
 

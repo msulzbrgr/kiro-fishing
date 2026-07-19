@@ -45,7 +45,7 @@ function ProfileAvatar({ profile, size = 40 }: { profile: Profile; size?: number
       style={{ width: size, height: size, fontSize: size * 0.45 }}
       data-testid={`profile-avatar-placeholder-${profile.id}`}
     >
-      {profile.nickname.charAt(0).toUpperCase() || <User size={size * 0.5} />}
+      {profile.nickname ? profile.nickname.charAt(0).toUpperCase() : <User size={size * 0.5} />}
     </div>
   );
 }

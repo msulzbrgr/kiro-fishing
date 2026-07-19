@@ -191,8 +191,14 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       for (const cm of catchMarkers) {
         let marker;
         if (cm.profilePhotoUrl) {
+          const div = document.createElement('div');
+          div.className = 'catch-marker-profile';
+          const img = document.createElement('img');
+          img.src = cm.profilePhotoUrl;
+          img.alt = '';
+          div.appendChild(img);
           const icon = L.divIcon({
-            html: `<div class="catch-marker-profile"><img src="${cm.profilePhotoUrl}" alt="" /></div>`,
+            html: div,
             className: '',
             iconSize: [36, 36],
             iconAnchor: [18, 18],
