@@ -361,4 +361,69 @@ test.describe('IndexedDB storage migration', () => {
     await page.getByTestId('nav-settings').click();
     await expect(page.getByTestId('storage-health')).toBeVisible();
   });
+
+  test('migrates schemaVersion 2 sessions to version 3 on import', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
+    await page.goto('/');
+
+    const payload = {
+      version: '1.0',
+      app: 'kiro-fishing',
+      exportedAt: new Date().toISOString(),
+      sessions: [
+        {
+          schemaVersion: 2,
+          id: 'v2-session-1',
+          date: '2026-05-01',
+          startTime: '08:00',
+          location: { lat: 47.3769, lng: 8.5417 },
+          weather: {},
+          water: {},
+          catches: [
+            {
+              id: 'catch-v2-1',
+              species: 'Trout',
+              time: '08:30',
+              released: false,
+            },
+          ],
+        },
+      ],
+    };
+
+    const tmpFile = path.join(os.tmpdir(), 'kiro-test-v2-migration.json');
+    fs.writeFileSync(tmpFile, JSON.stringify(payload));
+
+    page.on('dialog', (dialog) => dialog.accept());
+    await page.getByTestId('nav-settings').click();
+    await page.getByTestId('import-file-input').setInputFiles(tmpFile);
+
+    await page.getByTestId('nav-sessions').click();
+    await expect(page.locator('.session-card')).toHaveCount(1);
+
+    const sessions = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+      const tx = db.transaction('sessions', 'readonly');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const req = tx.objectStore('sessions').getAll();
+        req.onerror = () => reject(req.error);
+        req.onsuccess = () => resolve(req.result as unknown[]);
+      });
+      db.close();
+      return records;
+    });
+
+    const storedSession = sessions[0] as { schemaVersion: number; catches: Array<{ location?: unknown }> };
+    expect(storedSession.schemaVersion).toBe(3);
+    expect(storedSession.catches[0].location).toBeUndefined();
+
+    fs.unlinkSync(tmpFile);
+  });
 });

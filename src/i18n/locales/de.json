@@ -125,7 +125,14 @@
       "error_malformed_image": "Bild konnte nicht verarbeitet werden. Bitte anderes Foto versuchen.",
       "error_out_of_memory": "Nicht genug Speicher, um dieses Bild auf dem Gerät zu verarbeiten.",
       "error_processing_failed": "Arterkennung fehlgeschlagen. Bitte Art manuell auswählen."
-    }
+    },
+    "location_label": "Standort (optional)",
+    "set_location": "Standort festlegen",
+    "change_location": "Standort ändern",
+    "clear_location": "Löschen",
+    "use_gps": "GPS nutzen",
+    "location_set": "Standort gesetzt",
+    "gps_unavailable": "GPS auf diesem Gerät nicht verfügbar."
   },
   "conditions": {
     "weather_title": "Wetter",

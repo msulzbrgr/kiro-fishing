@@ -13,9 +13,14 @@ export type FishingSessionV0 = Omit<FishingSession, 'schemaVersion'>;
 export type FishingSessionV1 = FishingSessionV0 & { schemaVersion: 1 };
 
 /**
- * V2 — current version. Introduces optional catch `photoIds`.
+ * V2 — introduces optional catch `photoIds`.
  */
 export type FishingSessionV2 = Omit<FishingSessionV1, 'schemaVersion'> & { schemaVersion: 2 };
+
+/**
+ * V3 — current version. Introduces optional catch `location`.
+ */
+export type FishingSessionV3 = Omit<FishingSessionV2, 'schemaVersion'> & { schemaVersion: 3 };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -44,6 +49,13 @@ function migrateV1toV2(v1: FishingSessionV1): FishingSessionV2 {
   };
 }
 
+function migrateV2toV3(v2: FishingSessionV2): FishingSessionV3 {
+  return {
+    ...v2,
+    schemaVersion: 3,
+  };
+}
+
 /**
  * Accepts any raw value from storage and returns a fully-typed FishingSession
  * at the current schema version.
@@ -61,7 +73,7 @@ export function migrateSession(raw: unknown): FishingSession {
   }
 
   if (isFishingSessionV0(raw)) {
-    return migrateV1toV2(migrateV0toV1(raw));
+    return migrateV2toV3(migrateV1toV2(migrateV0toV1(raw)));
   }
 
   const schemaVersion = raw.schemaVersion;
@@ -69,11 +81,15 @@ export function migrateSession(raw: unknown): FishingSession {
   if (typeof schemaVersion !== 'number') {
     // Malformed schemaVersion — treat defensively as V0
     console.warn('migrateSession: non-numeric schemaVersion, treating as V0', raw);
-    return migrateV1toV2(migrateV0toV1(raw as FishingSessionV0));
+    return migrateV2toV3(migrateV1toV2(migrateV0toV1(raw as FishingSessionV0)));
   }
 
   if (schemaVersion === 1) {
-    return migrateV1toV2(raw as FishingSessionV1);
+    return migrateV2toV3(migrateV1toV2(raw as FishingSessionV1));
+  }
+
+  if (schemaVersion === 2) {
+    return migrateV2toV3(raw as FishingSessionV2);
   }
 
   if (schemaVersion > CURRENT_SESSION_SCHEMA_VERSION) {
@@ -83,7 +99,6 @@ export function migrateSession(raw: unknown): FishingSession {
     return raw as unknown as FishingSession;
   }
 
-  // schemaVersion === CURRENT_SESSION_SCHEMA_VERSION (or a known prior version
-  // that future migration hops would handle — add migrateV1toV2 etc. here)
+  // schemaVersion === CURRENT_SESSION_SCHEMA_VERSION
   return raw as unknown as FishingSession;
 }

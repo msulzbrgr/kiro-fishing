@@ -343,4 +343,119 @@ test.describe('Catch Log', () => {
     expect(catchEntry.notes).toBe('updated catch note');
     expect(catchEntry.released).toBe(false);
   });
+
+  test('catch location picker button is visible in catch form', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await expect(page.getByTestId('catch-pick-location-btn')).toBeVisible();
+    await expect(page.getByTestId('catch-use-gps-btn')).toBeVisible();
+  });
+
+  test('can pick catch location on map and it is saved with the catch', async ({ page }) => {
+    await page.route('https://nominatim.openstreetmap.org/reverse**', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          display_name: 'Zürich, Schweiz',
+          address: { state: 'Zürich', city: 'Zürich', country: 'Switzerland', country_code: 'ch' },
+        }),
+      });
+    });
+
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+
+    // Open location picker modal
+    await page.getByTestId('catch-pick-location-btn').click();
+    await expect(page.getByTestId('catch-location-picker-modal')).toBeVisible();
+    await expect(page.getByTestId('map-container')).toBeVisible();
+
+    // Click on map to select location
+    await page.getByTestId('map-container').click({ position: { x: 240, y: 200 } });
+
+    // Modal should close after location is selected
+    await expect(page.getByTestId('catch-location-picker-modal')).toHaveCount(0);
+
+    // Location display should appear in form
+    await expect(page.getByTestId('catch-location-display')).toBeVisible();
+
+    // Clear location button should appear
+    await expect(page.getByTestId('catch-clear-location-btn')).toBeVisible();
+
+    // Save catch
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    // Verify location is stored with the catch
+    const storedSessions = await loadStoredSessions(page);
+    const catchEntry = (storedSessions[0] as { catches: Array<{ location?: { lat: number; lng: number } }> }).catches[0];
+    expect(catchEntry.location).toBeTruthy();
+    expect(typeof catchEntry.location?.lat).toBe('number');
+    expect(typeof catchEntry.location?.lng).toBe('number');
+  });
+
+  test('can clear catch location', async ({ page }) => {
+    await page.route('https://nominatim.openstreetmap.org/reverse**', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          display_name: 'Zürich, Schweiz',
+          address: { state: 'Zürich', city: 'Zürich', country: 'Switzerland', country_code: 'ch' },
+        }),
+      });
+    });
+
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+
+    // Pick a location
+    await page.getByTestId('catch-pick-location-btn').click();
+    await page.getByTestId('map-container').click({ position: { x: 240, y: 200 } });
+    await expect(page.getByTestId('catch-location-display')).toBeVisible();
+
+    // Clear it
+    await page.getByTestId('catch-clear-location-btn').click();
+    await expect(page.getByTestId('catch-location-display')).toHaveCount(0);
+    await expect(page.getByTestId('catch-clear-location-btn')).toHaveCount(0);
+  });
+
+  test('catch location is shown in expanded catch details', async ({ page }) => {
+    await page.route('https://nominatim.openstreetmap.org/reverse**', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          display_name: 'Zürich, Schweiz',
+          address: { state: 'Zürich', city: 'Zürich', country: 'Switzerland', country_code: 'ch' },
+        }),
+      });
+    });
+
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+
+    // Pick a location
+    await page.getByTestId('catch-pick-location-btn').click();
+    await page.getByTestId('map-container').click({ position: { x: 240, y: 200 } });
+    await expect(page.getByTestId('catch-location-display')).toBeVisible();
+
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    // Expand the catch
+    await page.locator('.catch-item .catch-header').click();
+
+    // Location info should be visible in expanded details
+    const storedSessions = await loadStoredSessions(page);
+    const catchId = (storedSessions[0] as { catches: Array<{ id: string }> }).catches[0].id;
+    await expect(page.getByTestId(`catch-location-info-${catchId}`)).toBeVisible();
+  });
+
+  test('location picker modal can be dismissed', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('catch-pick-location-btn').click();
+    await expect(page.getByTestId('catch-location-picker-modal')).toBeVisible();
+
+    // Close via overlay click
+    await page.getByTestId('catch-location-picker-modal').click({ position: { x: 5, y: 5 } });
+    await expect(page.getByTestId('catch-location-picker-modal')).toHaveCount(0);
+  });
 });
