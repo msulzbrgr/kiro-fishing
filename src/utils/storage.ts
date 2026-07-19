@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
-import type { Catch, FishingSession } from '../types';
+import type { Catch, FishingSession, Profile } from '../types';
 import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
-import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord } from './indexedDb';
+import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord, type ProfileRecord } from './indexedDb';
 import { migrateSession } from './sessionVersioning';
 
 const EXPORT_FORMAT_VERSION_V2 = '2.0';
@@ -543,4 +543,56 @@ export async function requestPersistentStorage(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// ===== Profile CRUD =====
+
+function hydrateProfilePhoto(record: ProfileRecord): Profile {
+  const profile: Profile = {
+    id: record.id,
+    nickname: record.nickname,
+  };
+  if (record.photoBlob) {
+    profile.photoId = record.id;
+    profile.photo = URL.createObjectURL(record.photoBlob);
+  }
+  return profile;
+}
+
+export async function loadProfiles(): Promise<Profile[]> {
+  const db = await getDb();
+  const records = await db.getAll('profiles');
+  return records.map(hydrateProfilePhoto);
+}
+
+export async function saveProfile(profile: Profile, photoDataUrl?: string | null): Promise<Profile> {
+  const db = await getDb();
+  const existing = await db.get('profiles', profile.id);
+
+  let photoBlob: Blob | undefined = existing?.photoBlob;
+  let photoMimeType: string | undefined = existing?.photoMimeType;
+
+  if (photoDataUrl) {
+    photoBlob = dataUrlToBlob(photoDataUrl);
+    photoMimeType = getMimeFromDataUrl(photoDataUrl);
+  } else if (photoDataUrl === null) {
+    photoBlob = undefined;
+    photoMimeType = undefined;
+  }
+
+  const record: ProfileRecord = {
+    id: profile.id,
+    nickname: profile.nickname,
+    photoBlob,
+    photoMimeType,
+    createdAt: existing?.createdAt ?? new Date().toISOString(),
+  };
+
+  await db.put('profiles', record);
+  return hydrateProfilePhoto(record);
+}
+
+export async function deleteProfile(id: string): Promise<void> {
+  const db = await getDb();
+  await db.delete('profiles', id);
 }
