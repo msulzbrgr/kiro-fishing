@@ -547,7 +547,7 @@ export async function requestPersistentStorage(): Promise<boolean> {
 
 // ===== Profile CRUD =====
 
-function hydrateProfilePhoto(record: ProfileRecord): Profile {
+function hydrateProfile(record: ProfileRecord): Profile {
   const profile: Profile = {
     id: record.id,
     nickname: record.nickname,
@@ -562,7 +562,7 @@ function hydrateProfilePhoto(record: ProfileRecord): Profile {
 export async function loadProfiles(): Promise<Profile[]> {
   const db = await getDb();
   const records = await db.getAll('profiles');
-  return records.map(hydrateProfilePhoto);
+  return records.map(hydrateProfile);
 }
 
 export async function saveProfile(profile: Profile, photoDataUrl?: string | null): Promise<Profile> {
@@ -589,7 +589,7 @@ export async function saveProfile(profile: Profile, photoDataUrl?: string | null
   };
 
   await db.put('profiles', record);
-  return hydrateProfilePhoto(record);
+  return hydrateProfile(record);
 }
 
 export async function deleteProfile(id: string): Promise<void> {

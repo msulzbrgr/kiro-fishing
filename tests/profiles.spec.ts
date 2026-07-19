@@ -108,7 +108,7 @@ test.describe('Profiles', () => {
   test('can cancel new profile form', async ({ page }) => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Temp');
-    await page.locator('.profile-form .btn-secondary').click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
     await expect(page.getByTestId('profile-form')).toHaveCount(0);
     await expect(page.locator('.profile-card')).toHaveCount(0);
   });
@@ -343,11 +343,9 @@ test.describe('Catch profile assignment', () => {
     await page.getByTestId('species-select').selectOption({ index: 1 });
     await page.getByTestId('catch-profile-select').selectOption({ label: 'Alice' });
     await page.getByTestId('add-catch-btn').click();
-
-    const sessions = await loadStoredSessions(page);
-    const catchId = (sessions[0] as { catches: Array<{ id: string }> }).catches[0].id;
-    await expect(page.getByTestId(`catch-profile-badge-${catchId}`)).toBeVisible();
-    await expect(page.getByTestId(`catch-profile-badge-${catchId}`)).toContainText('Alice');
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+    await expect(page.locator('.badge-profile')).toBeVisible();
+    await expect(page.locator('.badge-profile')).toContainText('Alice');
   });
 
   test('profile can be cleared from catch during edit', async ({ page }) => {
@@ -364,6 +362,7 @@ test.describe('Catch profile assignment', () => {
     await page.getByTestId('species-select').selectOption({ index: 1 });
     await page.getByTestId('catch-profile-select').selectOption({ label: 'Alice' });
     await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
 
     // Edit and clear profile
     const sessions = await loadStoredSessions(page);

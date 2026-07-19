@@ -108,12 +108,15 @@ export default function ProfilesView({ profiles, sessions, onProfilesChange }: P
     try {
       const id = editingId ?? generateId();
       const profile: Profile = { id, nickname: form.nickname.trim() };
-      const photoArg = form.photoDataUrl !== null
-        ? form.photoDataUrl || null
-        : form.previewUrl
-          ? undefined
-          : null;
-      await saveProfile(profile, photoArg as string | null | undefined);
+      let photoArg: string | null | undefined;
+      if (form.photoDataUrl !== null) {
+        photoArg = form.photoDataUrl || null;
+      } else if (form.previewUrl) {
+        photoArg = undefined; // keep existing photo
+      } else {
+        photoArg = null; // remove photo
+      }
+      await saveProfile(profile, photoArg);
       await onProfilesChange();
       resetForm();
     } finally {
