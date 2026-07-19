@@ -76,7 +76,10 @@
     "tab_map": "地図",
     "finish": "釣行を終了",
     "delete": "釣行を削除",
-    "loading": "釣行データを読み込み中…"
+    "loading": "釣行データを読み込み中…",
+    "create_story": "ストーリー作成",
+    "creating_story": "ストーリー作成中…",
+    "create_story_failed": "ストーリー画像を作成できなかった。もう一度試してね。"
   },
   "new_session": {
     "title": "新しい釣行を始めよう",
@@ -225,5 +228,26 @@
     "research_prompt_template": "{{country}} の {{location}} 周辺（座標 {{lat}}, {{lng}}）でレクリエーションとして釣りをする場合、どんな釣りの法律、許可証、最低サイズ、禁漁期、保護対象種、道具の制限、持ち帰り数の上限、水域ごとのローカルルールが適用される？ 国・地域・自治体の公式情報源を引用して、水域や許可エリアごとの差も示し、釣行前に必ず確認すべき重要ルールを要約してほしい。",
     "info_notification_title": "規制情報を更新した",
     "info_notification_desc": "別の規制エリアに移動した可能性がある。新しい情報を追加チェックポイントとして保存したよ。"
+  },
+  "story": {
+    "summary_title": "釣行ストーリー",
+    "summary_map": "釣果バッチのマップ",
+    "summary_conditions": "コンディション",
+    "summary_catches": "釣果",
+    "no_catches": "釣果はまだ記録されていない。",
+    "more_catches": "...ほか {{count}} 件の釣果",
+    "no_map_points": "マップ上に表示できる釣果位置がない。",
+    "session_location": "釣行場所",
+    "date": "日付",
+    "time": "時間",
+    "duration": "所要時間",
+    "weather": "天気",
+    "catch_title": "釣果",
+    "catch_time": "釣れた時間",
+    "catch_released": "リリース",
+    "catch_kept": "持ち帰り",
+    "catch_notes": "メモ",
+    "catch_location": "釣果の場所",
+    "catch_photo_missing": "この釣果にはアップロード画像がない。"
   }
 }

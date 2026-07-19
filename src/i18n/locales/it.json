@@ -76,7 +76,10 @@
     "tab_map": "Mappa",
     "finish": "Termina uscita",
     "delete": "Elimina uscita",
-    "loading": "Caricamento sessioni…"
+    "loading": "Caricamento sessioni…",
+    "create_story": "Crea story",
+    "creating_story": "Creazione story…",
+    "create_story_failed": "Impossibile creare le immagini della story. Riprova."
   },
   "new_session": {
     "title": "Nuova uscita di pesca",
@@ -249,5 +252,26 @@
     "topic_legal_basis": "Base legale",
     "topic_authority_contact": "Contatto autorità",
     "topic_inter_cantonal": "Regole intercantonali"
+  },
+  "story": {
+    "summary_title": "Story dell’uscita di pesca",
+    "summary_map": "Mappa dei batch di cattura",
+    "summary_conditions": "Condizioni",
+    "summary_catches": "Catture",
+    "no_catches": "Nessuna cattura registrata.",
+    "more_catches": "...e altre {{count}} catture",
+    "no_map_points": "Nessuna posizione di cattura disponibile per i batch sulla mappa.",
+    "session_location": "Luogo dell’uscita",
+    "date": "Data",
+    "time": "Ora",
+    "duration": "Durata",
+    "weather": "Meteo",
+    "catch_title": "Cattura",
+    "catch_time": "Ora della cattura",
+    "catch_released": "Rilasciata",
+    "catch_kept": "Trattenuta",
+    "catch_notes": "Note",
+    "catch_location": "Luogo della cattura",
+    "catch_photo_missing": "Nessuna immagine caricata per questa cattura."
   }
 }

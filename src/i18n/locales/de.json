@@ -76,7 +76,10 @@
     "tab_map": "Karte",
     "finish": "Ausfahrt beenden",
     "delete": "Ausfahrt löschen",
-    "loading": "Sitzungen werden geladen…"
+    "loading": "Sitzungen werden geladen…",
+    "create_story": "Story erstellen",
+    "creating_story": "Story wird erstellt…",
+    "create_story_failed": "Story-Bilder konnten nicht erstellt werden. Bitte erneut versuchen."
   },
   "new_session": {
     "title": "Neue Angelausfahrt",
@@ -249,5 +252,26 @@
     "topic_legal_basis": "Rechtsgrundlage",
     "topic_authority_contact": "Behördenkontakt",
     "topic_inter_cantonal": "Interkantonale Regelungen"
+  },
+  "story": {
+    "summary_title": "Story der Angelausfahrt",
+    "summary_map": "Karte der Fang-Batches",
+    "summary_conditions": "Bedingungen",
+    "summary_catches": "Fänge",
+    "no_catches": "Keine Fänge erfasst.",
+    "more_catches": "...und {{count}} weitere Fänge",
+    "no_map_points": "Keine Fang-Orte für Karten-Batches verfügbar.",
+    "session_location": "Ausfahrtsort",
+    "date": "Datum",
+    "time": "Zeit",
+    "duration": "Dauer",
+    "weather": "Wetter",
+    "catch_title": "Fang",
+    "catch_time": "Fangzeit",
+    "catch_released": "Zurückgeworfen",
+    "catch_kept": "Behalten",
+    "catch_notes": "Notizen",
+    "catch_location": "Fangort",
+    "catch_photo_missing": "Kein Bild für diesen Fang hochgeladen."
   }
 }
