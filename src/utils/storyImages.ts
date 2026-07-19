@@ -19,6 +19,19 @@ const OSM_COLS    = 3;
 const OSM_ROWS    = 5;
 const OSM_TILE_PX = 256;
 
+// ── Layout constants ──────────────────────────────────────────────────────────
+// Ratio used to offset the flag badge towards the logo's bottom-right corner
+const FLAG_BADGE_OFFSET_RATIO = 0.68;
+// Scale factor applied to the flag badge radius to get the emoji font size
+const FLAG_EMOJI_SIZE_MULTIPLIER = 1.35;
+// Radius fraction for the placeholder fish-body ellipse (width / height)
+const FISH_BODY_WIDTH_RATIO  = 0.36;
+const FISH_BODY_HEIGHT_RATIO = 0.20;
+// Font scale for text rendered inside a circular photo placeholder
+const CIRCLE_FONT_SCALE = 0.22;
+// Font scale for the "+N more" badge label
+const BADGE_FONT_SCALE = 0.34;
+
 // ── Inlined KiroFishing fishing-icon SVG ─────────────────────────────────────
 const KIRO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <circle cx="50" cy="50" r="50" fill="#1a6b3c"/>
@@ -274,7 +287,8 @@ async function drawBackground(
       const offscreen = document.createElement('canvas');
       offscreen.width = gridW;
       offscreen.height = gridH;
-      const offCtx = offscreen.getContext('2d')!;
+      const offCtx = offscreen.getContext('2d');
+      if (!offCtx) throw new Error('Could not create offscreen canvas context');
 
       // Fetch all tiles in parallel
       const loads: Promise<void>[] = [];
@@ -385,8 +399,8 @@ async function drawTopBar(
   // ── Country flag badge (bottom-right of logo) ─────────────────────────────
   if (countryCode) {
     const flagR  = 18;
-    const flagCx = logoCx + Math.round(logoR * 0.68);
-    const flagCy = logoCy + Math.round(logoR * 0.68);
+    const flagCx = logoCx + Math.round(logoR * FLAG_BADGE_OFFSET_RATIO);
+    const flagCy = logoCy + Math.round(logoR * FLAG_BADGE_OFFSET_RATIO);
 
     ctx.beginPath();
     ctx.arc(flagCx, flagCy, flagR, 0, Math.PI * 2);
@@ -398,7 +412,7 @@ async function drawTopBar(
 
     const flag = countryCodeToFlagEmoji(countryCode);
     if (flag) {
-      ctx.font = `${Math.round(flagR * 1.35)}px serif`;
+      ctx.font = `${Math.round(flagR * FLAG_EMOJI_SIZE_MULTIPLIER)}px serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(flag, flagCx, flagCy + 1);
@@ -478,7 +492,7 @@ async function drawCirclePhoto(
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = 'rgba(74, 222, 128, 0.70)';
-      ctx.font = `500 ${Math.max(18, Math.floor(r * 0.22))}px Inter, sans-serif`;
+      ctx.font = `500 ${Math.max(18, Math.floor(r * CIRCLE_FONT_SCALE))}px Inter, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(t('story.catch_photo_missing'), cx, cy);
@@ -493,7 +507,7 @@ async function drawCirclePhoto(
     ctx.fill();
     ctx.fillStyle = 'rgba(74, 222, 128, 0.35)';
     ctx.beginPath();
-    ctx.ellipse(cx, cy, r * 0.36, r * 0.20, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy, r * FISH_BODY_WIDTH_RATIO, r * FISH_BODY_HEIGHT_RATIO, 0, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -810,7 +824,7 @@ async function createSummaryImage(
     ctx.lineWidth = 4;
     ctx.stroke();
     ctx.fillStyle = '#ffffff';
-    ctx.font = `700 ${Math.floor(badgeR * 0.34)}px Inter, sans-serif`;
+    ctx.font = `700 ${Math.floor(badgeR * BADGE_FONT_SCALE)}px Inter, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`+${extraCount}`, badgeCx, badgeCy);
