@@ -304,11 +304,16 @@ test.describe('Catch Log', () => {
 
     await expect(page.locator('.catch-form h4')).toContainText('Edit Catch');
     await page.getByTestId('species-select').selectOption({ index: 2 });
-    await page.locator('.catch-form textarea').fill('updated catch note');
+    const notesField = page.locator('.catch-form textarea');
+    await notesField.fill('updated catch note');
+    await expect(notesField).toHaveValue('updated catch note');
     await page.locator('.catch-form input[type="checkbox"]').uncheck();
     await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-form')).toHaveCount(0);
 
     await expect(page.locator('.catch-item')).toHaveCount(1);
+    await page.locator('.catch-item .catch-header').click();
+    await expect(page.locator('.catch-notes')).toContainText('updated catch note');
 
     const sessions = await page.evaluate(async () => {
       const db = await new Promise<IDBDatabase>((resolve, reject) => {

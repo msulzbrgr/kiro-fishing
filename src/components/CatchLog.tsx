@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useId, useState } from 'react';
 import {
   Plus,
   Fish,
@@ -113,13 +113,20 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [recognitionModelVersion, setRecognitionModelVersion] = useState('');
   const [recognizedAt, setRecognizedAt] = useState('');
   const [recognitionErrorCode, setRecognitionErrorCode] = useState<CatchRecognitionErrorCode | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
+  const photoInputId = useId();
 
   const MAX_PHOTOS = 10;
   const MAX_BYTES = 5 * 1024 * 1024;
   const LOW_CONFIDENCE_THRESHOLD = 0.6;
 
   const closeGallery = () => setGalleryCatchId(null);
+  const clearFileInput = () => {
+    setFileInputKey((prev) => prev + 1);
+  };
+  const openPhotoPicker = () => {
+    document.getElementById(photoInputId)?.click();
+  };
 
   const resetFormState = () => {
     setEditingCatchId(null);
@@ -128,7 +135,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     setSaveError('');
     setPhotoValidationError('');
     resetRecognition();
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    clearFileInput();
   };
 
   const resetRecognition = () => {
@@ -147,7 +154,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     setSaveError('');
     setPhotoValidationError('');
     resetRecognition();
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    clearFileInput();
   };
 
   const startEditingCatch = (catchEntry: Catch) => {
@@ -157,7 +164,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     setSaveError('');
     setPhotoValidationError('');
     resetRecognition();
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    clearFileInput();
   };
 
   const getRecognitionErrorMessage = (code: CatchRecognitionErrorCode): string => {
@@ -180,7 +187,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     if (files.length === 0) return;
 
     if (form.photos.length >= MAX_PHOTOS) {
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearFileInput();
       return;
     }
 
@@ -206,7 +213,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
           setPhotoValidationError(t('catch.recognition.error_image_too_large'));
         }
       }
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearFileInput();
       return;
     }
     setPhotoValidationError('');
@@ -280,7 +287,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
         }
       }
 
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearFileInput();
     };
 
     void readFiles();
@@ -490,7 +497,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                               ...prev,
                               photos: prev.photos.filter((_, photoIdx) => photoIdx !== idx),
                             }));
-                            if (fileInputRef.current) fileInputRef.current.value = '';
+                            clearFileInput();
                           }}
                           aria-label={t('catch.remove_photo')}
                           title={t('catch.remove_photo')}
@@ -506,7 +513,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                     className="btn btn-secondary btn-sm"
                     onClick={() => {
                       setForm((prev) => ({ ...prev, photos: [] }));
-                      if (fileInputRef.current) fileInputRef.current.value = '';
+                      clearFileInput();
                     }}
                     data-testid="remove-all-photos-btn"
                   >
@@ -517,14 +524,15 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm catch-photo-add-btn"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={openPhotoPicker}
                   data-testid="add-photo-btn"
                 >
                   <Camera size={14} /> {t('catch.add_photo')}
                 </button>
               )}
               <input
-                ref={fileInputRef}
+                key={fileInputKey}
+                id={photoInputId}
                 type="file"
                 accept={FISH_RECOGNITION_ENABLED ? 'image/jpeg,image/png,image/webp' : 'image/*'}
                 multiple
