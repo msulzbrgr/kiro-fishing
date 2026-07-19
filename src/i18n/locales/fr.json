@@ -78,7 +78,8 @@
     "delete": "Supprimer la sortie",
     "loading": "Chargement des sessions…",
     "create_story": "Créer une story",
-    "creating_story": "Création de la story…"
+    "creating_story": "Création de la story…",
+    "create_story_failed": "Impossible de créer les images de story. Veuillez réessayer."
   },
   "new_session": {
     "title": "Nouvelle sortie de pêche",
@@ -258,6 +259,7 @@
     "summary_conditions": "Conditions",
     "summary_catches": "Prises",
     "no_catches": "Aucune prise enregistrée.",
+    "more_catches": "...et {{count}} prises supplémentaires",
     "no_map_points": "Aucune position de prise disponible pour les lots sur la carte.",
     "session_location": "Lieu de la sortie",
     "date": "Date",

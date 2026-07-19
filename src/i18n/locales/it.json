@@ -78,7 +78,8 @@
     "delete": "Elimina uscita",
     "loading": "Caricamento sessioni…",
     "create_story": "Crea story",
-    "creating_story": "Creazione story…"
+    "creating_story": "Creazione story…",
+    "create_story_failed": "Impossibile creare le immagini della story. Riprova."
   },
   "new_session": {
     "title": "Nuova uscita di pesca",
@@ -258,6 +259,7 @@
     "summary_conditions": "Condizioni",
     "summary_catches": "Catture",
     "no_catches": "Nessuna cattura registrata.",
+    "more_catches": "...e altre {{count}} catture",
     "no_map_points": "Nessuna posizione di cattura disponibile per i batch sulla mappa.",
     "session_location": "Luogo dell’uscita",
     "date": "Data",

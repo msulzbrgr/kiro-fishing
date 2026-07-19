@@ -78,7 +78,8 @@
     "delete": "Ausfahrt löschen",
     "loading": "Sitzungen werden geladen…",
     "create_story": "Story erstellen",
-    "creating_story": "Story wird erstellt…"
+    "creating_story": "Story wird erstellt…",
+    "create_story_failed": "Story-Bilder konnten nicht erstellt werden. Bitte erneut versuchen."
   },
   "new_session": {
     "title": "Neue Angelausfahrt",
@@ -258,6 +259,7 @@
     "summary_conditions": "Bedingungen",
     "summary_catches": "Fänge",
     "no_catches": "Keine Fänge erfasst.",
+    "more_catches": "...und {{count}} weitere Fänge",
     "no_map_points": "Keine Fang-Orte für Karten-Batches verfügbar.",
     "session_location": "Ausfahrtsort",
     "date": "Datum",

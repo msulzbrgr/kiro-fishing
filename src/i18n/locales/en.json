@@ -78,7 +78,8 @@
     "finish": "Finish Session",
     "delete": "Delete Session",
     "create_story": "Create Story",
-    "creating_story": "Creating Story…"
+    "creating_story": "Creating Story…",
+    "create_story_failed": "Could not create story images. Please try again."
   },
   "new_session": {
     "title": "Start New Fishing Session",
@@ -258,6 +259,7 @@
     "summary_conditions": "Conditions",
     "summary_catches": "Catches",
     "no_catches": "No catches logged.",
+    "more_catches": "...and {{count}} more catches",
     "no_map_points": "No catch locations available for map batches.",
     "session_location": "Session location",
     "date": "Date",

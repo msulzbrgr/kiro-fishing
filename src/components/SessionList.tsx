@@ -67,6 +67,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
   const [isStoryGenerating, setIsStoryGenerating] = useState(false);
+  const [storyError, setStoryError] = useState<string | null>(null);
   const pendingCheckpoint = getPendingCheckpoint(session);
   const latestInfoCheckpoint = getLatestInfoCheckpoint(session);
   const displayedCheckpoint = pendingCheckpoint ?? latestInfoCheckpoint;
@@ -305,6 +306,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
           <div className="session-footer">
             {session.notes && <p className="session-notes">{session.notes}</p>}
+            {storyError && <p className="form-error">{storyError}</p>}
             <div className="session-footer-actions">
               {!session.endTime && (
                 <button
@@ -326,11 +328,13 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={async () => {
+                  setStoryError(null);
                   setIsStoryGenerating(true);
                   try {
                     await exportSessionStoryImages(session, t);
                   } catch (err) {
                     console.error('Failed to generate session story images', err);
+                    setStoryError(t('sessions.create_story_failed'));
                   } finally {
                     setIsStoryGenerating(false);
                   }

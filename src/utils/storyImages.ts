@@ -93,6 +93,17 @@ function drawWrappedText(
   return lines.length;
 }
 
+function drawPhotoPlaceholder(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+): void {
+  ctx.fillStyle = '#64748b';
+  ctx.font = '500 30px Inter, sans-serif';
+  ctx.fillText(text, x, y);
+}
+
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -304,6 +315,10 @@ async function createSummaryImage(session: FishingSession, t: TFunction): Promis
       const text = `${index + 1}. ${catchEntry.species}${detailsLine ? ` — ${detailsLine}` : ''}`;
       ctx.fillText(text, 70, 1284 + index * 40);
     }
+    if (session.catches.length > MAX_SUMMARY_CATCHES) {
+      const remaining = session.catches.length - MAX_SUMMARY_CATCHES;
+      ctx.fillText(t('story.more_catches', { count: remaining }), 70, 1284 + MAX_SUMMARY_CATCHES * 40);
+    }
   }
 
   return toBlob(canvas);
@@ -327,9 +342,7 @@ async function drawCatchPhoto(
 
   const primaryPhoto = catchEntry.photos?.[0];
   if (!primaryPhoto) {
-    ctx.fillStyle = '#64748b';
-    ctx.font = '500 30px Inter, sans-serif';
-    ctx.fillText(t('story.catch_photo_missing'), frameX + 40, frameY + frameH / 2);
+    drawPhotoPlaceholder(ctx, t('story.catch_photo_missing'), frameX + 40, frameY + frameH / 2);
     return;
   }
 
@@ -342,9 +355,7 @@ async function drawCatchPhoto(
     const drawY = frameY + (frameH - drawH) / 2;
     ctx.drawImage(image, drawX, drawY, drawW, drawH);
   } catch {
-    ctx.fillStyle = '#64748b';
-    ctx.font = '500 30px Inter, sans-serif';
-    ctx.fillText(t('story.catch_photo_missing'), frameX + 40, frameY + frameH / 2);
+    drawPhotoPlaceholder(ctx, t('story.catch_photo_missing'), frameX + 40, frameY + frameH / 2);
   }
 }
 

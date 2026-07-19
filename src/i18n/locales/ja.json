@@ -78,7 +78,8 @@
     "delete": "釣行を削除",
     "loading": "釣行データを読み込み中…",
     "create_story": "ストーリー作成",
-    "creating_story": "ストーリー作成中…"
+    "creating_story": "ストーリー作成中…",
+    "create_story_failed": "ストーリー画像を作成できなかった。もう一度試してね。"
   },
   "new_session": {
     "title": "新しい釣行を始めよう",
@@ -234,6 +235,7 @@
     "summary_conditions": "コンディション",
     "summary_catches": "釣果",
     "no_catches": "釣果はまだ記録されていない。",
+    "more_catches": "...ほか {{count}} 件の釣果",
     "no_map_points": "マップ上に表示できる釣果位置がない。",
     "session_location": "釣行場所",
     "date": "日付",
