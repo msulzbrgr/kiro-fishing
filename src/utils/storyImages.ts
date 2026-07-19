@@ -72,7 +72,22 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
       current = next;
     } else {
       if (current) lines.push(current);
-      current = word;
+      // If a single word exceeds maxWidth, force-break it
+      if (ctx.measureText(word).width > maxWidth) {
+        let remaining = word;
+        while (remaining.length > 0) {
+          let chunk = remaining;
+          while (chunk.length > 0 && ctx.measureText(chunk).width > maxWidth) {
+            chunk = chunk.slice(0, -1);
+          }
+          if (chunk.length === 0) chunk = remaining.slice(0, 1); // Ensure at least 1 char
+          lines.push(chunk);
+          remaining = remaining.slice(chunk.length);
+        }
+        current = '';
+      } else {
+        current = word;
+      }
     }
   }
   if (current) lines.push(current);
@@ -425,7 +440,7 @@ export async function exportSessionStoryImages(session: FishingSession, t: TFunc
 
   for (const [index, catchEntry] of session.catches.entries()) {
     const catchBlob = await createCatchImage(session, catchEntry, index, t);
-    const speciesPart = sanitizeFilePart(catchEntry.species || 'unknown-species');
+    const speciesPart = sanitizeFilePart(catchEntry.species || 'unknown-species') || 'species';
     zip.file(`story-${datePart}-${idPart}-catch-${index + 1}-${speciesPart}.png`, catchBlob);
   }
 

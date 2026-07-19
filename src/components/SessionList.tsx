@@ -306,7 +306,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
           <div className="session-footer">
             {session.notes && <p className="session-notes">{session.notes}</p>}
-            {storyError && <p className="form-error">{storyError}</p>}
+            {storyError && <p className="form-error" role="alert">{storyError}</p>}
             <div className="session-footer-actions">
               {!session.endTime && (
                 <button
