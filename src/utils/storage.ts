@@ -103,9 +103,12 @@ async function hydrateSessionPhotos(session: FishingSession): Promise<FishingSes
       catchEntry.photoIds.map((id) => db.get('photos', id)),
     );
 
-    catchEntry.photos = photoRecords
-      .filter((record): record is PhotoRecord => Boolean(record))
-      .map((record) => URL.createObjectURL(record.blob));
+    const validPairs = photoRecords
+      .map((record, i) => ({ record, photoId: catchEntry.photoIds![i] }))
+      .filter((pair): pair is { record: PhotoRecord; photoId: string } => Boolean(pair.record));
+
+    catchEntry.photoIds = validPairs.map((pair) => pair.photoId);
+    catchEntry.photos = validPairs.map((pair) => URL.createObjectURL(pair.record.blob));
   }
 
   return hydrated;
