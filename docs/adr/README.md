@@ -10,6 +10,7 @@ ADRs document important architectural choices, the context behind them, and the 
 - [0002 - Keep KiroFishing local-first in the browser](0002-local-first-browser-application.md)
 - [0003 - Use raw Leaflet with dynamic imports for maps](0003-raw-leaflet-dynamic-imports.md)
 - [0004 - Treat fishing regulations as a dedicated domain](0004-dedicated-regulation-domain.md)
+- [0005 - Use OSM tiles and Canvas API for story image export](0005-osm-tiles-and-canvas-for-story-export.md)
 
 ## Status values
 

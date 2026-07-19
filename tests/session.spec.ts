@@ -98,6 +98,76 @@ test.describe('Session Management', () => {
     await expect(page.getByTestId(`create-story-btn-${sessionId}`)).toBeVisible();
   });
 
+  test('create story button triggers a zip download', async ({ page }) => {
+    // Intercept OSM tile requests so the test is offline-safe
+    await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    await page.locator('.session-card .session-header').click();
+
+    const storedSessions = await loadStoredSessions(page);
+    const sessionId = (storedSessions[0] as { id: string }).id;
+    const storyBtn = page.getByTestId(`create-story-btn-${sessionId}`);
+
+    // Intercept the download triggered by the story export
+    const downloadPromise = page.waitForEvent('download');
+    await storyBtn.click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^story-.*\.zip$/);
+  });
+
+  test('create story button is disabled while generating and restores after', async ({ page }) => {
+    await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    await page.locator('.session-card .session-header').click();
+
+    const storedSessions = await loadStoredSessions(page);
+    const sessionId = (storedSessions[0] as { id: string }).id;
+    const storyBtn = page.getByTestId(`create-story-btn-${sessionId}`);
+
+    const downloadPromise = page.waitForEvent('download');
+    await storyBtn.click();
+    // Button must be disabled immediately after click
+    await expect(storyBtn).toBeDisabled();
+    // Button label should switch to the "in progress" text
+    await expect(storyBtn).toContainText('Creating Story');
+    // Wait for the download to complete, then verify the button is re-enabled
+    await downloadPromise;
+    await expect(storyBtn).toBeEnabled();
+    await expect(storyBtn).toContainText('Create Story');
+  });
+
+  test('create story shows error message when generation fails', async ({ page }) => {
+    await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    await page.locator('.session-card .session-header').click();
+
+    const storedSessions = await loadStoredSessions(page);
+    const sessionId = (storedSessions[0] as { id: string }).id;
+    const storyBtn = page.getByTestId(`create-story-btn-${sessionId}`);
+
+    // Patch canvas.toBlob in the live page context so the export promise rejects
+    await page.evaluate(() => {
+      (HTMLCanvasElement.prototype as { toBlob: unknown }).toBlob = function (
+        callback: (blob: Blob | null) => void,
+      ) {
+        callback(null);
+      };
+    });
+
+    await storyBtn.click();
+    // An error alert should appear in the session footer
+    await expect(page.locator('[role="alert"]').first()).toBeVisible();
+    await expect(page.locator('[role="alert"]').first()).toContainText('Could not create story');
+    // Button must be re-enabled so the user can retry
+    await expect(storyBtn).toBeEnabled();
+  });
+
   test('Finland location shows a research prompt and can be saved', async ({ page }) => {
     await selectFinnishLocation(page);
 
