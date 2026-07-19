@@ -130,6 +130,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const MAX_PHOTOS = 10;
   const MAX_BYTES = 5 * 1024 * 1024;
   const LOW_CONFIDENCE_THRESHOLD = 0.6;
+  const hasAnyFormPhotos = form.photos.length > 0;
   const visibleFormPhotos = form.photos.flatMap((photo, index) => (
     photo.previewUrl ? [{ ...photo, index }] : []
   ));
@@ -524,7 +525,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   <Camera size={14} /> {t('catch.add_photo')}
                 </button>
               )}
-              {form.photos.length > 0 && (
+              {hasAnyFormPhotos && (
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
