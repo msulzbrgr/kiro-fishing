@@ -291,6 +291,7 @@ async function drawBackground(
       if (!offCtx) throw new Error('Could not create offscreen canvas context');
 
       // Fetch all tiles in parallel
+      let tilesDrawn = 0;
       const loads: Promise<void>[] = [];
       for (let row = 0; row < OSM_ROWS; row++) {
         for (let col = 0; col < OSM_COLS; col++) {
@@ -300,23 +301,28 @@ async function drawBackground(
           const dx = col * OSM_TILE_PX;
           const dy = row * OSM_TILE_PX;
           loads.push(loadTileImage(url).then((img) => {
-            if (img) offCtx.drawImage(img, dx, dy, OSM_TILE_PX, OSM_TILE_PX);
+            if (img) {
+              offCtx.drawImage(img, dx, dy, OSM_TILE_PX, OSM_TILE_PX);
+              tilesDrawn++;
+            }
           }));
         }
       }
       await Promise.all(loads);
 
-      // Scale the tile grid to "cover" the story canvas
-      const scale = Math.max(STORY_WIDTH / gridW, STORY_HEIGHT / gridH);
-      const drawW = gridW * scale;
-      const drawH = gridH * scale;
-      const dx = (STORY_WIDTH - drawW) / 2;
-      const dy = (STORY_HEIGHT - drawH) / 2;
+      if (tilesDrawn > 0) {
+        // Scale the tile grid to "cover" the story canvas
+        const scale = Math.max(STORY_WIDTH / gridW, STORY_HEIGHT / gridH);
+        const drawW = gridW * scale;
+        const drawH = gridH * scale;
+        const dx = (STORY_WIDTH - drawW) / 2;
+        const dy = (STORY_HEIGHT - drawH) / 2;
 
-      ctx.filter = 'blur(10px)';
-      ctx.drawImage(offscreen, dx, dy, drawW, drawH);
-      ctx.filter = 'none';
-      usedTiles = true;
+        ctx.filter = 'blur(10px)';
+        ctx.drawImage(offscreen, dx, dy, drawW, drawH);
+        ctx.filter = 'none';
+        usedTiles = true;
+      }
     } catch {
       // fall through to gradient
     }
@@ -532,7 +538,7 @@ function drawCatchInfoCard(
   cardX: number,
   cardY: number,
   cardW: number,
-): void {
+): number {
   const hasAngler   = Boolean(profileNickname);
   const hasLocation = Boolean(
     catchEntry.location?.locationName ?? session.location.locationName,
@@ -590,6 +596,8 @@ function drawCatchInfoCard(
     const locLines = wrapText(ctx, `\uD83D\uDCCD ${locName}`, cardW - 64);
     ctx.fillText(locLines[0] ?? '', textX, rowY);
   }
+
+  return cardH;
 }
 
 // ── Session meta bar ──────────────────────────────────────────────────────────
@@ -713,12 +721,10 @@ async function createCatchImage(
   // ── Frosted info card ──────────────────────────────────────────────────────
   const cardX = 60;
   const cardY = 1082;
-  drawCatchInfoCard(ctx, catchEntry, session, t, profile?.nickname, cardX, cardY, STORY_WIDTH - cardX * 2);
+  const cardH = drawCatchInfoCard(ctx, catchEntry, session, t, profile?.nickname, cardX, cardY, STORY_WIDTH - cardX * 2);
 
   // ── Notes ──────────────────────────────────────────────────────────────────
   if (catchEntry.notes) {
-    const hasAngler = Boolean(profile?.nickname);
-    const cardH = 230 + (hasAngler ? 42 : 0);
     const notesY = cardY + cardH + 46;
     ctx.fillStyle = KIRO_GOLD;
     ctx.font = '600 26px Inter, sans-serif';
