@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { selectFinnishLocation, selectSwissLocation } from './helpers/location';
+import { loadStoredSessions } from './helpers/storage';
 
 test.describe('Session Management', () => {
   test.beforeEach(async ({ page }) => {
@@ -299,23 +300,8 @@ test.describe('Catch Log', () => {
 
     await expect(page.locator('.catch-item')).toHaveCount(1);
 
-    const catchId = await page.evaluate(async () => {
-      const db = await new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open('kiro-fishing');
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-      });
-
-      const tx = db.transaction('sessions', 'readonly');
-      const store = tx.objectStore('sessions');
-      const records = await new Promise<unknown[]>((resolve, reject) => {
-        const request = store.getAll();
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result as unknown[]);
-      });
-      db.close();
-      return (records[0] as { catches: Array<{ id: string }> }).catches[0].id;
-    });
+    const storedSessions = await loadStoredSessions(page);
+    const catchId = (storedSessions[0] as { catches: Array<{ id: string }> }).catches[0].id;
 
     const editButton = page.getByTestId(`edit-catch-btn-${catchId}`);
     await editButton.click();
@@ -333,23 +319,7 @@ test.describe('Catch Log', () => {
     await page.locator('.catch-item .catch-header').click();
     await expect(page.locator('.catch-notes')).toContainText('updated catch note');
 
-    const sessions = await page.evaluate(async () => {
-      const db = await new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open('kiro-fishing');
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-      });
-
-      const tx = db.transaction('sessions', 'readonly');
-      const store = tx.objectStore('sessions');
-      const records = await new Promise<unknown[]>((resolve, reject) => {
-        const request = store.getAll();
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result as unknown[]);
-      });
-      db.close();
-      return records;
-    });
+    const sessions = await loadStoredSessions(page);
 
     const catchEntry = (sessions[0] as {
       catches: Array<{ species: string; notes?: string; released: boolean }>;

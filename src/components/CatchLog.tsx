@@ -130,6 +130,9 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const MAX_PHOTOS = 10;
   const MAX_BYTES = 5 * 1024 * 1024;
   const LOW_CONFIDENCE_THRESHOLD = 0.6;
+  const visibleFormPhotos = form.photos.flatMap((photo, index) => (
+    photo.previewUrl ? [{ ...photo, index }] : []
+  ));
 
   const closeGallery = () => setGalleryCatchId(null);
   const clearFileInput = () => {
@@ -494,12 +497,11 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   {photoValidationError}
                 </div>
               )}
-              {form.photos.some((photo) => photo.previewUrl) ? (
+              {visibleFormPhotos.length > 0 ? (
                 <div className="catch-photo-preview">
                   <div className="catch-photo-thumb-grid" data-testid="catch-photo-preview">
-                    {form.photos.map((photo, idx) => (
-                      photo.previewUrl ? (
-                      <div key={idx} className="catch-photo-thumb-wrapper">
+                    {visibleFormPhotos.map((photo) => (
+                      <div key={photo.index} className="catch-photo-thumb-wrapper">
                         <img src={photo.previewUrl} alt="" className="catch-photo-thumb" />
                         <button
                           type="button"
@@ -507,18 +509,17 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                           onClick={() => {
                             setForm((prev) => ({
                               ...prev,
-                              photos: prev.photos.filter((_, photoIdx) => photoIdx !== idx),
+                              photos: prev.photos.filter((_, photoIdx) => photoIdx !== photo.index),
                             }));
                             clearFileInput();
                           }}
                           aria-label={t('catch.remove_photo')}
                           title={t('catch.remove_photo')}
-                          data-testid={`remove-photo-btn-${idx}`}
-                        >
-                          <X size={12} />
-                        </button>
+                         data-testid={`remove-photo-btn-${photo.index}`}
+                       >
+                         <X size={12} />
+                       </button>
                       </div>
-                      ) : null
                     ))}
                   </div>
                   <button
