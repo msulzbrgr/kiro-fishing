@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import type { TFunction } from 'i18next';
 import type { Catch, FishingSession, Profile } from '../types';
+import kiroFishingLogo from '../assets/KiroFishingLogo.png';
 
 // ── Story dimensions ─────────────────────────────────────────────────────────
 const STORY_WIDTH = 1080;
@@ -31,30 +32,6 @@ const FISH_BODY_HEIGHT_RATIO = 0.20;
 const CIRCLE_FONT_SCALE = 0.22;
 // Font scale for the "+N more" badge label
 const BADGE_FONT_SCALE = 0.34;
-
-// ── Inlined KiroFishing fishing-icon SVG ─────────────────────────────────────
-const KIRO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="50" fill="#1a6b3c"/>
-  <ellipse cx="50" cy="78" rx="38" ry="10" fill="#0d4a2a" opacity="0.5"/>
-  <path d="M14 76 Q24 70 34 76 Q44 82 54 76 Q64 70 74 76 Q84 82 86 78" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
-  <path d="M14 80 Q22 74 32 80 Q42 86 52 80 Q62 74 72 80 Q82 86 86 82" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-  <line x1="54" y1="32" x2="80" y2="72" stroke="#f0a500" stroke-width="1.5" stroke-linecap="round"/>
-  <rect x="42" y="46" width="14" height="16" rx="4" fill="#e8d5b0"/>
-  <circle cx="49" cy="38" r="8" fill="#f5c68c"/>
-  <ellipse cx="49" cy="31" rx="11" ry="3" fill="#1a3a2a"/>
-  <rect x="42" y="24" width="14" height="8" rx="3" fill="#1a3a2a"/>
-  <rect x="42" y="29" width="14" height="2" fill="#f0a500"/>
-  <line x1="56" y1="52" x2="68" y2="34" stroke="#8B5E3C" stroke-width="3" stroke-linecap="round"/>
-  <rect x="55" y="50" width="4" height="8" rx="2" fill="#6b3a2a"/>
-  <g transform="translate(76, 68)">
-    <ellipse cx="0" cy="0" rx="6" ry="3.5" fill="#4ade80"/>
-    <polygon points="-6,0 -10,-3 -10,3" fill="#2dd068"/>
-    <circle cx="3" cy="-0.5" r="1" fill="white"/>
-    <circle cx="3.3" cy="-0.5" r="0.5" fill="#222"/>
-    <path d="M -1,-3.5 Q 1,-7 3,-3.5" fill="#2dd068"/>
-  </g>
-  <path d="M80 72 Q83 72 83 76 Q83 80 79 80" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
-</svg>`;
 
 // ── File utilities ────────────────────────────────────────────────────────────
 
@@ -217,13 +194,11 @@ async function loadTileImage(url: string): Promise<HTMLImageElement | null> {
 }
 
 async function loadKiroLogoImage(): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
-    const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(KIRO_ICON_SVG)}`;
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = dataUrl;
-  });
+  try {
+    return await loadImage(kiroFishingLogo);
+  } catch {
+    return null;
+  }
 }
 
 // ── OSM tile background ───────────────────────────────────────────────────────
@@ -332,10 +307,10 @@ async function drawBackground(
 
   // Semi-transparent dark overlay — heavier at top and bottom for text readability
   const overlay = ctx.createLinearGradient(0, 0, 0, STORY_HEIGHT);
-  overlay.addColorStop(0,    'rgba(11, 31, 59, 0.84)');
-  overlay.addColorStop(0.22, 'rgba(11, 31, 59, 0.62)');
-  overlay.addColorStop(0.68, 'rgba(11, 31, 59, 0.68)');
-  overlay.addColorStop(1,    'rgba(11, 31, 59, 0.90)');
+  overlay.addColorStop(0,    'rgba(11, 31, 59, 0.52)');
+  overlay.addColorStop(0.22, 'rgba(11, 31, 59, 0.34)');
+  overlay.addColorStop(0.68, 'rgba(11, 31, 59, 0.38)');
+  overlay.addColorStop(1,    'rgba(11, 31, 59, 0.58)');
   ctx.fillStyle = overlay;
   ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT);
 }
