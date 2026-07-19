@@ -253,23 +253,23 @@
     "topic_inter_cantonal": "Règles intercantonales"
   },
   "story": {
-    "summary_title": "Fishing Session Story",
-    "summary_map": "Catch Map Batches",
+    "summary_title": "Story de sortie de pêche",
+    "summary_map": "Carte des lots de prises",
     "summary_conditions": "Conditions",
-    "summary_catches": "Catches",
-    "no_catches": "No catches logged.",
-    "no_map_points": "No catch locations available for map batches.",
-    "session_location": "Session location",
+    "summary_catches": "Prises",
+    "no_catches": "Aucune prise enregistrée.",
+    "no_map_points": "Aucune position de prise disponible pour les lots sur la carte.",
+    "session_location": "Lieu de la sortie",
     "date": "Date",
-    "time": "Time",
-    "duration": "Duration",
-    "weather": "Weather",
-    "catch_title": "Catch",
-    "catch_time": "Catch time",
-    "catch_released": "Released",
-    "catch_kept": "Kept",
+    "time": "Heure",
+    "duration": "Durée",
+    "weather": "Météo",
+    "catch_title": "Prise",
+    "catch_time": "Heure de la prise",
+    "catch_released": "Relâchée",
+    "catch_kept": "Conservée",
     "catch_notes": "Notes",
-    "catch_location": "Catch location",
-    "catch_photo_missing": "No uploaded image for this catch."
+    "catch_location": "Lieu de la prise",
+    "catch_photo_missing": "Aucune image importée pour cette prise."
   }
 }
