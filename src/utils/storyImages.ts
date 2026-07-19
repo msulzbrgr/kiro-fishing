@@ -77,10 +77,11 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
         let remaining = word;
         while (remaining.length > 0) {
           let chunk = remaining;
-          while (chunk.length > 0 && ctx.measureText(chunk).width > maxWidth) {
+          while (chunk.length > 1 && ctx.measureText(chunk).width > maxWidth) {
             chunk = chunk.slice(0, -1);
           }
-          if (chunk.length === 0) chunk = remaining.slice(0, 1); // Ensure at least 1 char
+          // Always emit at least one character to avoid infinite loop
+          if (chunk.length === 0) chunk = remaining.slice(0, 1);
           lines.push(chunk);
           remaining = remaining.slice(chunk.length);
         }
