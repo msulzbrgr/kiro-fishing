@@ -68,7 +68,7 @@ const EMPTY_FORM: CatchFormState = {
 function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
   const previewPhotos = catchEntry.photos ?? [];
   if (catchEntry.photoIds && previewPhotos.length > 0 && catchEntry.photoIds.length !== previewPhotos.length) {
-    console.warn('Catch photo preview count does not match persisted photo ids.', {
+    console.warn('Catch photo preview count does not match persisted photo ids; preserving stored ids during edit.', {
       catchId: catchEntry.id,
       photoIds: catchEntry.photoIds.length,
       previews: previewPhotos.length,
@@ -327,11 +327,12 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     }
 
     if (!existingRecognition) return undefined;
+    const predictedSpecies = existingRecognition.predictedSpecies ?? [];
 
     return {
       ...existingRecognition,
       selectedSpeciesSource: form.selectedSpeciesSource,
-      selectedSpeciesConfidence: existingRecognition.predictedSpecies.find((p) => p.species === form.species)?.confidence,
+      selectedSpeciesConfidence: predictedSpecies.find((p) => p.species === form.species)?.confidence,
     };
   };
 
