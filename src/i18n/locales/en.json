@@ -125,7 +125,14 @@
       "error_malformed_image": "Image could not be processed. Please try another photo.",
       "error_out_of_memory": "Not enough memory to process this image on this device.",
       "error_processing_failed": "Species recognition failed. Please select species manually."
-    }
+    },
+    "location_label": "Location (optional)",
+    "set_location": "Set Location",
+    "change_location": "Change Location",
+    "clear_location": "Clear",
+    "use_gps": "Use GPS",
+    "location_set": "Location set",
+    "gps_unavailable": "GPS not available on this device."
   },
   "conditions": {
     "weather_title": "Weather Conditions",

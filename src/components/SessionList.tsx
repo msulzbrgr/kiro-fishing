@@ -289,6 +289,13 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                 compact
                 initialLocation={session.location}
                 onLocationSelect={handleLocationSelect}
+                catchMarkers={session.catches
+                  .filter((c) => c.location != null)
+                  .map((c) => ({
+                    lat: c.location!.lat,
+                    lng: c.location!.lng,
+                    label: c.species,
+                  }))}
               />
             )}
           </div>

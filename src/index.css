@@ -1407,6 +1407,43 @@ textarea {
   color: var(--primary);
 }
 
+.badge-location {
+  color: var(--primary);
+}
+
+.catch-location-display {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.catch-location-coords {
+  font-size: 0.75rem;
+  color: var(--text-muted, var(--text-secondary));
+  width: 100%;
+}
+
+.catch-location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.catch-location-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

@@ -10,6 +10,13 @@ interface MapViewProps {
   onLocationSelect?: (location: FishingLocation) => void;
   initialLocation?: FishingLocation;
   compact?: boolean;
+  catchMarkers?: CatchMarker[];
+}
+
+interface CatchMarker {
+  lat: number;
+  lng: number;
+  label: string;
 }
 
 interface NominatimResult {
@@ -51,13 +58,15 @@ function detectCanton(result: NominatimResult): { code: string; name: string } |
   return null;
 }
 
-export default function MapView({ onLocationSelect, initialLocation, compact = false }: MapViewProps) {
+export default function MapView({ onLocationSelect, initialLocation, compact = false, catchMarkers }: MapViewProps) {
   const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leafletMapRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const catchMarkersRef = useRef<any[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<FishingLocation | null>(
     initialLocation ?? null
   );
@@ -166,6 +175,32 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       setSelectedLocation(initialLocation);
     });
   }, [initialLocation]);
+
+  useEffect(() => {
+    if (!leafletMapRef.current || !mapReady) return;
+    import('leaflet').then((L) => {
+      // Remove existing catch markers
+      for (const m of catchMarkersRef.current) {
+        m.remove();
+      }
+      catchMarkersRef.current = [];
+
+      if (!catchMarkers || catchMarkers.length === 0) return;
+
+      for (const cm of catchMarkers) {
+        const circle = L.circleMarker([cm.lat, cm.lng], {
+          radius: 8,
+          color: '#e85d04',
+          fillColor: '#ff7f0e',
+          fillOpacity: 0.85,
+          weight: 2,
+        })
+          .bindPopup(`🐟 ${cm.label}`)
+          .addTo(leafletMapRef.current);
+        catchMarkersRef.current.push(circle);
+      }
+    });
+  }, [catchMarkers, mapReady]);
 
   const mapHeight = compact ? '250px' : '400px';
   const outsideSwitzerland = selectedLocation ? isOutsideSwitzerland(selectedLocation) : false;

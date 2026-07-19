@@ -12,12 +12,15 @@ import {
   RefreshCw,
   Camera,
   AlertTriangle,
+  MapPin,
+  Locate,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type {
   Catch,
   CatchRecognitionErrorCode,
   CatchSpeciesSelectionSource,
+  FishingLocation,
   FishingSession,
   SpeciesPrediction,
 } from '../types';
@@ -31,6 +34,7 @@ import {
   isSupportedFishImage,
   MAX_FISH_RECOGNITION_IMAGE_BYTES,
 } from '../services/fishRecognitionService';
+import MapView from './MapView';
 
 interface CatchLogProps {
   session: FishingSession;
@@ -45,6 +49,7 @@ interface CatchFormState {
   released: boolean;
   notes: string;
   photos: CatchPhotoFormEntry[];
+  location?: FishingLocation;
 }
 
 interface CatchPhotoFormEntry {
@@ -63,6 +68,7 @@ const EMPTY_FORM: CatchFormState = {
   released: true,
   notes: '',
   photos: [],
+  location: undefined,
 };
 
 function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
@@ -95,10 +101,15 @@ function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
     released: catchEntry.released,
     notes: catchEntry.notes ?? '',
     photos: [...persistedPhotos, ...newPhotos],
+    location: catchEntry.location,
   };
 }
 
 type RecognitionState = 'idle' | 'processing' | 'success' | 'low_confidence' | 'failed';
+
+function formatCoords(lat: number, lng: number): string {
+  return `${lat.toFixed(5)}°N, ${lng.toFixed(5)}°E`;
+}
 
 function isQuotaExceededError(err: unknown): boolean {
   if (!err || typeof err !== 'object') return false;
@@ -125,6 +136,8 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [recognizedAt, setRecognizedAt] = useState('');
   const [recognitionErrorCode, setRecognitionErrorCode] = useState<CatchRecognitionErrorCode | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [gpsError, setGpsError] = useState<string>('');
   const photoInputId = useId();
 
   const MAX_PHOTOS = 10;
@@ -149,6 +162,8 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     setShowForm(false);
     setSaveError('');
     setPhotoValidationError('');
+    setShowLocationPicker(false);
+    setGpsError('');
     resetRecognition();
     clearFileInput();
   };
@@ -303,6 +318,25 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     void readFiles();
   };
 
+  const handleUseGps = () => {
+    setGpsError('');
+    if (!navigator.geolocation) {
+      setGpsError(t('catch.gps_unavailable'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((prev) => ({
+          ...prev,
+          location: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+        }));
+      },
+      () => {
+        setGpsError(t('catch.gps_unavailable'));
+      },
+    );
+  };
+
   const buildRecognitionForSave = (existingCatch?: Catch) => {
     const existingRecognition = existingCatch?.recognition;
 
@@ -352,6 +386,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       photoIds: persistedPhotoIds.length > 0 ? persistedPhotoIds : undefined,
       photos: newPhotos.length > 0 ? newPhotos : undefined,
       recognition: buildRecognitionForSave(existingCatch),
+      location: form.location,
     };
 
     const updated: FishingSession = {
@@ -590,6 +625,60 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
             </div>
           </div>
 
+          <div className="form-group form-group-full">
+            <label>
+              <MapPin size={14} /> {t('catch.location_label')}
+            </label>
+            {form.location && (
+              <div className="catch-location-display" data-testid="catch-location-display">
+                <span>
+                  {form.location.locationName
+                    ? form.location.locationName
+                    : formatCoords(form.location.lat, form.location.lng)}
+                </span>
+                {form.location.canton && (
+                  <span className="canton-badge">{form.location.canton}</span>
+                )}
+                <div className="catch-location-coords">
+                  {formatCoords(form.location.lat, form.location.lng)}
+                </div>
+              </div>
+            )}
+            {gpsError && (
+              <div className="form-error" role="alert" data-testid="catch-gps-error">
+                {gpsError}
+              </div>
+            )}
+            <div className="catch-location-actions">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleUseGps}
+                data-testid="catch-use-gps-btn"
+              >
+                <Locate size={14} /> {t('catch.use_gps')}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowLocationPicker(true)}
+                data-testid="catch-pick-location-btn"
+              >
+                <MapPin size={14} /> {form.location ? t('catch.change_location') : t('catch.set_location')}
+              </button>
+              {form.location && (
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setForm((prev) => ({ ...prev, location: undefined }))}
+                  data-testid="catch-clear-location-btn"
+                >
+                  <X size={14} /> {t('catch.clear_location')}
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="form-actions">
             <button
               className="btn btn-secondary"
@@ -660,6 +749,11 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   {photos.length > 0 && (
                     <span className="badge badge-photo">
                       <Camera size={11} />
+                    </span>
+                  )}
+                  {c.location && (
+                    <span className="badge badge-location" data-testid={`catch-location-badge-${c.id}`}>
+                      <MapPin size={11} />
                     </span>
                   )}
                 </div>
@@ -736,6 +830,19 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   </div>
                 )}
                 {c.notes && <div className="catch-notes">{c.notes}</div>}
+                {c.location && (
+                  <div className="catch-location-info" data-testid={`catch-location-info-${c.id}`}>
+                    <MapPin size={12} />
+                    <span>
+                      {c.location.locationName
+                        ? c.location.locationName
+                        : formatCoords(c.location.lat, c.location.lng)}
+                    </span>
+                    {c.location.canton && (
+                      <span className="canton-badge">{c.location.canton}</span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -839,6 +946,42 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
             </div>
           );
         })()
+      )}
+
+      {showLocationPicker && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setShowLocationPicker(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowLocationPicker(false); }}
+          tabIndex={-1}
+          data-testid="catch-location-picker-modal"
+        >
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3><MapPin size={16} /> {t('catch.set_location')}</h3>
+              <button
+                type="button"
+                className="btn btn-icon"
+                onClick={() => setShowLocationPicker(false)}
+                aria-label={t('catch.close')}
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <MapView
+                compact
+                initialLocation={form.location}
+                onLocationSelect={(loc) => {
+                  setForm((prev) => ({ ...prev, location: loc }));
+                  setShowLocationPicker(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

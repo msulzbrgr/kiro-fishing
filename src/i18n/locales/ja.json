@@ -125,7 +125,14 @@
       "error_malformed_image": "画像を処理できませんでした。別の写真を試してください。",
       "error_out_of_memory": "この端末では画像処理のメモリが不足しています。",
       "error_processing_failed": "魚種判定に失敗しました。魚種を手動で選択してください。"
-    }
+    },
+    "location_label": "場所（任意）",
+    "set_location": "場所を設定",
+    "change_location": "場所を変更",
+    "clear_location": "クリア",
+    "use_gps": "GPS を使用",
+    "location_set": "場所が設定されました",
+    "gps_unavailable": "このデバイスでは GPS を使用できません。"
   },
   "conditions": {
     "weather_title": "天気",

@@ -3,7 +3,7 @@ export type WaterClarity = 'clear' | 'slightly-murky' | 'murky';
 export type WaterLevel = 'low' | 'normal' | 'high';
 export type WaterCurrent = 'still' | 'slow' | 'moderate' | 'fast';
 
-export const CURRENT_SESSION_SCHEMA_VERSION = 2;
+export const CURRENT_SESSION_SCHEMA_VERSION = 3;
 
 export interface WeatherConditions {
   temperature?: number;
@@ -30,6 +30,7 @@ export interface Catch {
   photoIds?: string[]; // IndexedDB photo references
   photos?: string[]; // base64 data URLs
   recognition?: CatchRecognitionMetadata;
+  location?: FishingLocation; // optional per-catch location
 }
 
 export type CatchSpeciesSelectionSource = 'manual' | 'ai';
