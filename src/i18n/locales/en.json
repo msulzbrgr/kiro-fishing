@@ -114,8 +114,7 @@
     "edit_end_time": "End Time (optional)",
     "edit_notes": "Notes (optional)",
     "edit_save": "Save Changes",
-    "edit_cancel": "Cancel",
-    "edit_end_time_placeholder": "HH:MM"
+    "edit_cancel": "Cancel"
   },
   "new_session": {
     "title": "Start New Fishing Session",

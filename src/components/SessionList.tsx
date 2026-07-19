@@ -161,7 +161,7 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
       ...session,
       date: editDate,
       startTime: editStartTime,
-      endTime: editEndTime.trim() || undefined,
+      endTime: editEndTime === '' ? undefined : editEndTime,
       notes: editNotes.trim() || undefined,
     };
     const savedSession = await saveSession(updated);
@@ -365,7 +365,6 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
                     <input
                       type="time"
                       value={editEndTime}
-                      placeholder={t('sessions.edit_end_time_placeholder')}
                       onChange={(e) => setEditEndTime(e.target.value)}
                       data-testid="edit-session-end-time"
                     />

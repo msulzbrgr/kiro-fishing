@@ -114,8 +114,7 @@
     "edit_end_time": "終了時刻（任意）",
     "edit_notes": "メモ（任意）",
     "edit_save": "変更を保存",
-    "edit_cancel": "キャンセル",
-    "edit_end_time_placeholder": "HH:MM"
+    "edit_cancel": "キャンセル"
   },
   "new_session": {
     "title": "新しい釣行を始めよう",

@@ -114,8 +114,7 @@
     "edit_end_time": "Endzeit (optional)",
     "edit_notes": "Notizen (optional)",
     "edit_save": "Änderungen speichern",
-    "edit_cancel": "Abbrechen",
-    "edit_end_time_placeholder": "HH:MM"
+    "edit_cancel": "Abbrechen"
   },
   "new_session": {
     "title": "Neue Angelausfahrt",

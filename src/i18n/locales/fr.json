@@ -114,8 +114,7 @@
     "edit_end_time": "Heure de fin (optionnel)",
     "edit_notes": "Notes (optionnel)",
     "edit_save": "Enregistrer les modifications",
-    "edit_cancel": "Annuler",
-    "edit_end_time_placeholder": "HH:MM"
+    "edit_cancel": "Annuler"
   },
   "new_session": {
     "title": "Nouvelle sortie de pêche",

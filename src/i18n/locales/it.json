@@ -114,8 +114,7 @@
     "edit_end_time": "Ora di fine (opzionale)",
     "edit_notes": "Note (opzionale)",
     "edit_save": "Salva modifiche",
-    "edit_cancel": "Annulla",
-    "edit_end_time_placeholder": "HH:MM"
+    "edit_cancel": "Annulla"
   },
   "new_session": {
     "title": "Nuova uscita di pesca",
