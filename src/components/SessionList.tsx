@@ -15,6 +15,9 @@ import {
   AlertTriangle,
   ShieldCheck,
   StopCircle,
+  Pencil,
+  Save,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingLocation, FishingSession, Profile, RegulationCheckpoint } from '../types';
@@ -69,6 +72,11 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
   const [isStoryGenerating, setIsStoryGenerating] = useState(false);
   const [storyError, setStoryError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editDate, setEditDate] = useState(session.date);
+  const [editStartTime, setEditStartTime] = useState(session.startTime);
+  const [editEndTime, setEditEndTime] = useState(session.endTime ?? '');
+  const [editNotes, setEditNotes] = useState(session.notes ?? '');
   const pendingCheckpoint = getPendingCheckpoint(session);
   const latestInfoCheckpoint = getLatestInfoCheckpoint(session);
   const displayedCheckpoint = pendingCheckpoint ?? latestInfoCheckpoint;
@@ -146,6 +154,27 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
       regulationState: getRegulationStateAfterConfirmation(confirmedSnapshot),
       regulationCheckpoints,
     });
+  };
+
+  const handleSaveEdit = async () => {
+    const updated: FishingSession = {
+      ...session,
+      date: editDate,
+      startTime: editStartTime,
+      endTime: editEndTime.trim() || undefined,
+      notes: editNotes.trim() || undefined,
+    };
+    const savedSession = await saveSession(updated);
+    await onUpdate(savedSession);
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditDate(session.date);
+    setEditStartTime(session.startTime);
+    setEditEndTime(session.endTime ?? '');
+    setEditNotes(session.notes ?? '');
+    setIsEditing(false);
   };
 
   return (
@@ -309,60 +338,130 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
           </div>
 
           <div className="session-footer">
-            {session.notes && <p className="session-notes">{session.notes}</p>}
-            {storyError && <p className="form-error" role="alert">{storyError}</p>}
-            <div className="session-footer-actions">
-              {!session.endTime && (
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={async () => {
-                    const endTime = new Date().toLocaleTimeString('de-CH', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
-                    const updated = { ...session, endTime };
-                    const savedSession = await saveSession(updated);
-                    await onUpdate(savedSession);
-                  }}
-                  data-testid="finish-session-btn"
-                >
-                  <StopCircle size={14} /> {t('sessions.finish')}
-                </button>
-              )}
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={async () => {
-                  setStoryError(null);
-                  setIsStoryGenerating(true);
-                  try {
-                    await exportSessionStoryImages(session, t, profiles);
-                  } catch (err) {
-                    console.error('Failed to generate session story images', err);
-                    setStoryError(t('sessions.create_story_failed'));
-                  } finally {
-                    setIsStoryGenerating(false);
-                  }
-                }}
-                disabled={isStoryGenerating}
-                data-testid={`create-story-btn-${session.id}`}
-              >
-                <Camera size={14} /> {t(isStoryGenerating ? 'sessions.creating_story' : 'sessions.create_story')}
-              </button>
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => {
-                  if (confirm(t('sessions.delete_confirm'))) {
-                    void deleteSession(session.id)
-                      .then(() => onDelete(session.id))
-                      .catch((err) => {
-                        console.error('Failed to delete session', err);
-                      });
-                  }
-                }}
-              >
-                <Trash2 size={14} /> {t('sessions.delete')}
-              </button>
-            </div>
+            {isEditing ? (
+              <div className="session-edit-form" data-testid="session-edit-form">
+                <h4><Pencil size={15} /> {t('sessions.edit_title')}</h4>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>{t('sessions.edit_date')}</label>
+                    <input
+                      type="date"
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                      data-testid="edit-session-date"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('sessions.edit_start_time')}</label>
+                    <input
+                      type="time"
+                      value={editStartTime}
+                      onChange={(e) => setEditStartTime(e.target.value)}
+                      data-testid="edit-session-start-time"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('sessions.edit_end_time')}</label>
+                    <input
+                      type="time"
+                      value={editEndTime}
+                      placeholder={t('sessions.edit_end_time_placeholder')}
+                      onChange={(e) => setEditEndTime(e.target.value)}
+                      data-testid="edit-session-end-time"
+                    />
+                  </div>
+                  <div className="form-group form-group-full">
+                    <label>{t('sessions.edit_notes')}</label>
+                    <textarea
+                      value={editNotes}
+                      onChange={(e) => setEditNotes(e.target.value)}
+                      rows={2}
+                      data-testid="edit-session-notes"
+                    />
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={handleCancelEdit}
+                    data-testid="edit-session-cancel-btn"
+                  >
+                    <X size={14} /> {t('sessions.edit_cancel')}
+                  </button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleSaveEdit}
+                    data-testid="edit-session-save-btn"
+                  >
+                    <Save size={14} /> {t('sessions.edit_save')}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {session.notes && <p className="session-notes">{session.notes}</p>}
+                {storyError && <p className="form-error" role="alert">{storyError}</p>}
+                <div className="session-footer-actions">
+                  {!session.endTime && (
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={async () => {
+                        const endTime = new Date().toLocaleTimeString('de-CH', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        });
+                        const updated = { ...session, endTime };
+                        const savedSession = await saveSession(updated);
+                        await onUpdate(savedSession);
+                      }}
+                      data-testid="finish-session-btn"
+                    >
+                      <StopCircle size={14} /> {t('sessions.finish')}
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setIsEditing(true)}
+                    data-testid="edit-session-btn"
+                  >
+                    <Pencil size={14} /> {t('sessions.edit')}
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={async () => {
+                      setStoryError(null);
+                      setIsStoryGenerating(true);
+                      try {
+                        await exportSessionStoryImages(session, t, profiles);
+                      } catch (err) {
+                        console.error('Failed to generate session story images', err);
+                        setStoryError(t('sessions.create_story_failed'));
+                      } finally {
+                        setIsStoryGenerating(false);
+                      }
+                    }}
+                    disabled={isStoryGenerating}
+                    data-testid={`create-story-btn-${session.id}`}
+                  >
+                    <Camera size={14} /> {t(isStoryGenerating ? 'sessions.creating_story' : 'sessions.create_story')}
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => {
+                      if (confirm(t('sessions.delete_confirm'))) {
+                        void deleteSession(session.id)
+                          .then(() => onDelete(session.id))
+                          .catch((err) => {
+                            console.error('Failed to delete session', err);
+                          });
+                      }
+                    }}
+                  >
+                    <Trash2 size={14} /> {t('sessions.delete')}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

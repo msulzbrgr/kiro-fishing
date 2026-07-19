@@ -106,7 +106,16 @@
     "delete": "Delete Session",
     "create_story": "Create Story",
     "creating_story": "Creating Story…",
-    "create_story_failed": "Could not create story images. Please try again."
+    "create_story_failed": "Could not create story images. Please try again.",
+    "edit": "Edit Session",
+    "edit_title": "Edit Session",
+    "edit_date": "Date",
+    "edit_start_time": "Start Time",
+    "edit_end_time": "End Time (optional)",
+    "edit_notes": "Notes (optional)",
+    "edit_save": "Save Changes",
+    "edit_cancel": "Cancel",
+    "edit_end_time_placeholder": "HH:MM"
   },
   "new_session": {
     "title": "Start New Fishing Session",

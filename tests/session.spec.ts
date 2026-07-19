@@ -538,3 +538,120 @@ test.describe('Catch Log', () => {
     await expect(page.getByTestId('catch-location-picker-modal')).toHaveCount(0);
   });
 });
+
+test.describe('Edit Session', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
+    await page.goto('/');
+    // Create a session first
+    await page.getByTestId('nav-new').click();
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    // Expand the session card
+    await page.locator('.session-card .session-header').click();
+  });
+
+  test('edit button is visible in session footer', async ({ page }) => {
+    await expect(page.getByTestId('edit-session-btn')).toBeVisible();
+  });
+
+  test('clicking edit shows the edit form', async ({ page }) => {
+    await page.getByTestId('edit-session-btn').click();
+    await expect(page.getByTestId('session-edit-form')).toBeVisible();
+    await expect(page.getByTestId('edit-session-date')).toBeVisible();
+    await expect(page.getByTestId('edit-session-start-time')).toBeVisible();
+    await expect(page.getByTestId('edit-session-end-time')).toBeVisible();
+    await expect(page.getByTestId('edit-session-notes')).toBeVisible();
+    await expect(page.getByTestId('edit-session-save-btn')).toBeVisible();
+    await expect(page.getByTestId('edit-session-cancel-btn')).toBeVisible();
+  });
+
+  test('edit form is pre-filled with current session values', async ({ page }) => {
+    const storedSessions = await loadStoredSessions(page);
+    const session = storedSessions[0] as { date: string; startTime: string };
+
+    await page.getByTestId('edit-session-btn').click();
+    await expect(page.getByTestId('edit-session-date')).toHaveValue(session.date);
+    await expect(page.getByTestId('edit-session-start-time')).toHaveValue(session.startTime);
+  });
+
+  test('cancel edit hides the form without saving', async ({ page }) => {
+    await page.getByTestId('edit-session-btn').click();
+    await page.getByTestId('edit-session-date').fill('2020-01-01');
+    await page.getByTestId('edit-session-cancel-btn').click();
+
+    await expect(page.getByTestId('session-edit-form')).toHaveCount(0);
+    await expect(page.getByTestId('edit-session-btn')).toBeVisible();
+
+    // The displayed date should not have changed to 2020-01-01
+    await expect(page.locator('.session-date strong')).not.toContainText('2020-01-01');
+  });
+
+  test('can save edited date and start time', async ({ page }) => {
+    await page.getByTestId('edit-session-btn').click();
+    await page.getByTestId('edit-session-date').fill('2023-06-15');
+    await page.getByTestId('edit-session-start-time').fill('07:30');
+    await page.getByTestId('edit-session-save-btn').click();
+
+    // Edit form should close
+    await expect(page.getByTestId('session-edit-form')).toHaveCount(0);
+
+    // Session header should reflect updated values
+    await expect(page.locator('.session-date strong')).toContainText('2023-06-15');
+    await expect(page.locator('.session-meta')).toContainText('07:30');
+
+    // Persisted in storage
+    const storedSessions = await loadStoredSessions(page);
+    const storedSession = storedSessions[0] as { date: string; startTime: string };
+    expect(storedSession.date).toBe('2023-06-15');
+    expect(storedSession.startTime).toBe('07:30');
+  });
+
+  test('can save an end time via edit form', async ({ page }) => {
+    await page.getByTestId('edit-session-btn').click();
+    await page.getByTestId('edit-session-end-time').fill('15:45');
+    await page.getByTestId('edit-session-save-btn').click();
+
+    await expect(page.getByTestId('session-edit-form')).toHaveCount(0);
+
+    const storedSessions = await loadStoredSessions(page);
+    const storedSession = storedSessions[0] as { endTime?: string };
+    expect(storedSession.endTime).toBe('15:45');
+  });
+
+  test('can save notes via edit form', async ({ page }) => {
+    await page.getByTestId('edit-session-btn').click();
+    await page.getByTestId('edit-session-notes').fill('Great fishing trip!');
+    await page.getByTestId('edit-session-save-btn').click();
+
+    await expect(page.getByTestId('session-edit-form')).toHaveCount(0);
+    await expect(page.locator('.session-notes')).toContainText('Great fishing trip!');
+
+    const storedSessions = await loadStoredSessions(page);
+    const storedSession = storedSessions[0] as { notes?: string };
+    expect(storedSession.notes).toBe('Great fishing trip!');
+  });
+
+  test('can clear end time via edit form', async ({ page }) => {
+    // First set an end time
+    await page.getByTestId('edit-session-btn').click();
+    await page.getByTestId('edit-session-end-time').fill('16:00');
+    await page.getByTestId('edit-session-save-btn').click();
+    await expect(page.getByTestId('session-edit-form')).toHaveCount(0);
+
+    let storedSessions = await loadStoredSessions(page);
+    expect((storedSessions[0] as { endTime?: string }).endTime).toBe('16:00');
+
+    // Now clear it
+    await page.getByTestId('edit-session-btn').click();
+    await page.getByTestId('edit-session-end-time').fill('');
+    await page.getByTestId('edit-session-save-btn').click();
+    await expect(page.getByTestId('session-edit-form')).toHaveCount(0);
+
+    storedSessions = await loadStoredSessions(page);
+    expect((storedSessions[0] as { endTime?: string }).endTime).toBeUndefined();
+  });
+});

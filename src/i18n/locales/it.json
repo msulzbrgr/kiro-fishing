@@ -106,7 +106,16 @@
     "loading": "Caricamento sessioni…",
     "create_story": "Crea story",
     "creating_story": "Creazione story…",
-    "create_story_failed": "Impossibile creare le immagini della story. Riprova."
+    "create_story_failed": "Impossibile creare le immagini della story. Riprova.",
+    "edit": "Modifica uscita",
+    "edit_title": "Modifica uscita",
+    "edit_date": "Data",
+    "edit_start_time": "Ora di inizio",
+    "edit_end_time": "Ora di fine (opzionale)",
+    "edit_notes": "Note (opzionale)",
+    "edit_save": "Salva modifiche",
+    "edit_cancel": "Annulla",
+    "edit_end_time_placeholder": "HH:MM"
   },
   "new_session": {
     "title": "Nuova uscita di pesca",
