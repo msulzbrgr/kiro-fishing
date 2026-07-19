@@ -515,10 +515,10 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                           }}
                           aria-label={t('catch.remove_photo')}
                           title={t('catch.remove_photo')}
-                         data-testid={`remove-photo-btn-${photo.index}`}
-                       >
-                         <X size={12} />
-                       </button>
+                          data-testid={`remove-photo-btn-${photo.index}`}
+                        >
+                          <X size={12} />
+                        </button>
                       </div>
                     ))}
                   </div>
