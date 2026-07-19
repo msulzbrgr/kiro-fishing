@@ -284,13 +284,18 @@ async function createSummaryImage(session: FishingSession, t: TFunction): Promis
   ctx.fillText(t('story.summary_conditions'), 70, 930);
   ctx.font = '400 28px Inter, sans-serif';
 
+  const weatherConditionLabel = mapWeatherConditionLabel(session, t);
+  const waterConditionLabel = mapWaterConditionLabel(session, t);
+  const waterLevelLabel = mapWaterLevelLabel(session, t);
+  const currentLabel = mapCurrentLabel(session, t);
+
   const conditionLines = [
-    session.weather.temperature != null ? `${t('conditions.air_temp')}: ${session.weather.temperature}°C` : null,
-    mapWeatherConditionLabel(session, t) ? `${t('story.weather')}: ${mapWeatherConditionLabel(session, t)}` : null,
-    session.water.temperature != null ? `${t('conditions.water_temp')}: ${session.water.temperature}°C` : null,
-    mapWaterConditionLabel(session, t) ? `${t('conditions.water_clarity')}: ${mapWaterConditionLabel(session, t)}` : null,
-    mapWaterLevelLabel(session, t) ? `${t('conditions.water_level')}: ${mapWaterLevelLabel(session, t)}` : null,
-    mapCurrentLabel(session, t) ? `${t('conditions.current')}: ${mapCurrentLabel(session, t)}` : null,
+    session.weather.temperature != null ? `${t('conditions.air_temp')}: ${session.weather.temperature}` : null,
+    weatherConditionLabel ? `${t('story.weather')}: ${weatherConditionLabel}` : null,
+    session.water.temperature != null ? `${t('conditions.water_temp')}: ${session.water.temperature}` : null,
+    waterConditionLabel ? `${t('conditions.water_clarity')}: ${waterConditionLabel}` : null,
+    waterLevelLabel ? `${t('conditions.water_level')}: ${waterLevelLabel}` : null,
+    currentLabel ? `${t('conditions.current')}: ${currentLabel}` : null,
   ].filter(Boolean) as string[];
 
   if (conditionLines.length === 0) {
