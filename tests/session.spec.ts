@@ -1,5 +1,21 @@
 import { test, expect } from '@playwright/test';
 import { selectFinnishLocation, selectSwissLocation } from './helpers/location';
+import { loadStoredSessions } from './helpers/storage';
+
+type StoredCatch = {
+  id: string;
+  species: string;
+  notes?: string;
+  released: boolean;
+  recognition?: unknown;
+};
+
+type StoredSession = {
+  catches: StoredCatch[];
+  location?: { country?: string; countryCode?: string };
+  regulationSnapshot?: { jurisdiction?: string; userConfirmedUncertain?: boolean; reviewMode?: string; sourceUrls?: string[] };
+  regulationState?: string;
+};
 
 test.describe('Session Management', () => {
   test.beforeEach(async ({ page }) => {
@@ -66,10 +82,11 @@ test.describe('Session Management', () => {
       db.close();
       return records;
     });
-    expect((sessions[0] as Record<string, unknown>).regulationSnapshot).toBeTruthy();
-    expect((sessions[0] as { regulationSnapshot: { userConfirmedUncertain: boolean } }).regulationSnapshot.userConfirmedUncertain).toBe(false);
-    expect((sessions[0] as { regulationSnapshot: { reviewMode: string } }).regulationSnapshot.reviewMode).toBe('information');
-    expect((sessions[0] as { regulationState: string }).regulationState).toBe('active_current');
+    const storedSession = sessions[0] as StoredSession;
+    expect(storedSession.regulationSnapshot).toBeTruthy();
+    expect(storedSession.regulationSnapshot?.userConfirmedUncertain).toBe(false);
+    expect(storedSession.regulationSnapshot?.reviewMode).toBe('information');
+    expect(storedSession.regulationState).toBe('active_current');
   });
 
   test('Finland location shows a research prompt and can be saved', async ({ page }) => {
@@ -102,10 +119,11 @@ test.describe('Session Management', () => {
       return records;
     });
 
-    expect((sessions[0] as { location: { country?: string; countryCode?: string } }).location.country).toBe('Finland');
-    expect((sessions[0] as { location: { countryCode?: string } }).location.countryCode).toBe('fi');
-    expect((sessions[0] as { regulationSnapshot: { jurisdiction?: string } }).regulationSnapshot.jurisdiction).toBe('Finland');
-    expect((sessions[0] as { regulationSnapshot: { sourceUrls: string[] } }).regulationSnapshot.sourceUrls).toEqual([]);
+    const storedSession = sessions[0] as StoredSession;
+    expect(storedSession.location?.country).toBe('Finland');
+    expect(storedSession.location?.countryCode).toBe('fi');
+    expect(storedSession.regulationSnapshot?.jurisdiction).toBe('Finland');
+    expect(storedSession.regulationSnapshot?.sourceUrls).toEqual([]);
   });
 
   test('cancel returns to sessions tab', async ({ page }) => {
@@ -252,7 +270,7 @@ test.describe('Catch Log', () => {
       return records;
     });
 
-    const catchEntry = (sessions[0] as { catches: Array<{ recognition?: unknown }> }).catches[0];
+    const catchEntry = (sessions[0] as StoredSession).catches[0];
     expect(catchEntry.recognition).toBeUndefined();
   });
 
@@ -286,8 +304,43 @@ test.describe('Catch Log', () => {
       return records;
     });
 
-    const catchEntry = (sessions[0] as { catches: Array<{ species: string; recognition?: unknown }> }).catches[0];
+    const catchEntry = (sessions[0] as StoredSession).catches[0];
     expect(catchEntry.species).not.toBe('');
     expect(catchEntry.recognition).toBeUndefined();
+  });
+
+  test('can edit an existing catch and persist the changes', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.locator('.catch-form textarea').fill('initial catch note');
+    await page.getByTestId('add-catch-btn').click();
+
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const storedSessions = await loadStoredSessions(page);
+    const catchId = (storedSessions[0] as StoredSession).catches[0].id;
+
+    const editButton = page.getByTestId(`edit-catch-btn-${catchId}`);
+    await editButton.click();
+
+    await expect(page.locator('.catch-form textarea')).toHaveValue('initial catch note');
+    await page.getByTestId('species-select').selectOption({ index: 2 });
+    const notesField = page.locator('.catch-form textarea');
+    await notesField.fill('updated catch note');
+    await expect(notesField).toHaveValue('updated catch note');
+    await page.locator('.catch-form input[type="checkbox"]').uncheck();
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-form')).toHaveCount(0);
+
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+    await page.locator('.catch-item .catch-header').click();
+    await expect(page.locator('.catch-notes')).toContainText('updated catch note');
+
+    const sessions = await loadStoredSessions(page);
+
+    const catchEntry = (sessions[0] as StoredSession).catches[0];
+    expect(catchEntry.species).not.toBe('');
+    expect(catchEntry.notes).toBe('updated catch note');
+    expect(catchEntry.released).toBe(false);
   });
 });

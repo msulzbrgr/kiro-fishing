@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useId, useState } from 'react';
 import {
   Plus,
   Fish,
   X,
+  Pencil,
   ChevronDown,
   ChevronUp,
   Ruler,
@@ -43,18 +44,59 @@ interface CatchFormState {
   length: string;
   released: boolean;
   notes: string;
-  photos: string[];
+  photos: CatchPhotoFormEntry[];
 }
+
+interface CatchPhotoFormEntry {
+  previewUrl: string;
+  uploadDataUrl?: string;
+  photoId?: string;
+}
+
+const DEFAULT_SPECIES_SOURCE: CatchSpeciesSelectionSource = 'manual';
 
 const EMPTY_FORM: CatchFormState = {
   species: '',
-  selectedSpeciesSource: 'manual',
+  selectedSpeciesSource: DEFAULT_SPECIES_SOURCE,
   weight: '',
   length: '',
   released: true,
   notes: '',
   photos: [],
 };
+
+function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
+  const previewPhotos = catchEntry.photos ?? [];
+  if (catchEntry.photoIds && previewPhotos.length > 0 && catchEntry.photoIds.length !== previewPhotos.length) {
+    console.warn('Catch photo preview count does not match persisted photo ids; preserving stored ids during edit.', {
+      catchId: catchEntry.id,
+      photoIds: catchEntry.photoIds.length,
+      previews: previewPhotos.length,
+    });
+  }
+
+  const persistedPhotos = (catchEntry.photoIds ?? []).map((photoId, index) => ({
+    photoId,
+    previewUrl: previewPhotos[index] ?? '',
+  }));
+
+  const newPhotos = previewPhotos
+    .slice(persistedPhotos.length)
+    .map((previewUrl) => ({
+      previewUrl,
+      uploadDataUrl: previewUrl,
+    }));
+
+  return {
+    species: catchEntry.species,
+    selectedSpeciesSource: catchEntry.recognition?.selectedSpeciesSource ?? DEFAULT_SPECIES_SOURCE,
+    weight: catchEntry.weight?.toString() ?? '',
+    length: catchEntry.length?.toString() ?? '',
+    released: catchEntry.released,
+    notes: catchEntry.notes ?? '',
+    photos: [...persistedPhotos, ...newPhotos],
+  };
+}
 
 type RecognitionState = 'idle' | 'processing' | 'success' | 'low_confidence' | 'failed';
 
@@ -70,6 +112,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CatchFormState>(EMPTY_FORM);
+  const [editingCatchId, setEditingCatchId] = useState<string | null>(null);
   const [expandedCatch, setExpandedCatch] = useState<string | null>(null);
   const [activePhotoIndexByCatch, setActivePhotoIndexByCatch] = useState<Record<string, number>>({});
   const [galleryCatchId, setGalleryCatchId] = useState<string | null>(null);
@@ -81,13 +124,34 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
   const [recognitionModelVersion, setRecognitionModelVersion] = useState('');
   const [recognizedAt, setRecognizedAt] = useState('');
   const [recognitionErrorCode, setRecognitionErrorCode] = useState<CatchRecognitionErrorCode | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
+  const photoInputId = useId();
 
   const MAX_PHOTOS = 10;
   const MAX_BYTES = 5 * 1024 * 1024;
   const LOW_CONFIDENCE_THRESHOLD = 0.6;
+  const hasAnyFormPhotos = form.photos.length > 0;
+  const visibleFormPhotos = form.photos.flatMap((photo, index) => (
+    photo.previewUrl ? [{ ...photo, index }] : []
+  ));
 
   const closeGallery = () => setGalleryCatchId(null);
+  const clearFileInput = () => {
+    setFileInputKey((prev) => prev + 1);
+  };
+  const openPhotoPicker = () => {
+    document.getElementById(photoInputId)?.click();
+  };
+
+  const resetFormState = () => {
+    setEditingCatchId(null);
+    setForm(EMPTY_FORM);
+    setShowForm(false);
+    setSaveError('');
+    setPhotoValidationError('');
+    resetRecognition();
+    clearFileInput();
+  };
 
   const resetRecognition = () => {
     setRecognitionState('idle');
@@ -96,6 +160,26 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     setRecognitionModelVersion('');
     setRecognizedAt('');
     setRecognitionErrorCode(null);
+  };
+
+  const startNewCatch = () => {
+    setEditingCatchId(null);
+    setForm(EMPTY_FORM);
+    setShowForm(true);
+    setSaveError('');
+    setPhotoValidationError('');
+    resetRecognition();
+    clearFileInput();
+  };
+
+  const startEditingCatch = (catchEntry: Catch) => {
+    setEditingCatchId(catchEntry.id);
+    setForm(createFormStateFromCatch(catchEntry));
+    setShowForm(true);
+    setSaveError('');
+    setPhotoValidationError('');
+    resetRecognition();
+    clearFileInput();
   };
 
   const getRecognitionErrorMessage = (code: CatchRecognitionErrorCode): string => {
@@ -118,7 +202,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
     if (files.length === 0) return;
 
     if (form.photos.length >= MAX_PHOTOS) {
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearFileInput();
       return;
     }
 
@@ -144,13 +228,10 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
           setPhotoValidationError(t('catch.recognition.error_image_too_large'));
         }
       }
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearFileInput();
       return;
     }
     setPhotoValidationError('');
-
-    let canceled = false;
-    const readers: FileReader[] = [];
 
     const readFiles = async () => {
       const dataUrls: string[] = [];
@@ -158,7 +239,6 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
       for (const file of acceptedFiles) {
         const dataUrl = await new Promise<string | null>((resolve) => {
           const reader = new FileReader();
-          readers.push(reader);
           reader.onload = (ev) => {
             const result = ev.target?.result;
             resolve(typeof result === 'string' ? result : null);
@@ -167,14 +247,19 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
           reader.readAsDataURL(file);
         });
 
-        if (canceled) return;
         if (dataUrl) dataUrls.push(dataUrl);
       }
 
       if (dataUrls.length > 0) {
         setForm((prev) => ({
           ...prev,
-          photos: [...prev.photos, ...dataUrls].slice(0, MAX_PHOTOS),
+          photos: [
+            ...prev.photos,
+            ...dataUrls.map((previewUrl) => ({
+              previewUrl,
+              uploadDataUrl: previewUrl,
+            })),
+          ].slice(0, MAX_PHOTOS),
         }));
       }
 
@@ -212,57 +297,76 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
         }
       }
 
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearFileInput();
     };
 
     void readFiles();
+  };
 
-    return () => {
-      canceled = true;
-      readers.forEach((reader) => reader.readyState === reader.LOADING && reader.abort());
+  const buildRecognitionForSave = (existingCatch?: Catch) => {
+    const existingRecognition = existingCatch?.recognition;
+
+    if (FISH_RECOGNITION_ENABLED && recognitionAttempted) {
+      return {
+        predictedSpecies: recognitionCandidates,
+        selectedSpeciesSource: form.selectedSpeciesSource,
+        selectedSpeciesConfidence: recognitionCandidates.find((p) => p.species === form.species)?.confidence,
+        modelVersion: recognitionModelVersion || FISH_RECOGNITION_MODEL_VERSION,
+        recognizedAt: recognizedAt || new Date().toISOString(),
+        errorCode: recognitionState === 'failed' ? recognitionErrorCode ?? 'processing_failed' : undefined,
+      };
+    }
+
+    if (!existingRecognition) return undefined;
+    const predictedSpecies = existingRecognition.predictedSpecies ?? [];
+
+    return {
+      ...existingRecognition,
+      selectedSpeciesSource: form.selectedSpeciesSource,
+      selectedSpeciesConfidence: predictedSpecies.find((p) => p.species === form.species)?.confidence,
     };
   };
 
-  const handleAddCatch = async () => {
+  const handleSaveCatch = async () => {
     if (!form.species.trim()) return;
 
-    const newCatch: Catch = {
-      id: generateId(),
+    const existingCatch = editingCatchId
+      ? session.catches.find((catchEntry) => catchEntry.id === editingCatchId)
+      : undefined;
+    const persistedPhotoIds = form.photos
+      .flatMap((photo) => (photo.photoId ? [photo.photoId] : []));
+    const newPhotos = form.photos
+      .flatMap((photo) => (photo.uploadDataUrl ? [photo.uploadDataUrl] : []));
+
+    const nextCatch: Catch = {
+      id: existingCatch?.id ?? generateId(),
       species: form.species,
       weight: form.weight ? parseFloat(form.weight) : undefined,
       length: form.length ? parseFloat(form.length) : undefined,
-      time: new Date().toLocaleTimeString('de-CH', {
+      time: existingCatch?.time ?? new Date().toLocaleTimeString('de-CH', {
         hour: '2-digit',
         minute: '2-digit',
       }),
       released: form.released,
       notes: form.notes.trim() || undefined,
-      photos: form.photos.length > 0 ? form.photos : undefined,
-      recognition: FISH_RECOGNITION_ENABLED && recognitionAttempted
-        ? {
-            predictedSpecies: recognitionCandidates,
-            selectedSpeciesSource: form.selectedSpeciesSource,
-            selectedSpeciesConfidence: recognitionCandidates.find((p) => p.species === form.species)?.confidence,
-            modelVersion: recognitionModelVersion || FISH_RECOGNITION_MODEL_VERSION,
-            recognizedAt: recognizedAt || new Date().toISOString(),
-            errorCode: recognitionState === 'failed' ? recognitionErrorCode ?? 'processing_failed' : undefined,
-          }
-        : undefined,
+      photoIds: persistedPhotoIds.length > 0 ? persistedPhotoIds : undefined,
+      photos: newPhotos.length > 0 ? newPhotos : undefined,
+      recognition: buildRecognitionForSave(existingCatch),
     };
 
     const updated: FishingSession = {
       ...session,
-      catches: [...session.catches, newCatch],
+      catches: existingCatch
+        ? session.catches.map((catchEntry) => (catchEntry.id === existingCatch.id ? nextCatch : catchEntry))
+        : [...session.catches, nextCatch],
     };
 
     try {
       const savedSession = await saveSession(updated);
       setSaveError('');
       setPhotoValidationError('');
-      resetRecognition();
       await onSessionUpdate(savedSession);
-      setForm(EMPTY_FORM);
-      setShowForm(false);
+      resetFormState();
     } catch (err) {
       if (isQuotaExceededError(err)) {
         setSaveError(t('storage.quota_exceeded'));
@@ -289,7 +393,13 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
         </h3>
         <button
           className="btn btn-primary btn-sm"
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (showForm) {
+              resetFormState();
+              return;
+            }
+            startNewCatch();
+          }}
           data-testid="log-catch-btn"
         >
           <Plus size={16} /> {t('catch.log_catch')}
@@ -298,7 +408,7 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
 
       {showForm && (
         <div className="catch-form card">
-          <h4>{t('catch.new_catch')}</h4>
+          <h4>{t(editingCatchId ? 'catch.edit_catch' : 'catch.new_catch')}</h4>
           {saveError && (
             <div className="form-error" role="alert" data-testid="catch-save-error">
               {saveError}
@@ -379,55 +489,58 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                   {photoValidationError}
                 </div>
               )}
-              {form.photos.length > 0 ? (
+              {visibleFormPhotos.length > 0 ? (
                 <div className="catch-photo-preview">
                   <div className="catch-photo-thumb-grid" data-testid="catch-photo-preview">
-                    {form.photos.map((photo, idx) => (
-                      <div key={idx} className="catch-photo-thumb-wrapper">
-                        <img src={photo} alt="" className="catch-photo-thumb" />
+                    {visibleFormPhotos.map((photo) => (
+                      <div key={photo.index} className="catch-photo-thumb-wrapper">
+                        <img src={photo.previewUrl} alt="" className="catch-photo-thumb" />
                         <button
                           type="button"
                           className="btn btn-icon btn-danger catch-photo-thumb-remove"
                           onClick={() => {
                             setForm((prev) => ({
                               ...prev,
-                              photos: prev.photos.filter((_, photoIdx) => photoIdx !== idx),
+                              photos: prev.photos.filter((_, photoIdx) => photoIdx !== photo.index),
                             }));
-                            if (fileInputRef.current) fileInputRef.current.value = '';
+                            clearFileInput();
                           }}
                           aria-label={t('catch.remove_photo')}
                           title={t('catch.remove_photo')}
-                          data-testid={`remove-photo-btn-${idx}`}
+                          data-testid={`remove-photo-btn-${photo.index}`}
                         >
                           <X size={12} />
                         </button>
                       </div>
                     ))}
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => {
-                      setForm((prev) => ({ ...prev, photos: [] }));
-                      if (fileInputRef.current) fileInputRef.current.value = '';
-                    }}
-                    data-testid="remove-all-photos-btn"
-                  >
-                    <X size={14} /> {t('catch.remove_photo')}
-                  </button>
                 </div>
               ) : (
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm catch-photo-add-btn"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={openPhotoPicker}
                   data-testid="add-photo-btn"
                 >
                   <Camera size={14} /> {t('catch.add_photo')}
                 </button>
               )}
+              {hasAnyFormPhotos && (
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setForm((prev) => ({ ...prev, photos: [] }));
+                    clearFileInput();
+                  }}
+                  data-testid="remove-all-photos-btn"
+                >
+                  <X size={14} /> {t('catch.remove_photo')}
+                </button>
+              )}
               <input
-                ref={fileInputRef}
+                key={fileInputKey}
+                id={photoInputId}
                 type="file"
                 accept={FISH_RECOGNITION_ENABLED ? 'image/jpeg,image/png,image/webp' : 'image/*'}
                 multiple
@@ -480,22 +593,17 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
           <div className="form-actions">
             <button
               className="btn btn-secondary"
-              onClick={() => {
-                setShowForm(false);
-                setForm(EMPTY_FORM);
-                setPhotoValidationError('');
-                resetRecognition();
-              }}
+              onClick={resetFormState}
             >
               {t('catch.cancel')}
             </button>
             <button
               className="btn btn-primary"
-              onClick={handleAddCatch}
+              onClick={handleSaveCatch}
               disabled={!form.species}
               data-testid="add-catch-btn"
             >
-              {t('catch.add')}
+              {t(editingCatchId ? 'catch.save' : 'catch.add')}
             </button>
           </div>
         </div>
@@ -557,6 +665,18 @@ export default function CatchLog({ session, onSessionUpdate }: CatchLogProps) {
                 </div>
               </div>
               <div className="catch-actions">
+                <button
+                  className="btn btn-icon btn-secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    startEditingCatch(c);
+                  }}
+                  title={t('catch.edit_title')}
+                  aria-label={t('catch.edit_title')}
+                  data-testid={`edit-catch-btn-${c.id}`}
+                >
+                  <Pencil size={14} />
+                </button>
                 <button
                   className="btn btn-icon btn-danger"
                   onClick={(e) => {
