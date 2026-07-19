@@ -299,6 +299,7 @@ test.describe('Catch Log', () => {
 
     await expect(page.locator('.catch-item')).toHaveCount(1);
 
+    // This test creates exactly one catch, so the first edit button is the one under test.
     const editButton = page.locator('[data-testid^="edit-catch-btn-"]').first();
     await editButton.click();
 

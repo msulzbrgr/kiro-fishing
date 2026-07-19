@@ -53,9 +53,11 @@ interface CatchPhotoFormEntry {
   photoId?: string;
 }
 
+const DEFAULT_SPECIES_SOURCE: CatchSpeciesSelectionSource = 'manual';
+
 const EMPTY_FORM: CatchFormState = {
   species: '',
-  selectedSpeciesSource: 'manual',
+  selectedSpeciesSource: DEFAULT_SPECIES_SOURCE,
   weight: '',
   length: '',
   released: true,
@@ -78,7 +80,7 @@ function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
 
   return {
     species: catchEntry.species,
-    selectedSpeciesSource: catchEntry.recognition?.selectedSpeciesSource ?? 'manual',
+    selectedSpeciesSource: catchEntry.recognition?.selectedSpeciesSource ?? DEFAULT_SPECIES_SOURCE,
     weight: catchEntry.weight?.toString() ?? '',
     length: catchEntry.length?.toString() ?? '',
     released: catchEntry.released,
