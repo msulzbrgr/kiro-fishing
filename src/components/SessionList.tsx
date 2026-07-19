@@ -17,7 +17,7 @@ import {
   StopCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { FishingLocation, FishingSession, RegulationCheckpoint } from '../types';
+import type { FishingLocation, FishingSession, Profile, RegulationCheckpoint } from '../types';
 import { deleteSession, saveSession } from '../utils/storage';
 import { exportSessionStoryImages } from '../utils/storyImages';
 import {
@@ -37,6 +37,7 @@ interface SessionCardProps {
   session: FishingSession;
   onUpdate: (session: FishingSession) => Promise<void>;
   onDelete: (id: string) => void;
+  profiles?: Profile[];
 }
 
 function weatherEmoji(condition?: string) {
@@ -62,7 +63,7 @@ function getLatestInfoCheckpoint(session: FishingSession): RegulationCheckpoint 
     .find((checkpoint) => checkpoint.requiresConfirmation === false);
 }
 
-function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
+function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCardProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'catches' | 'conditions' | 'map'>('catches');
@@ -283,7 +284,7 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
 
           <div className="tab-content">
             {activeTab === 'catches' && (
-              <CatchLog session={session} onSessionUpdate={onUpdate} />
+              <CatchLog session={session} onSessionUpdate={onUpdate} profiles={profiles} />
             )}
             {activeTab === 'conditions' && (
               <ConditionsForm session={session} onSessionUpdate={onUpdate} />
@@ -299,6 +300,9 @@ function SessionCard({ session, onUpdate, onDelete }: SessionCardProps) {
                     lat: c.location!.lat,
                     lng: c.location!.lng,
                     label: c.species,
+                    profilePhotoUrl: c.profileId
+                      ? profiles.find((p) => p.id === c.profileId)?.photo
+                      : undefined,
                   }))}
               />
             )}
@@ -370,12 +374,14 @@ interface SessionListProps {
   sessions: FishingSession[];
   onSessionUpdate: (session: FishingSession) => Promise<void>;
   onSessionDelete: (id: string) => void;
+  profiles?: Profile[];
 }
 
 export default function SessionList({
   sessions,
   onSessionUpdate,
   onSessionDelete,
+  profiles = [],
 }: SessionListProps) {
   const { t } = useTranslation();
 
@@ -397,6 +403,7 @@ export default function SessionList({
           session={s}
           onUpdate={onSessionUpdate}
           onDelete={onSessionDelete}
+          profiles={profiles}
         />
       ))}
     </div>

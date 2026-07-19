@@ -19,6 +19,13 @@ export interface WaterConditions {
   current?: WaterCurrent;
 }
 
+export interface Profile {
+  id: string;
+  nickname: string;
+  photoId?: string; // IndexedDB profile-photos store reference
+  photo?: string;   // Object URL (hydrated at runtime)
+}
+
 export interface Catch {
   id: string;
   species: string;
@@ -31,6 +38,7 @@ export interface Catch {
   photos?: string[]; // base64 data URLs
   recognition?: CatchRecognitionMetadata;
   location?: FishingLocation; // optional per-catch location
+  profileId?: string; // optional angler profile reference
 }
 
 export type CatchSpeciesSelectionSource = 'manual' | 'ai';

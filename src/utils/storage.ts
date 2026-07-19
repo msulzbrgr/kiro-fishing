@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
-import type { Catch, FishingSession } from '../types';
+import type { Catch, FishingSession, Profile } from '../types';
 import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
-import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord } from './indexedDb';
+import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord, type ProfileRecord } from './indexedDb';
 import { migrateSession } from './sessionVersioning';
 
 const EXPORT_FORMAT_VERSION_V2 = '2.0';
@@ -23,12 +23,21 @@ interface ExportPhotoManifestEntry {
   catchId: string;
 }
 
+interface ExportProfileManifestEntry {
+  id: string;
+  nickname: string;
+  photoFileName?: string;
+  photoMimeType?: string;
+  createdAt: string;
+}
+
 interface ExportPayloadV2 {
   version: string;
   app: string;
   exportedAt: string;
   sessions: FishingSession[];
   photos: ExportPhotoManifestEntry[];
+  profiles?: ExportProfileManifestEntry[];
 }
 
 interface SaveSessionResult {
@@ -326,8 +335,11 @@ function triggerDownload(blob: Blob, filename: string): void {
 export async function exportData(): Promise<void> {
   await ensureLegacyMigration();
   const db = await getDb();
-  const sessions = await db.getAll('sessions');
-  const photos = await db.getAll('photos');
+  const [sessions, photos, profileRecords] = await Promise.all([
+    db.getAll('sessions'),
+    db.getAll('photos'),
+    db.getAll('profiles'),
+  ]);
 
   const payload: ExportPayloadV2 = {
     version: EXPORT_FORMAT_VERSION_V2,
@@ -341,12 +353,24 @@ export async function exportData(): Promise<void> {
       sessionId: photo.sessionId,
       catchId: photo.catchId,
     })),
+    profiles: profileRecords.map((p) => ({
+      id: p.id,
+      nickname: p.nickname,
+      photoFileName: p.photoBlob ? `profile-photos/${p.id}` : undefined,
+      photoMimeType: p.photoMimeType,
+      createdAt: p.createdAt,
+    })),
   };
 
   const zip = new JSZip();
   zip.file('manifest.json', JSON.stringify(payload, null, 2));
   for (const photo of photos) {
     zip.file(`photos/${photo.id}`, await photo.blob.arrayBuffer());
+  }
+  for (const profile of profileRecords) {
+    if (profile.photoBlob) {
+      zip.file(`profile-photos/${profile.id}`, await profile.photoBlob.arrayBuffer());
+    }
   }
 
   const content = await zip.generateAsync({ type: 'blob' });
@@ -449,12 +473,36 @@ async function importV2Zip(file: File): Promise<number> {
     resolvedPhotos.push({ entry: photoEntry, blob, mimeType });
   }
 
+  // Pre-fetch profile photo blobs before the IDB transaction for the same reason.
+  interface ResolvedProfilePhoto {
+    id: string;
+    blob: Blob;
+    mimeType: string;
+  }
+  const resolvedProfilePhotos: ResolvedProfilePhoto[] = [];
+  if (Array.isArray(payload.profiles)) {
+    for (const profileEntry of payload.profiles) {
+      if (!profileEntry.photoFileName) continue;
+      const zipFile = zip.file(profileEntry.photoFileName);
+      if (!zipFile) continue;
+      const blob = await zipFile.async('blob');
+      const mimeType = profileEntry.photoMimeType?.trim() || blob.type || 'application/octet-stream';
+      resolvedProfilePhotos.push({ id: profileEntry.id, blob, mimeType });
+    }
+  }
+
   const db = await getDb();
-  const tx = db.transaction(['sessions', 'photos'], 'readwrite');
-  await Promise.all([
+  const tx = db.transaction(['sessions', 'photos', 'profiles'], 'readwrite');
+  const clearOps: Promise<void>[] = [
     tx.objectStore('sessions').clear(),
     tx.objectStore('photos').clear(),
-  ]);
+  ];
+  // Only replace profiles when the backup explicitly includes a profiles array.
+  // Old backups without profiles leave existing profiles intact.
+  if (Array.isArray(payload.profiles)) {
+    clearOps.push(tx.objectStore('profiles').clear());
+  }
+  await Promise.all(clearOps);
 
   for (const session of sessions) {
     await tx.objectStore('sessions').put(stripInlinePhotos(session));
@@ -469,6 +517,20 @@ async function importV2Zip(file: File): Promise<number> {
       blob,
       createdAt: new Date().toISOString(),
     });
+  }
+
+  if (Array.isArray(payload.profiles)) {
+    const profilePhotoMap = new Map(resolvedProfilePhotos.map((p) => [p.id, p]));
+    for (const profileEntry of payload.profiles) {
+      const photoResolved = profilePhotoMap.get(profileEntry.id);
+      await tx.objectStore('profiles').put({
+        id: profileEntry.id,
+        nickname: profileEntry.nickname,
+        photoBlob: photoResolved?.blob,
+        photoMimeType: photoResolved?.mimeType,
+        createdAt: profileEntry.createdAt ?? new Date().toISOString(),
+      });
+    }
   }
 
   await tx.done;
@@ -543,4 +605,56 @@ export async function requestPersistentStorage(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// ===== Profile CRUD =====
+
+function hydrateProfile(record: ProfileRecord): Profile {
+  const profile: Profile = {
+    id: record.id,
+    nickname: record.nickname,
+  };
+  if (record.photoBlob) {
+    profile.photoId = record.id;
+    profile.photo = URL.createObjectURL(record.photoBlob);
+  }
+  return profile;
+}
+
+export async function loadProfiles(): Promise<Profile[]> {
+  const db = await getDb();
+  const records = await db.getAll('profiles');
+  return records.map(hydrateProfile);
+}
+
+export async function saveProfile(profile: Profile, photoDataUrl?: string | null): Promise<Profile> {
+  const db = await getDb();
+  const existing = await db.get('profiles', profile.id);
+
+  let photoBlob: Blob | undefined = existing?.photoBlob;
+  let photoMimeType: string | undefined = existing?.photoMimeType;
+
+  if (photoDataUrl) {
+    photoBlob = dataUrlToBlob(photoDataUrl);
+    photoMimeType = getMimeFromDataUrl(photoDataUrl);
+  } else if (photoDataUrl === null) {
+    photoBlob = undefined;
+    photoMimeType = undefined;
+  }
+
+  const record: ProfileRecord = {
+    id: profile.id,
+    nickname: profile.nickname,
+    photoBlob,
+    photoMimeType,
+    createdAt: existing?.createdAt ?? new Date().toISOString(),
+  };
+
+  await db.put('profiles', record);
+  return hydrateProfile(record);
+}
+
+export async function deleteProfile(id: string): Promise<void> {
+  const db = await getDb();
+  await db.delete('profiles', id);
 }

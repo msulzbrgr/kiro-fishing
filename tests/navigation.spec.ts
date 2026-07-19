@@ -9,9 +9,9 @@ test.describe('Navigation', () => {
     await page.goto('/');
   });
 
-  test('bottom nav has five items', async ({ page }) => {
+  test('bottom nav has six items', async ({ page }) => {
     const navItems = page.locator('.nav-item');
-    await expect(navItems).toHaveCount(5);
+    await expect(navItems).toHaveCount(6);
   });
 
   test('Home nav item is active by default', async ({ page }) => {
@@ -27,6 +27,11 @@ test.describe('Navigation', () => {
   test('clicking Laws nav shows map page', async ({ page }) => {
     await page.getByTestId('nav-laws').click();
     await expect(page.locator('.map-view')).toBeVisible();
+  });
+
+  test('clicking Profiles nav shows profiles page', async ({ page }) => {
+    await page.getByTestId('nav-profiles').click();
+    await expect(page.getByTestId('profiles-view')).toBeVisible();
   });
 
   test('clicking New nav shows new session form', async ({ page }) => {

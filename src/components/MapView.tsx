@@ -17,6 +17,7 @@ interface CatchMarker {
   lat: number;
   lng: number;
   label: string;
+  profilePhotoUrl?: string;
 }
 
 interface NominatimResult {
@@ -188,16 +189,36 @@ export default function MapView({ onLocationSelect, initialLocation, compact = f
       if (!catchMarkers || catchMarkers.length === 0) return;
 
       for (const cm of catchMarkers) {
-        const circle = L.circleMarker([cm.lat, cm.lng], {
-          radius: 8,
-          color: '#e85d04',
-          fillColor: '#ff7f0e',
-          fillOpacity: 0.85,
-          weight: 2,
-        })
-          .bindPopup(`🐟 ${cm.label}`)
-          .addTo(leafletMapRef.current);
-        catchMarkersRef.current.push(circle);
+        let marker;
+        if (cm.profilePhotoUrl) {
+          const div = document.createElement('div');
+          div.className = 'catch-marker-profile';
+          const img = document.createElement('img');
+          img.src = cm.profilePhotoUrl;
+          img.alt = '';
+          div.appendChild(img);
+          const icon = L.divIcon({
+            html: div,
+            className: '',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18],
+          });
+          marker = L.marker([cm.lat, cm.lng], { icon })
+            .bindPopup(`🐟 ${cm.label}`)
+            .addTo(leafletMapRef.current);
+        } else {
+          marker = L.circleMarker([cm.lat, cm.lng], {
+            radius: 8,
+            color: '#e85d04',
+            fillColor: '#ff7f0e',
+            fillOpacity: 0.85,
+            weight: 2,
+          })
+            .bindPopup(`🐟 ${cm.label}`)
+            .addTo(leafletMapRef.current);
+        }
+        catchMarkersRef.current.push(marker);
       }
     });
   }, [catchMarkers, mapReady]);
