@@ -4,6 +4,8 @@ import type { Catch, FishingSession } from '../types';
 
 const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
+const SUMMARY_HEADER_HEIGHT = 300;
+const CATCH_HEADER_HEIGHT = 280;
 const MIN_MAP_SPAN = 0.001;
 const MAX_SUMMARY_CATCHES = 14;
 const MAX_CATCH_NOTES_LINES = 10;
@@ -255,7 +257,7 @@ async function createSummaryImage(session: FishingSession, t: TFunction): Promis
   ctx.fillStyle = '#0b1f3b';
   ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT);
   ctx.fillStyle = '#132e56';
-  ctx.fillRect(0, 300, STORY_WIDTH, STORY_HEIGHT - 300);
+  ctx.fillRect(0, SUMMARY_HEADER_HEIGHT, STORY_WIDTH, STORY_HEIGHT - SUMMARY_HEADER_HEIGHT);
 
   ctx.fillStyle = '#ffffff';
   ctx.font = '700 54px Inter, sans-serif';
@@ -369,7 +371,7 @@ async function createCatchImage(
   ctx.fillStyle = '#0b1f3b';
   ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT);
   ctx.fillStyle = '#132e56';
-  ctx.fillRect(0, 280, STORY_WIDTH, STORY_HEIGHT - 280);
+  ctx.fillRect(0, CATCH_HEADER_HEIGHT, STORY_WIDTH, STORY_HEIGHT - CATCH_HEADER_HEIGHT);
 
   ctx.fillStyle = '#ffffff';
   ctx.font = '700 50px Inter, sans-serif';
@@ -418,7 +420,7 @@ export async function exportSessionStoryImages(session: FishingSession, t: TFunc
 
   for (const [index, catchEntry] of session.catches.entries()) {
     const catchBlob = await createCatchImage(session, catchEntry, index, t);
-    const speciesPart = sanitizeFilePart(catchEntry.species || `catch-${index + 1}`);
+    const speciesPart = sanitizeFilePart(catchEntry.species || 'unknown-species');
     zip.file(`story-${datePart}-${idPart}-catch-${index + 1}-${speciesPart}.png`, catchBlob);
   }
 
