@@ -4,6 +4,9 @@ import type { Catch, FishingSession } from '../types';
 
 const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
+const MIN_MAP_SPAN = 0.001;
+const MAX_SUMMARY_CATCHES = 14;
+const MAX_CATCH_NOTES_LINES = 10;
 
 function sanitizeFilePart(value: string): string {
   return value.replace(/[^a-z0-9_-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
@@ -214,8 +217,8 @@ function drawSummaryMap(ctx: CanvasRenderingContext2D, session: FishingSession, 
   const maxLat = Math.max(...points.map((p) => p.lat));
   const minLng = Math.min(...points.map((p) => p.lng));
   const maxLng = Math.max(...points.map((p) => p.lng));
-  const latSpan = Math.max(maxLat - minLat, 0.001);
-  const lngSpan = Math.max(maxLng - minLng, 0.001);
+  const latSpan = Math.max(maxLat - minLat, MIN_MAP_SPAN);
+  const lngSpan = Math.max(maxLng - minLng, MIN_MAP_SPAN);
 
   for (const point of points) {
     const x = innerX + ((point.lng - minLng) / lngSpan) * innerW;
@@ -292,7 +295,7 @@ async function createSummaryImage(session: FishingSession, t: TFunction): Promis
   if (session.catches.length === 0) {
     ctx.fillText(t('story.no_catches'), 70, 1284);
   } else {
-    for (const [index, catchEntry] of session.catches.slice(0, 14).entries()) {
+    for (const [index, catchEntry] of session.catches.slice(0, MAX_SUMMARY_CATCHES).entries()) {
       const weight = catchEntry.weight != null ? `${catchEntry.weight}g` : null;
       const length = catchEntry.length != null ? `${catchEntry.length}cm` : null;
       const measurements = [length, weight].filter(Boolean).join(' · ');
@@ -388,7 +391,7 @@ async function createCatchImage(
     ctx.font = '600 32px Inter, sans-serif';
     ctx.fillText(t('story.catch_notes'), 70, 1340);
     ctx.font = '400 28px Inter, sans-serif';
-    drawWrappedText(ctx, catchEntry.notes, 70, 1380, 940, 36, 10);
+    drawWrappedText(ctx, catchEntry.notes, 70, 1380, 940, 36, MAX_CATCH_NOTES_LINES);
   }
 
   return toBlob(canvas);
