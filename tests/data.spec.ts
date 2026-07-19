@@ -4,6 +4,24 @@ import * as fs from 'fs';
 import * as os from 'os';
 import JSZip from 'jszip';
 import { selectSwissLocation } from './helpers/location';
+import { loadStoredSessions } from './helpers/storage';
+
+type StoredCatch = {
+  id: string;
+  species: string;
+  notes?: string;
+  released: boolean;
+  photoIds?: string[];
+};
+
+type StoredSession = {
+  catches: StoredCatch[];
+};
+
+const MINIMAL_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  'base64',
+);
 
 test.describe('Export / Import Data', () => {
   test.beforeEach(async ({ page }) => {
@@ -190,6 +208,75 @@ test.describe('Export / Import Data', () => {
     await page.getByTestId('nav-sessions').click();
     await expect(page.locator('.session-card')).toHaveCount(1);
 
+    fs.unlinkSync(tmpFile);
+  });
+
+  test('exported V2 backups can be imported back with edited catches and photos', async ({ page }) => {
+    await page.getByTestId('nav-new').click();
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    await page.locator('.session-card .session-header').click();
+
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.locator('.catch-form textarea').fill('initial export note');
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'fish.png',
+      mimeType: 'image/png',
+      buffer: MINIMAL_PNG,
+    });
+    await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const storedSessions = await loadStoredSessions(page);
+    const catchId = (storedSessions[0] as StoredSession).catches[0].id;
+
+    await page.getByTestId(`edit-catch-btn-${catchId}`).click();
+    await page.getByTestId('species-select').selectOption({ index: 2 });
+    await page.locator('.catch-form textarea').fill('updated export note');
+    await page.locator('.catch-form input[type="checkbox"]').uncheck();
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-form')).toHaveCount(0);
+
+    await page.getByTestId('nav-settings').click();
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByTestId('export-btn').click();
+    const download = await downloadPromise;
+
+    const tmpFile = path.join(os.tmpdir(), `kiro-test-roundtrip-${Date.now()}.zip`);
+    await download.saveAs(tmpFile);
+
+    const exportedZip = await JSZip.loadAsync(fs.readFileSync(tmpFile));
+    const manifestText = await exportedZip.file('manifest.json')?.async('string');
+    expect(manifestText).toBeTruthy();
+    const manifest = JSON.parse(manifestText ?? '{}') as {
+      version?: string;
+      sessions?: Array<{ catches?: Array<{ notes?: string; released?: boolean; photoIds?: string[] }> }>;
+      photos?: Array<unknown>;
+    };
+    expect(manifest.version).toBe('2.0');
+    expect(manifest.sessions).toHaveLength(1);
+    expect(manifest.sessions?.[0].catches?.[0].notes).toBe('updated export note');
+    expect(manifest.sessions?.[0].catches?.[0].released).toBe(false);
+    expect(manifest.sessions?.[0].catches?.[0].photoIds).toHaveLength(1);
+    expect(manifest.photos).toHaveLength(1);
+
+    page.on('dialog', (dialog) => dialog.accept());
+    await page.getByTestId('import-file-input').setInputFiles(tmpFile);
+    await page.getByTestId('nav-sessions').click();
+    await expect(page.locator('.session-card')).toHaveCount(1);
+    await page.locator('.session-card .session-header').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+    await page.locator('.catch-item .catch-header').click();
+    await expect(page.locator('.catch-notes')).toContainText('updated export note');
+    await expect(page.getByTestId('catch-photo-full')).toBeVisible();
+
+    const importedSessions = await loadStoredSessions(page);
+    const importedCatch = (importedSessions[0] as StoredSession).catches[0];
+    expect(importedCatch.notes).toBe('updated export note');
+    expect(importedCatch.released).toBe(false);
+    expect(importedCatch.photoIds).toHaveLength(1);
     fs.unlinkSync(tmpFile);
   });
 
