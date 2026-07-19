@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { selectSwissLocation } from './helpers/location';
 
 test.describe('Language Switcher (i18n)', () => {
   test.beforeEach(async ({ page }) => {
@@ -49,5 +50,21 @@ test.describe('Language Switcher (i18n)', () => {
     await page.reload();
     // Should not fall back to English after reload
     await expect(page.locator('.landing-hero-title')).not.toContainText('Swiss Fishing Companion');
+  });
+
+  test('catch edit labels are translated when switching language', async ({ page }) => {
+    await page.getByTestId('nav-new').click();
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    await page.locator('.session-card .session-header').click();
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.getByTestId('add-catch-btn').click();
+
+    await page.getByTestId('lang-btn-fr').click();
+    await page.locator('[data-testid^="edit-catch-btn-"]').first().click();
+
+    await expect(page.locator('.catch-form h4')).toContainText('Modifier la prise');
+    await expect(page.getByTestId('add-catch-btn')).toContainText('Enregistrer la prise');
   });
 });

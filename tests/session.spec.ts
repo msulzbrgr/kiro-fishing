@@ -290,4 +290,49 @@ test.describe('Catch Log', () => {
     expect(catchEntry.species).not.toBe('');
     expect(catchEntry.recognition).toBeUndefined();
   });
+
+  test('can edit an existing catch and persist the changes', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.locator('.catch-form textarea').fill('initial catch note');
+    await page.getByTestId('add-catch-btn').click();
+
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const editButton = page.locator('[data-testid^="edit-catch-btn-"]').first();
+    await editButton.click();
+
+    await expect(page.locator('.catch-form h4')).toContainText('Edit Catch');
+    await page.getByTestId('species-select').selectOption({ index: 2 });
+    await page.locator('.catch-form textarea').fill('updated catch note');
+    await page.locator('.catch-form input[type="checkbox"]').uncheck();
+    await page.getByTestId('add-catch-btn').click();
+
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const sessions = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('kiro-fishing');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const tx = db.transaction('sessions', 'readonly');
+      const store = tx.objectStore('sessions');
+      const records = await new Promise<unknown[]>((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result as unknown[]);
+      });
+      db.close();
+      return records;
+    });
+
+    const catchEntry = (sessions[0] as {
+      catches: Array<{ species: string; notes?: string; released: boolean }>;
+    }).catches[0];
+    expect(catchEntry.species).not.toBe('');
+    expect(catchEntry.notes).toBe('updated catch note');
+    expect(catchEntry.released).toBe(false);
+  });
 });
