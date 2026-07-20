@@ -277,9 +277,9 @@ test.describe('Catch Log', () => {
       buffer: MINIMAL_PNG,
     });
 
-    // Preview thumbnail should appear and the add-photo button should disappear
+    // Preview thumbnail should appear and the add-photo button should remain available
     await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
-    await expect(page.getByTestId('add-photo-btn')).toHaveCount(0);
+    await expect(page.getByTestId('add-photo-btn')).toBeVisible();
 
     // Remove photo button should be available
     await expect(page.getByTestId('remove-all-photos-btn')).toBeVisible();
