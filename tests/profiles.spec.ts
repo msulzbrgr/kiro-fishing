@@ -51,6 +51,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Bob');
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
 
     const profiles = await loadStoredProfiles(page);
     expect(profiles).toHaveLength(1);
@@ -127,6 +128,7 @@ test.describe('Profiles', () => {
     await expect(page.getByTestId('profile-add-photo-btn')).toBeVisible();
 
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
     const profiles = await loadStoredProfiles(page);
     expect((profiles[0] as { photoBlob?: unknown }).photoBlob).toBeFalsy();
   });
@@ -152,6 +154,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -173,6 +176,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('ToDelete');
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -236,6 +240,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Empty');
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -249,6 +254,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -265,6 +271,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
+    await expect(page.getByTestId('profile-form')).toHaveCount(0);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
