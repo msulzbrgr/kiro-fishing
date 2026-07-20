@@ -112,7 +112,7 @@ function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
     selectedSpeciesSource: catchEntry.recognition?.selectedSpeciesSource ?? DEFAULT_SPECIES_SOURCE,
     weight: catchEntry.weight?.toString() ?? '',
     length: catchEntry.length?.toString() ?? '',
-    time: catchEntry.time,
+    time: catchEntry.time || getCurrentCatchTime(),
     released: catchEntry.released,
     notes: catchEntry.notes ?? '',
     photos: [...persistedPhotos, ...newPhotos],

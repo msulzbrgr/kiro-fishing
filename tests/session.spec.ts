@@ -5,7 +5,7 @@ import { loadStoredSessions } from './helpers/storage';
 type StoredCatch = {
   id: string;
   species: string;
-  time: string;
+  time?: string;
   notes?: string;
   released: boolean;
   photoIds?: string[];
