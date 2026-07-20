@@ -422,8 +422,10 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
                     className="btn btn-secondary btn-sm"
                     onClick={() => setIsEditing(true)}
                     data-testid="edit-session-btn"
+                    aria-label={t('sessions.edit')}
+                    title={t('sessions.edit')}
                   >
-                    <Pencil size={14} /> {t('sessions.edit')}
+                    <Pencil size={14} />
                   </button>
                   <button
                     className="btn btn-secondary btn-sm"
@@ -455,8 +457,11 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
                           });
                       }
                     }}
+                    data-testid="delete-session-btn"
+                    aria-label={t('sessions.delete')}
+                    title={t('sessions.delete')}
                   >
-                    <Trash2 size={14} /> {t('sessions.delete')}
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </>

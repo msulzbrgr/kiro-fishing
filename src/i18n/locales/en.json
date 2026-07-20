@@ -140,6 +140,7 @@
     "released": "Released",
     "notes": "Notes",
     "notes_placeholder": "Optional notes about the catch…",
+    "time": "Time",
     "add": "Add Catch",
     "save": "Save Catch",
     "cancel": "Cancel",

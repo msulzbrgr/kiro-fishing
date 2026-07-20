@@ -49,6 +49,7 @@ interface CatchFormState {
   selectedSpeciesSource: CatchSpeciesSelectionSource;
   weight: string;
   length: string;
+  time: string;
   released: boolean;
   notes: string;
   photos: CatchPhotoFormEntry[];
@@ -64,17 +65,27 @@ interface CatchPhotoFormEntry {
 
 const DEFAULT_SPECIES_SOURCE: CatchSpeciesSelectionSource = 'manual';
 
-const EMPTY_FORM: CatchFormState = {
-  species: '',
-  selectedSpeciesSource: DEFAULT_SPECIES_SOURCE,
-  weight: '',
-  length: '',
-  released: true,
-  notes: '',
-  photos: [],
-  location: undefined,
-  profileId: undefined,
-};
+function getCurrentCatchTime(): string {
+  return new Date().toLocaleTimeString('de-CH', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function createEmptyFormState(): CatchFormState {
+  return {
+    species: '',
+    selectedSpeciesSource: DEFAULT_SPECIES_SOURCE,
+    weight: '',
+    length: '',
+    time: getCurrentCatchTime(),
+    released: true,
+    notes: '',
+    photos: [],
+    location: undefined,
+    profileId: undefined,
+  };
+}
 
 function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
   const previewPhotos = catchEntry.photos ?? [];
@@ -103,6 +114,7 @@ function createFormStateFromCatch(catchEntry: Catch): CatchFormState {
     selectedSpeciesSource: catchEntry.recognition?.selectedSpeciesSource ?? DEFAULT_SPECIES_SOURCE,
     weight: catchEntry.weight?.toString() ?? '',
     length: catchEntry.length?.toString() ?? '',
+    time: catchEntry.time,
     released: catchEntry.released,
     notes: catchEntry.notes ?? '',
     photos: [...persistedPhotos, ...newPhotos],
@@ -128,7 +140,7 @@ function isQuotaExceededError(err: unknown): boolean {
 export default function CatchLog({ session, onSessionUpdate, profiles = [] }: CatchLogProps) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState<CatchFormState>(EMPTY_FORM);
+  const [form, setForm] = useState<CatchFormState>(() => createEmptyFormState());
   const [editingCatchId, setEditingCatchId] = useState<string | null>(null);
   const [expandedCatch, setExpandedCatch] = useState<string | null>(null);
   const [activePhotoIndexByCatch, setActivePhotoIndexByCatch] = useState<Record<string, number>>({});
@@ -164,7 +176,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
 
   const resetFormState = () => {
     setEditingCatchId(null);
-    setForm(EMPTY_FORM);
+    setForm(createEmptyFormState());
     setShowForm(false);
     setSaveError('');
     setPhotoValidationError('');
@@ -185,7 +197,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
 
   const startNewCatch = () => {
     setEditingCatchId(null);
-    setForm(EMPTY_FORM);
+    setForm(createEmptyFormState());
     setShowForm(true);
     setSaveError('');
     setPhotoValidationError('');
@@ -383,10 +395,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
       species: form.species,
       weight: form.weight ? parseFloat(form.weight) : undefined,
       length: form.length ? parseFloat(form.length) : undefined,
-      time: existingCatch?.time ?? new Date().toLocaleTimeString('de-CH', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+      time: form.time,
       released: form.released,
       notes: form.notes.trim() || undefined,
       photoIds: persistedPhotoIds.length > 0 ? persistedPhotoIds : undefined,
@@ -520,6 +529,18 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
             </div>
 
             <div className="form-group">
+              <label>
+                <Clock size={14} /> {t('catch.time')}
+              </label>
+              <input
+                type="time"
+                value={form.time}
+                onChange={(e) => setForm({ ...form, time: e.target.value })}
+                data-testid="catch-time-input"
+              />
+            </div>
+
+            <div className="form-group">
               <label className="checkbox-label">
                 <input
                   type="checkbox"
@@ -549,7 +570,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
                   {photoValidationError}
                 </div>
               )}
-              {visibleFormPhotos.length > 0 ? (
+              {visibleFormPhotos.length > 0 && (
                 <div className="catch-photo-preview">
                   <div className="catch-photo-thumb-grid" data-testid="catch-photo-preview">
                     {visibleFormPhotos.map((photo) => (
@@ -575,16 +596,15 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
                     ))}
                   </div>
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm catch-photo-add-btn"
-                  onClick={openPhotoPicker}
-                  data-testid="add-photo-btn"
-                >
-                  <Camera size={14} /> {t('catch.add_photo')}
-                </button>
               )}
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm catch-photo-add-btn"
+                onClick={openPhotoPicker}
+                data-testid="add-photo-btn"
+              >
+                <Camera size={14} /> {t('catch.add_photo')}
+              </button>
               {hasAnyFormPhotos && (
                 <button
                   type="button"
