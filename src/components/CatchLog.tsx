@@ -66,10 +66,8 @@ interface CatchPhotoFormEntry {
 const DEFAULT_SPECIES_SOURCE: CatchSpeciesSelectionSource = 'manual';
 
 function getCurrentCatchTime(): string {
-  return new Date().toLocaleTimeString('de-CH', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 }
 
 function createEmptyFormState(): CatchFormState {
