@@ -702,13 +702,40 @@ textarea {
 }
 
 .research-prompt-card strong {
-  display: block;
   color: var(--primary-dark);
-  margin-bottom: 6px;
 }
 
 .research-prompt-card p {
   margin-bottom: 8px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.panel-header h3,
+.panel-header strong {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.panel-close-btn {
+  flex-shrink: 0;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 9px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  line-height: 1;
+}
+
+.panel-close-btn:hover {
+  opacity: 1;
+  color: var(--text);
 }
 
 .research-prompt-textarea {

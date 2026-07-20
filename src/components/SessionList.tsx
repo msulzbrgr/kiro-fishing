@@ -77,6 +77,12 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
   const [editStartTime, setEditStartTime] = useState(session.startTime);
   const [editEndTime, setEditEndTime] = useState(session.endTime ?? '');
   const [editNotes, setEditNotes] = useState(session.notes ?? '');
+  const [infoPanelDismissedAtCount, setInfoPanelDismissedAtCount] = useState<number | null>(null);
+  const [promptDismissedAtCount, setPromptDismissedAtCount] = useState<number | null>(null);
+  const catchCount = session.catches.length;
+  const infoPanelDismissed = infoPanelDismissedAtCount === catchCount;
+  const promptDismissed = promptDismissedAtCount === catchCount;
+
   const pendingCheckpoint = getPendingCheckpoint(session);
   const latestInfoCheckpoint = getLatestInfoCheckpoint(session);
   const displayedCheckpoint = pendingCheckpoint ?? latestInfoCheckpoint;
@@ -105,7 +111,6 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
       })()
     : null;
 
-  const catchCount = session.catches.length;
   const catchLabel = `${catchCount} ${catchCount === 1 ? t('sessions.catches_one') : t('sessions.catches_other')}`;
 
   const handleLocationSelect = async (nextLocation: FishingLocation) => {
@@ -225,19 +230,31 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
 
       {expanded && (
         <div className="session-body">
-          {(displayedCheckpoint || regulationState === 'active_confirmed_uncertain') && (
+          {!infoPanelDismissed && (displayedCheckpoint || regulationState === 'active_confirmed_uncertain') && (
             <div
               className={`regulation-alert ${pendingCheckpoint ? 'regulation-alert-warning' : ''}`}
               data-testid="session-regulation-alert"
             >
-              <h3>
-                {pendingCheckpoint ? <AlertTriangle size={16} /> : <ShieldCheck size={16} />}
-                {pendingCheckpoint
-                  ? t('regulation.change_notification_title')
-                  : latestInfoCheckpoint
-                    ? t('regulation.info_notification_title')
-                  : t('regulation.confirmed_uncertain_title')}
-              </h3>
+              <div className="panel-header">
+                <h3>
+                  {pendingCheckpoint ? <AlertTriangle size={16} /> : <ShieldCheck size={16} />}
+                  {pendingCheckpoint
+                    ? t('regulation.change_notification_title')
+                    : latestInfoCheckpoint
+                      ? t('regulation.info_notification_title')
+                    : t('regulation.confirmed_uncertain_title')}
+                </h3>
+                {!pendingCheckpoint && (
+                  <button
+                    className="btn btn-icon panel-close-btn"
+                    onClick={() => setInfoPanelDismissedAtCount(catchCount)}
+                    aria-label={t('regulation.dismiss_panel')}
+                    data-testid="dismiss-regulation-alert-btn"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
               <p>
                 {pendingCheckpoint
                   ? t('regulation.change_notification_desc')
@@ -285,10 +302,13 @@ function SessionCard({ session, onUpdate, onDelete, profiles = [] }: SessionCard
             </div>
           )}
 
-          <RegulationResearchPrompt
-            location={regulationSnapshot.location}
-            dataTestId={`session-research-prompt-${session.id}`}
-          />
+          {!promptDismissed && (
+            <RegulationResearchPrompt
+              location={regulationSnapshot.location}
+              dataTestId={`session-research-prompt-${session.id}`}
+              onDismiss={() => setPromptDismissedAtCount(catchCount)}
+            />
+          )}
 
           <div className="tab-bar">
             <button

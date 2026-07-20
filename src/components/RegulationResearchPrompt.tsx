@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FishingLocation } from '../types';
 import { isOutsideSwitzerland } from '../utils/regulations';
@@ -5,11 +6,13 @@ import { isOutsideSwitzerland } from '../utils/regulations';
 interface RegulationResearchPromptProps {
   location: FishingLocation | null;
   dataTestId?: string;
+  onDismiss?: () => void;
 }
 
 export default function RegulationResearchPrompt({
   location,
   dataTestId,
+  onDismiss,
 }: RegulationResearchPromptProps) {
   const { t } = useTranslation();
 
@@ -26,7 +29,19 @@ export default function RegulationResearchPrompt({
 
   return (
     <div className="research-prompt-card" data-testid={dataTestId}>
-      <strong>{t('regulation.research_prompt_title')}</strong>
+      <div className="panel-header">
+        <strong>{t('regulation.research_prompt_title')}</strong>
+        {onDismiss && (
+          <button
+            className="btn btn-icon panel-close-btn"
+            onClick={onDismiss}
+            aria-label={t('regulation.dismiss_panel')}
+            data-testid={dataTestId ? `${dataTestId}-dismiss` : undefined}
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
       <p>{t('regulation.research_prompt_desc')}</p>
       <textarea
         className="research-prompt-textarea"

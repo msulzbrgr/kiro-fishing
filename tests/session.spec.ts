@@ -700,3 +700,113 @@ test.describe('Edit Session', () => {
     expect((storedSessions[0] as { endTime?: string }).endTime).toBeUndefined();
   });
 });
+
+test.describe('Dismissible panels — regulation info alert', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
+    await page.goto('/');
+    // Create a strict-mode session at ZH (stale regulation → active_confirmed_uncertain)
+    await page.getByTestId('nav-new').click();
+    await page.getByTestId('regulation-strict-mode-checkbox').check();
+    await selectSwissLocation(page);
+    await page.getByTestId('regulation-confirm-checkbox').check();
+    await page.getByTestId('create-session-btn').click();
+    // Expand the session card
+    await page.locator('.session-card .session-header').click();
+  });
+
+  test('dismiss button is visible and hides the regulation info panel', async ({ page }) => {
+    await expect(page.getByTestId('session-regulation-alert')).toBeVisible();
+    await expect(page.getByTestId('dismiss-regulation-alert-btn')).toBeVisible();
+    await page.getByTestId('dismiss-regulation-alert-btn').click();
+    await expect(page.getByTestId('session-regulation-alert')).toHaveCount(0);
+  });
+
+  test('regulation info panel re-appears when a new catch is logged', async ({ page }) => {
+    // Dismiss the panel
+    await page.getByTestId('dismiss-regulation-alert-btn').click();
+    await expect(page.getByTestId('session-regulation-alert')).toHaveCount(0);
+
+    // Add a catch to change the catch count
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.getByTestId('add-catch-btn').click();
+
+    // Panel should re-appear because catch count changed
+    await expect(page.getByTestId('session-regulation-alert')).toBeVisible();
+  });
+
+  test('warning alert for pending checkpoint does not show dismiss button', async ({ page }) => {
+    // Navigate to the Map tab in the session body
+    await page.locator('.session-body .tab-bar button').filter({ hasText: 'Map' }).click();
+
+    // Mock Nominatim to return a different Swiss canton (Bern / BE)
+    await page.route('https://nominatim.openstreetmap.org/reverse**', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          display_name: 'Bern, Schweiz',
+          address: { state: 'Bern', city: 'Bern', country: 'Switzerland', country_code: 'ch' },
+        }),
+      });
+    });
+
+    // Click the map to trigger a canton change; strict mode creates a pending checkpoint
+    await page.getByTestId('map-container').click({ position: { x: 240, y: 200 } });
+
+    // Warning alert should be visible
+    await expect(page.getByTestId('session-regulation-alert')).toBeVisible();
+
+    // Dismiss button must NOT be present for pending (unconfirmed) checkpoints
+    await expect(page.getByTestId('dismiss-regulation-alert-btn')).toHaveCount(0);
+
+    // Confirm button should be shown instead
+    await expect(page.getByTestId('confirm-regulation-change-btn')).toBeVisible();
+  });
+});
+
+test.describe('Dismissible panels — research prompt', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      void indexedDB.deleteDatabase('kiro-fishing');
+    });
+    await page.goto('/');
+    // Create a session outside Switzerland (Finland) so the research prompt is shown
+    await page.getByTestId('nav-new').click();
+    await selectFinnishLocation(page);
+    await page.getByTestId('create-session-btn').click();
+    // Expand the session card
+    await page.locator('.session-card .session-header').click();
+  });
+
+  test('dismiss button is visible and hides the research prompt', async ({ page }) => {
+    const storedSessions = await loadStoredSessions(page);
+    const sessionId = (storedSessions[0] as { id: string }).id;
+
+    await expect(page.getByTestId(`session-research-prompt-${sessionId}`)).toBeVisible();
+    await expect(page.getByTestId(`session-research-prompt-${sessionId}-dismiss`)).toBeVisible();
+    await page.getByTestId(`session-research-prompt-${sessionId}-dismiss`).click();
+    await expect(page.getByTestId(`session-research-prompt-${sessionId}`)).toHaveCount(0);
+  });
+
+  test('research prompt re-appears when a new catch is logged', async ({ page }) => {
+    const storedSessions = await loadStoredSessions(page);
+    const sessionId = (storedSessions[0] as { id: string }).id;
+
+    // Dismiss the prompt
+    await page.getByTestId(`session-research-prompt-${sessionId}-dismiss`).click();
+    await expect(page.getByTestId(`session-research-prompt-${sessionId}`)).toHaveCount(0);
+
+    // Add a catch to change the catch count
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.getByTestId('add-catch-btn').click();
+
+    // Prompt should re-appear because catch count changed
+    await expect(page.getByTestId(`session-research-prompt-${sessionId}`)).toBeVisible();
+  });
+});

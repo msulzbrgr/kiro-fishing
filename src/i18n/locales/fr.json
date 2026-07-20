@@ -256,6 +256,7 @@
     "confirm_change": "J’ai vérifié les nouvelles règles",
     "select_location_first": "Sélectionnez d’abord votre position de pêche afin d’enregistrer les informations réglementaires avec la sortie.",
     "invalid_source": "Lien source invalide",
+    "dismiss_panel": "Fermer",
     "strict_mode_label": "Activer la confirmation réglementaire stricte",
     "information_mode_desc": "Mode information: enregistrer le contexte réglementaire et me laisser décider comment l’utiliser.",
     "strict_mode_desc": "Mode strict: exiger une confirmation explicite avant de commencer ou de continuer après un changement réglementaire.",

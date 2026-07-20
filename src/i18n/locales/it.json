@@ -256,6 +256,7 @@
     "confirm_change": "Ho verificato le nuove regole",
     "select_location_first": "Seleziona prima la posizione di pesca per salvare le informazioni normative con l’uscita.",
     "invalid_source": "Link fonte non valido",
+    "dismiss_panel": "Chiudi",
     "strict_mode_label": "Attiva conferma normativa rigida",
     "information_mode_desc": "Modalità informativa: salva il contesto normativo e lascia decidere a me come usarlo.",
     "strict_mode_desc": "Modalità rigida: richiede una conferma esplicita prima di iniziare o continuare dopo cambi normativi.",
