@@ -256,6 +256,7 @@
     "confirm_change": "I reviewed the new rules",
     "select_location_first": "Select your fishing position first so the regulation information can be saved with the session.",
     "invalid_source": "Invalid source link",
+    "dismiss_panel": "Dismiss",
     "strict_mode_label": "Enable strict regulation confirmation",
     "information_mode_desc": "Information mode: save the regulation context and let me decide how to use it.",
     "strict_mode_desc": "Strict mode: require explicit confirmation before starting or continuing after regulation changes.",

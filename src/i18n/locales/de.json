@@ -256,6 +256,7 @@
     "confirm_change": "Neue Regeln gecheckt",
     "select_location_first": "Wähl zuerst deinen Angelort, damit die Vorschriften mit der Ausfahrt gespeichert werden.",
     "invalid_source": "Ungültiger Quellenlink",
+    "dismiss_panel": "Schliessen",
     "strict_mode_label": "Strikten Bestätigungsmodus aktivieren",
     "information_mode_desc": "Infomodus: Regelungskontext speichern und selbst entscheiden.",
     "strict_mode_desc": "Strikter Modus: ausdrückliche Bestätigung vor dem Start oder nach Regelungsänderungen.",
