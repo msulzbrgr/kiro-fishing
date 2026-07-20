@@ -239,6 +239,10 @@ async function ensureBestEffortPersistentStorage(): Promise<boolean> {
   return runPersistentStorageRequest();
 }
 
+/**
+ * When force=false, reuse the last successful/failed result while a request is still relevant.
+ * When force=true, retry after a previous false result, but still wait for any in-flight request first.
+ */
 async function runPersistentStorageRequest(force = false): Promise<boolean> {
   if (!('storage' in navigator) || !navigator.storage?.persist) {
     return false;
@@ -246,7 +250,10 @@ async function runPersistentStorageRequest(force = false): Promise<boolean> {
 
   if (persistentStorageRequest) {
     const pending = await persistentStorageRequest;
-    if (!force || pending) {
+    if (!force) {
+      return pending;
+    }
+    if (pending === true) {
       return pending;
     }
   }

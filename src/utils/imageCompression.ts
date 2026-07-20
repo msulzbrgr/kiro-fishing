@@ -38,6 +38,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 function estimateDataUrlBytes(dataUrl: string): number {
   const commaIndex = dataUrl.indexOf(',');
   if (commaIndex < 0) return dataUrl.length;
+  // Base64 encodes every 3 bytes as 4 characters, so we invert that ratio here.
   const base64Length = dataUrl.length - commaIndex - 1;
   return Math.ceil((base64Length * 3) / 4);
 }
@@ -88,6 +89,7 @@ export async function optimizeImageForStorage(
   options: OptimizeImageOptions = {},
 ): Promise<string> {
   const originalDataUrl = await readFileAsDataUrl(file);
+  // GIFs can be animated and SVGs are vector assets, so re-encoding them would be lossy or unnecessary.
   if (!file.type.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
     return originalDataUrl;
   }

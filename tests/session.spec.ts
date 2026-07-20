@@ -122,7 +122,6 @@ test.describe('Session Management', () => {
     await expect(page.locator('.session-card')).toHaveCount(1);
     await page.waitForFunction(
       () => (window as Window & { __persistCallCount: number }).__persistCallCount === 1,
-      undefined,
       { timeout: 5000 },
     );
   });
