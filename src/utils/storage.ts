@@ -631,8 +631,8 @@ export async function requestPersistentStorage(): Promise<boolean> {
   }
 
   try {
-    persistentStorageRequest = navigator.storage.persist();
-    return await persistentStorageRequest;
+    persistentStorageRequest = null;
+    return await ensureBestEffortPersistentStorage();
   } catch {
     persistentStorageRequest = null;
     return false;

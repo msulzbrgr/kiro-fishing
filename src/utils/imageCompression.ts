@@ -1,6 +1,7 @@
 const DEFAULT_MAX_DIMENSION = 1600;
 const DEFAULT_MAX_BYTES = 1.5 * 1024 * 1024;
 const MIN_OUTPUT_QUALITY = 0.55;
+const MIN_RESIZE_DIMENSION = 800;
 const QUALITY_STEP = 0.07;
 const DIMENSION_STEP = 0.85;
 
@@ -92,11 +93,13 @@ export async function optimizeImageForStorage(
   const startingQuality = options.quality ?? 0.82;
 
   const image = await loadImage(originalDataUrl);
-  const initialDimensions = scaleDimensions(image.naturalWidth || image.width, image.naturalHeight || image.height, maxDimension);
+  const imageWidth = image.naturalWidth || image.width;
+  const imageHeight = image.naturalHeight || image.height;
+  const initialDimensions = scaleDimensions(imageWidth, imageHeight, maxDimension);
 
   if (
-    initialDimensions.width === (image.naturalWidth || image.width)
-    && initialDimensions.height === (image.naturalHeight || image.height)
+    initialDimensions.width === imageWidth
+    && initialDimensions.height === imageHeight
     && file.size <= maxBytes
   ) {
     return originalDataUrl;
@@ -108,7 +111,10 @@ export async function optimizeImageForStorage(
   let quality = startingQuality;
   let optimized = renderCompressedDataUrl(image, width, height, outputType, quality);
 
-  while (estimateDataUrlBytes(optimized) > maxBytes && (quality > MIN_OUTPUT_QUALITY || width > 800 || height > 800)) {
+  while (
+    estimateDataUrlBytes(optimized) > maxBytes
+    && (quality > MIN_OUTPUT_QUALITY || width > MIN_RESIZE_DIMENSION || height > MIN_RESIZE_DIMENSION)
+  ) {
     if (quality > MIN_OUTPUT_QUALITY) {
       quality = Math.max(MIN_OUTPUT_QUALITY, quality - QUALITY_STEP);
     } else {
