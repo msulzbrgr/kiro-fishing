@@ -251,10 +251,7 @@ async function runPersistentStorageRequest(force = false): Promise<boolean> {
 
   if (persistentStorageRequest) {
     const pending = await persistentStorageRequest;
-    if (!force) {
-      return pending;
-    }
-    if (pending === true) {
+    if (!force || pending === true) {
       return pending;
     }
   }

@@ -91,7 +91,7 @@ export async function optimizeImageForStorage(
 ): Promise<string> {
   const originalDataUrl = await readFileAsDataUrl(file);
   // GIFs can be animated and SVGs are vector assets, so re-encoding them would be lossy or unnecessary.
-  if (!file.type.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.includes(file.type as typeof UNCOMPRESSED_IMAGE_TYPES[number])) {
+  if (!file.type.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.some((type) => type === file.type)) {
     return originalDataUrl;
   }
 
