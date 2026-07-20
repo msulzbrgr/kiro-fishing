@@ -3,7 +3,7 @@ const DEFAULT_MAX_BYTES = 1.5 * 1024 * 1024;
 const MIN_OUTPUT_QUALITY = 0.55;
 const MIN_RESIZE_DIMENSION = 800;
 const QUALITY_STEP = 0.07;
-const DIMENSION_STEP = 0.85;
+const DIMENSION_SCALE_DOWN = 0.85;
 const UNCOMPRESSED_IMAGE_TYPES = ['image/gif', 'image/svg+xml'] as const;
 
 export interface OptimizeImageOptions {
@@ -137,8 +137,8 @@ async function optimizeDataUrlForStorage(
     if (quality > MIN_OUTPUT_QUALITY) {
       quality = Math.max(MIN_OUTPUT_QUALITY, quality - QUALITY_STEP);
     } else {
-      width = Math.max(1, Math.round(width * DIMENSION_STEP));
-      height = Math.max(1, Math.round(height * DIMENSION_STEP));
+      width = Math.max(1, Math.round(width * DIMENSION_SCALE_DOWN));
+      height = Math.max(1, Math.round(height * DIMENSION_SCALE_DOWN));
     }
     optimized = renderCompressedDataUrl(image, width, height, outputType, quality);
   }

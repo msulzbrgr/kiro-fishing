@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { selectSwissLocation } from './helpers/location';
 import { loadStoredProfiles, loadStoredSessions } from './helpers/storage';
 
@@ -7,6 +7,10 @@ const MINIMAL_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   'base64',
 );
+
+async function expectProfileFormClosed(page: Page) {
+  await expect(page.getByTestId('profile-form')).toHaveCount(0);
+}
 
 test.describe('Profiles', () => {
   test.beforeEach(async ({ page }) => {
@@ -51,7 +55,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Bob');
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     expect(profiles).toHaveLength(1);
@@ -128,7 +132,7 @@ test.describe('Profiles', () => {
     await expect(page.getByTestId('profile-add-photo-btn')).toBeVisible();
 
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
     const profiles = await loadStoredProfiles(page);
     expect((profiles[0] as { photoBlob?: unknown }).photoBlob).toBeFalsy();
   });
@@ -154,7 +158,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -176,7 +180,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('ToDelete');
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -240,7 +244,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Empty');
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -254,7 +258,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -271,7 +275,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
-    await expect(page.getByTestId('profile-form')).toHaveCount(0);
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
