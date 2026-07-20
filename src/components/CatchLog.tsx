@@ -270,7 +270,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
 
       for (const file of acceptedFiles) {
         const dataUrl = await optimizeImageForStorage(file).catch(async (err) => {
-          console.warn('optimizeCatchPhotoForStorage: failed before storage', err);
+          console.warn('Failed to optimize catch photo before storage', err);
           return await new Promise<string | null>((resolve) => {
             const reader = new FileReader();
             reader.onload = (ev) => {

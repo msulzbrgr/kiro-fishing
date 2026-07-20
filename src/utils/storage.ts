@@ -155,7 +155,7 @@ async function buildStoredSession(
         const optimizedPhoto = await optimizeImageDataUrlForStorage(photo).catch((err) => {
           const errorType = err instanceof Error ? err.name : typeof err;
           console.warn(
-            'optimizeCatchPhotoForStorage: failed before storage',
+            'Failed to optimize catch photo before storage',
             { catchId: catchEntry.id, errorType },
             err,
           );
