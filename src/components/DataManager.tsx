@@ -152,6 +152,8 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
             </span>
           </div>
         )}
+        <div className="settings-hint">{t('settings.backups_guidance')}</div>
+        <div className="settings-hint">{t('settings.backups_restore_guidance')}</div>
 
         <div className="data-manager-actions">
           <button
@@ -213,6 +215,8 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
                 : ''}
             </span>
           </div>
+          <div className="settings-hint">{t('storage.quota_guidance')}</div>
+          <div className="settings-hint">{t('storage.photo_usage_hint')}</div>
 
           <label className="settings-toggle" data-testid="storage-persistence-toggle">
             <span>{t('settings.persistent_storage_label')}</span>

@@ -57,6 +57,41 @@ test.describe('Profiles', () => {
     expect((profiles[0] as { nickname: string }).nickname).toBe('Bob');
   });
 
+  test('creating a profile requests persistent storage when available', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, '__persistCallCount', {
+        configurable: true,
+        writable: true,
+        value: 0,
+      });
+
+      if (!navigator.storage) return;
+
+      Object.defineProperty(navigator.storage, 'persisted', {
+        configurable: true,
+        value: async () => false,
+      });
+      Object.defineProperty(navigator.storage, 'persist', {
+        configurable: true,
+        value: async () => {
+          (window as Window & { __persistCallCount: number }).__persistCallCount += 1;
+          return true;
+        },
+      });
+    });
+
+    await page.goto('/');
+    await page.getByTestId('nav-profiles').click();
+    await page.getByTestId('new-profile-btn').click();
+    await page.getByTestId('profile-nickname-input').fill('Persistent');
+    await page.getByTestId('save-profile-btn').click();
+
+    await page.waitForFunction(
+      () => (window as Window & { __persistCallCount: number }).__persistCallCount === 1,
+      { timeout: 5000 },
+    );
+  });
+
   test('can create a profile with a photo', async ({ page }) => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Charlie');

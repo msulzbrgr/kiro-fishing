@@ -2,6 +2,7 @@ import JSZip from 'jszip';
 import type { Catch, FishingSession, Profile } from '../types';
 import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
 import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord, type ProfileRecord } from './indexedDb';
+import { optimizeImageDataUrlForStorage } from './imageCompression';
 import { migrateSession } from './sessionVersioning';
 
 const EXPORT_FORMAT_VERSION_V2 = '2.0';
@@ -151,14 +152,19 @@ async function buildStoredSession(
     if (inputPhotos.length > 0) {
       for (const photo of inputPhotos) {
         if (!isDataUrl(photo)) continue;
+        const optimizedPhoto = await optimizeImageDataUrlForStorage(photo).catch((err) => {
+          console.warn('buildStoredSession: failed to optimize catch photo before storage', err);
+          return photo;
+        });
+        const blob = dataUrlToBlob(optimizedPhoto);
         const id = generateId();
         currentPhotoIds.push(id);
         newPhotoRecords.push({
           id,
           sessionId: next.id,
           catchId: catchEntry.id,
-          blob: dataUrlToBlob(photo),
-          mimeType: getMimeFromDataUrl(photo),
+          blob,
+          mimeType: blob.type || getMimeFromDataUrl(optimizedPhoto),
           createdAt: new Date().toISOString(),
         });
       }
@@ -537,6 +543,7 @@ async function importV2Zip(file: File): Promise<number> {
     }
   }
 
+  await ensureBestEffortPersistentStorage();
   const db = await getDb();
   const tx = db.transaction(['sessions', 'photos', 'profiles'], 'readwrite');
   const clearOps: Promise<void>[] = [

@@ -12,6 +12,11 @@ export interface OptimizeImageOptions {
   quality?: number;
 }
 
+function getMimeTypeFromDataUrl(dataUrl: string): string {
+  const match = dataUrl.match(/^data:([^;]+);base64,/);
+  return match?.[1] ?? '';
+}
+
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -85,13 +90,14 @@ function renderCompressedDataUrl(
   return canvas.toDataURL(outputType, quality);
 }
 
-export async function optimizeImageForStorage(
-  file: File,
+async function optimizeDataUrlForStorage(
+  originalDataUrl: string,
+  inputType: string,
+  originalBytes: number,
   options: OptimizeImageOptions = {},
 ): Promise<string> {
-  const originalDataUrl = await readFileAsDataUrl(file);
   // GIFs can be animated and SVGs are vector assets, so re-encoding them would be lossy or unnecessary.
-  if (!file.type.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.some((type) => type === file.type)) {
+  if (!inputType.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.some((type) => type === inputType)) {
     return originalDataUrl;
   }
 
@@ -110,12 +116,12 @@ export async function optimizeImageForStorage(
   if (
     initialDimensions.width === imageWidth
     && initialDimensions.height === imageHeight
-    && file.size <= maxBytes
+    && originalBytes <= maxBytes
   ) {
     return originalDataUrl;
   }
 
-  const outputType = chooseOutputType(file.type);
+  const outputType = chooseOutputType(inputType);
   let width = initialDimensions.width;
   let height = initialDimensions.height;
   let quality = startingQuality;
@@ -135,4 +141,20 @@ export async function optimizeImageForStorage(
   }
 
   return optimized.length < originalDataUrl.length ? optimized : originalDataUrl;
+}
+
+export async function optimizeImageForStorage(
+  file: File,
+  options: OptimizeImageOptions = {},
+): Promise<string> {
+  const originalDataUrl = await readFileAsDataUrl(file);
+  return optimizeDataUrlForStorage(originalDataUrl, file.type, file.size, options);
+}
+
+export async function optimizeImageDataUrlForStorage(
+  dataUrl: string,
+  options: OptimizeImageOptions = {},
+): Promise<string> {
+  const inputType = getMimeTypeFromDataUrl(dataUrl);
+  return optimizeDataUrlForStorage(dataUrl, inputType, estimateDataUrlBytes(dataUrl), options);
 }
