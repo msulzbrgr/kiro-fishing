@@ -151,6 +151,7 @@
     "photo_label": "Foto (opzionale)",
     "add_photo": "Aggiungi foto",
     "remove_photo": "Rimuovi",
+    "photo_storage_hint": "Le foto vengono ottimizzate prima del salvataggio per ridurre lo spazio usato nel browser.",
     "photos": "Foto",
     "view_all_photos": "Mostra tutte",
     "close": "Chiudi",
@@ -230,6 +231,8 @@
     "request_persistence": "Abilita archiviazione persistente",
     "persistence_enabled": "Archiviazione persistente abilitata.",
     "persistence_failed": "Impossibile abilitare l'archiviazione persistente in questo browser.",
+    "persistence_best_effort": "La persistenza del browser è solo best-effort. Conserva backup ZIP se ti serve una conservazione garantita nel lungo periodo.",
+    "persistence_browser_hint": "Alcuni browser, incluso Vivaldi, possono comunque concedere una quota più piccola o rifiutare la persistenza per questo sito.",
     "v2_requires_zip": "Questo backup deve essere importato come file ZIP, non come manifest.json separato.",
     "persistence_disable_not_supported": "La disattivazione dell'archiviazione persistente non è supportata dai browser una volta attivata.",
     "persistence_disable_not_supported_short": "non disattivabile"

@@ -151,6 +151,7 @@
     "photo_label": "写真（任意）",
     "add_photo": "写真を追加",
     "remove_photo": "削除",
+    "photo_storage_hint": "写真は保存前に最適化され、ブラウザーで使う容量を減らします。",
     "photos": "写真",
     "view_all_photos": "すべて表示",
     "close": "閉じる",
@@ -230,6 +231,8 @@
     "request_persistence": "永続ストレージを有効化",
     "persistence_enabled": "永続ストレージを有効化しました。",
     "persistence_failed": "このブラウザでは永続ストレージを有効化できませんでした。",
+    "persistence_best_effort": "ブラウザーの永続化はベストエフォートです。長期保管を確実にしたい場合は ZIP バックアップを残してください。",
+    "persistence_browser_hint": "Vivaldi など一部のブラウザーでは、このサイトの容量上限が小さいまま、または永続化が拒否されることがあります。",
     "v2_requires_zip": "このバックアップは manifest.json 単体ではなく ZIP ファイルとしてインポートしてください。",
     "persistence_disable_not_supported": "永続ストレージは有効化後にブラウザ側で無効化できません。",
     "persistence_disable_not_supported_short": "無効化不可"

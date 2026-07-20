@@ -7,6 +7,7 @@ import { migrateSession } from './sessionVersioning';
 const EXPORT_FORMAT_VERSION_V2 = '2.0';
 const LEGACY_MIGRATION_META_KEY = 'legacy_localstorage_migration_v1_done';
 let idFallbackCounter = 0;
+let persistentStorageRequest: Promise<boolean> | null = null;
 
 export interface ExportPayloadV1 {
   version: string;
@@ -234,6 +235,33 @@ async function ensureLegacyMigration(): Promise<void> {
   await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
 }
 
+async function ensureBestEffortPersistentStorage(): Promise<boolean> {
+  if (!('storage' in navigator) || !navigator.storage?.persist) {
+    return false;
+  }
+
+  if (persistentStorageRequest) {
+    return persistentStorageRequest;
+  }
+
+  persistentStorageRequest = (async () => {
+    try {
+      const alreadyPersistent = navigator.storage.persisted
+        ? await navigator.storage.persisted()
+        : false;
+      if (alreadyPersistent) {
+        return true;
+      }
+
+      return await navigator.storage.persist();
+    } catch {
+      return false;
+    }
+  })();
+
+  return persistentStorageRequest;
+}
+
 async function replaceAllSessions(sessions: FishingSession[]): Promise<void> {
   const db = await getDb();
   const tx = db.transaction(['sessions', 'photos'], 'readwrite');
@@ -263,11 +291,13 @@ export async function loadSessions(): Promise<FishingSession[]> {
 }
 
 export async function saveSessions(sessions: FishingSession[]): Promise<void> {
+  await ensureBestEffortPersistentStorage();
   await replaceAllSessions(sessions);
 }
 
 export async function saveSession(session: FishingSession): Promise<FishingSession> {
   await ensureLegacyMigration();
+  await ensureBestEffortPersistentStorage();
   const db = await getDb();
   const existing = await db.get('sessions', session.id);
   const previous = existing ? migrateSession(existing) : undefined;
@@ -601,8 +631,10 @@ export async function requestPersistentStorage(): Promise<boolean> {
   }
 
   try {
-    return await navigator.storage.persist();
+    persistentStorageRequest = navigator.storage.persist();
+    return await persistentStorageRequest;
   } catch {
+    persistentStorageRequest = null;
     return false;
   }
 }
@@ -628,6 +660,7 @@ export async function loadProfiles(): Promise<Profile[]> {
 }
 
 export async function saveProfile(profile: Profile, photoDataUrl?: string | null): Promise<Profile> {
+  await ensureBestEffortPersistentStorage();
   const db = await getDb();
   const existing = await db.get('profiles', profile.id);
 

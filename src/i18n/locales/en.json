@@ -151,6 +151,7 @@
     "photo_label": "Photo (optional)",
     "add_photo": "Add Photo",
     "remove_photo": "Remove",
+    "photo_storage_hint": "Photos are optimized before saving to reduce browser storage usage.",
     "photos": "Photos",
     "view_all_photos": "View all",
     "close": "Close",
@@ -230,6 +231,8 @@
     "request_persistence": "Enable persistent storage",
     "persistence_enabled": "Persistent storage enabled.",
     "persistence_failed": "Could not enable persistent storage on this browser.",
+    "persistence_best_effort": "Browser storage persistence is best-effort. Keep ZIP backups if you need guaranteed long-term retention.",
+    "persistence_browser_hint": "Some browsers, including Vivaldi, may still keep a smaller quota or deny persistence for this site.",
     "persistence_disable_not_supported": "Disabling persistent storage is not supported by browsers once enabled.",
     "persistence_disable_not_supported_short": "can’t be disabled",
     "v2_requires_zip": "This backup requires importing the ZIP file, not manifest.json directly."

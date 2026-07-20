@@ -151,6 +151,7 @@
     "photo_label": "Foto (optional)",
     "add_photo": "Foto hinzufügen",
     "remove_photo": "Entfernen",
+    "photo_storage_hint": "Fotos werden vor dem Speichern optimiert, um weniger Browser-Speicher zu verbrauchen.",
     "photos": "Fotos",
     "view_all_photos": "Alle anzeigen",
     "close": "Schliessen",
@@ -230,6 +231,8 @@
     "request_persistence": "Dauerhafte Speicherung aktivieren",
     "persistence_enabled": "Dauerhafte Speicherung aktiviert.",
     "persistence_failed": "Dauerhafte Speicherung konnte in diesem Browser nicht aktiviert werden.",
+    "persistence_best_effort": "Die dauerhafte Browser-Speicherung ist nur bestmöglich. Behalte ZIP-Backups für garantiert langfristige Aufbewahrung.",
+    "persistence_browser_hint": "Einige Browser, darunter Vivaldi, erlauben für diese Website trotzdem nur ein kleineres Limit oder verweigern die Persistenz.",
     "persistence_disable_not_supported": "Dauerhafte Speicherung kann nach dem Aktivieren in Browsern nicht mehr deaktiviert werden.",
     "persistence_disable_not_supported_short": "nicht deaktivierbar",
     "v2_requires_zip": "Dieses Backup muss als ZIP-Datei importiert werden, nicht als einzelne manifest.json."

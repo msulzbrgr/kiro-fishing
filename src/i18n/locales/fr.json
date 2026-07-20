@@ -151,6 +151,7 @@
     "photo_label": "Photo (optionnel)",
     "add_photo": "Ajouter une photo",
     "remove_photo": "Supprimer",
+    "photo_storage_hint": "Les photos sont optimisées avant l’enregistrement pour réduire l’espace utilisé dans le navigateur.",
     "photos": "Photos",
     "view_all_photos": "Tout voir",
     "close": "Fermer",
@@ -230,6 +231,8 @@
     "request_persistence": "Activer le stockage persistant",
     "persistence_enabled": "Stockage persistant activé.",
     "persistence_failed": "Impossible d’activer le stockage persistant dans ce navigateur.",
+    "persistence_best_effort": "La persistance du stockage navigateur reste au mieux. Conservez des sauvegardes ZIP si vous avez besoin d’une conservation garantie à long terme.",
+    "persistence_browser_hint": "Certains navigateurs, dont Vivaldi, peuvent quand même accorder un quota plus faible ou refuser la persistance pour ce site.",
     "v2_requires_zip": "Cette sauvegarde doit être importée en fichier ZIP, pas via manifest.json seule.",
     "persistence_disable_not_supported": "La désactivation du stockage persistant n'est pas prise en charge par les navigateurs une fois activé.",
     "persistence_disable_not_supported_short": "non désactivable"

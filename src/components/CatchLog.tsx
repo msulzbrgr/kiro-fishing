@@ -36,6 +36,7 @@ import {
   isSupportedFishImage,
   MAX_FISH_RECOGNITION_IMAGE_BYTES,
 } from '../services/fishRecognitionService';
+import { optimizeImageForStorage } from '../utils/imageCompression';
 import MapView from './MapView';
 
 interface CatchLogProps {
@@ -268,15 +269,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
       const dataUrls: string[] = [];
 
       for (const file of acceptedFiles) {
-        const dataUrl = await new Promise<string | null>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const result = ev.target?.result;
-            resolve(typeof result === 'string' ? result : null);
-          };
-          reader.onerror = () => resolve(null);
-          reader.readAsDataURL(file);
-        });
+        const dataUrl = await optimizeImageForStorage(file).catch(() => null);
 
         if (dataUrl) dataUrls.push(dataUrl);
       }
@@ -603,6 +596,7 @@ export default function CatchLog({ session, onSessionUpdate, profiles = [] }: Ca
               >
                 <Camera size={14} /> {t('catch.add_photo')}
               </button>
+              <div className="settings-hint">{t('catch.photo_storage_hint')}</div>
               {hasAnyFormPhotos && (
                 <button
                   type="button"

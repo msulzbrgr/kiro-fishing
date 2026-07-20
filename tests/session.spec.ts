@@ -91,6 +91,40 @@ test.describe('Session Management', () => {
     expect(storedSession.regulationState).toBe('active_current');
   });
 
+  test('creating a session requests persistent storage when available', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, '__persistCallCount', {
+        configurable: true,
+        writable: true,
+        value: 0,
+      });
+
+      if (!navigator.storage) return;
+
+      Object.defineProperty(navigator.storage, 'persisted', {
+        configurable: true,
+        value: async () => false,
+      });
+      Object.defineProperty(navigator.storage, 'persist', {
+        configurable: true,
+        value: async () => {
+          (window as Window & { __persistCallCount: number }).__persistCallCount += 1;
+          return true;
+        },
+      });
+    });
+
+    await page.goto('/');
+    await page.getByTestId('nav-new').click();
+    await selectSwissLocation(page);
+    await page.getByTestId('create-session-btn').click();
+
+    await expect(page.locator('.session-card')).toHaveCount(1);
+    await expect
+      .poll(async () => page.evaluate(() => (window as Window & { __persistCallCount: number }).__persistCallCount))
+      .toBe(1);
+  });
+
   test('session card shows create story button', async ({ page }) => {
     await selectSwissLocation(page);
     await page.getByTestId('create-session-btn').click();

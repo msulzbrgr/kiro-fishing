@@ -231,6 +231,10 @@ export default function DataManager({ onImportSuccess, onStorageHealthChange }: 
               ? `${t('storage.persistent_yes')} · ${t('storage.persistence_disable_not_supported_short')}`
               : t('storage.persistent_no')}
           </div>
+          <div className="settings-hint">{t('storage.persistence_best_effort')}</div>
+          {!storageHealth.persistent && (
+            <div className="settings-hint">{t('storage.persistence_browser_hint')}</div>
+          )}
         </div>
       )}
     </div>
