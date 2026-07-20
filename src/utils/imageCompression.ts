@@ -43,6 +43,10 @@ function estimateDataUrlBytes(dataUrl: string): number {
 }
 
 function scaleDimensions(width: number, height: number, maxDimension: number): { width: number; height: number } {
+  if (width <= 0 || height <= 0) {
+    return { width: 0, height: 0 };
+  }
+
   const largestSide = Math.max(width, height);
   if (largestSide <= maxDimension) return { width, height };
 
@@ -95,6 +99,9 @@ export async function optimizeImageForStorage(
   const image = await loadImage(originalDataUrl);
   const imageWidth = image.naturalWidth || image.width;
   const imageHeight = image.naturalHeight || image.height;
+  if (imageWidth <= 0 || imageHeight <= 0) {
+    return originalDataUrl;
+  }
   const initialDimensions = scaleDimensions(imageWidth, imageHeight, maxDimension);
 
   if (

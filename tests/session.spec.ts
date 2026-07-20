@@ -120,7 +120,11 @@ test.describe('Session Management', () => {
     await page.getByTestId('create-session-btn').click();
 
     await expect(page.locator('.session-card')).toHaveCount(1);
-    await page.waitForFunction(() => (window as Window & { __persistCallCount: number }).__persistCallCount === 1);
+    await page.waitForFunction(
+      () => (window as Window & { __persistCallCount: number }).__persistCallCount === 1,
+      undefined,
+      { timeout: 5000 },
+    );
   });
 
   test('session card shows create story button', async ({ page }) => {

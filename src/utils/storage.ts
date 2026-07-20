@@ -236,12 +236,19 @@ async function ensureLegacyMigration(): Promise<void> {
 }
 
 async function ensureBestEffortPersistentStorage(): Promise<boolean> {
+  return runPersistentStorageRequest();
+}
+
+async function runPersistentStorageRequest(force = false): Promise<boolean> {
   if (!('storage' in navigator) || !navigator.storage?.persist) {
     return false;
   }
 
   if (persistentStorageRequest) {
-    return persistentStorageRequest;
+    const pending = await persistentStorageRequest;
+    if (!force || pending) {
+      return pending;
+    }
   }
 
   persistentStorageRequest = (async () => {
@@ -259,7 +266,11 @@ async function ensureBestEffortPersistentStorage(): Promise<boolean> {
     }
   })();
 
-  return persistentStorageRequest;
+  const result = await persistentStorageRequest;
+  if (!result) {
+    persistentStorageRequest = null;
+  }
+  return result;
 }
 
 async function replaceAllSessions(sessions: FishingSession[]): Promise<void> {
@@ -626,17 +637,7 @@ export async function getStorageHealth(): Promise<StorageHealth> {
 }
 
 export async function requestPersistentStorage(): Promise<boolean> {
-  if (!('storage' in navigator) || !navigator.storage?.persist) {
-    return false;
-  }
-
-  try {
-    persistentStorageRequest = null;
-    return await ensureBestEffortPersistentStorage();
-  } catch {
-    persistentStorageRequest = null;
-    return false;
-  }
+  return runPersistentStorageRequest(true);
 }
 
 // ===== Profile CRUD =====
