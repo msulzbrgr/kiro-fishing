@@ -240,8 +240,9 @@ async function ensureBestEffortPersistentStorage(): Promise<boolean> {
 }
 
 /**
- * When force=false, reuse the last successful/failed result while a request is still relevant.
- * When force=true, retry after a previous false result, but still wait for any in-flight request first.
+ * Reuses the in-flight or successful persistence request to avoid duplicate navigator.storage.persist() calls.
+ * Failed attempts are cleared so a later forced/manual retry can run again, while force=true still waits for any
+ * currently pending request before deciding whether a new browser persistence request is needed.
  */
 async function runPersistentStorageRequest(force = false): Promise<boolean> {
   if (!('storage' in navigator) || !navigator.storage?.persist) {

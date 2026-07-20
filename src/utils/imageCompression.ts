@@ -4,6 +4,7 @@ const MIN_OUTPUT_QUALITY = 0.55;
 const MIN_RESIZE_DIMENSION = 800;
 const QUALITY_STEP = 0.07;
 const DIMENSION_STEP = 0.85;
+const UNCOMPRESSED_IMAGE_TYPES = ['image/gif', 'image/svg+xml'] as const;
 
 export interface OptimizeImageOptions {
   maxDimension?: number;
@@ -90,7 +91,7 @@ export async function optimizeImageForStorage(
 ): Promise<string> {
   const originalDataUrl = await readFileAsDataUrl(file);
   // GIFs can be animated and SVGs are vector assets, so re-encoding them would be lossy or unnecessary.
-  if (!file.type.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
+  if (!file.type.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.includes(file.type as typeof UNCOMPRESSED_IMAGE_TYPES[number])) {
     return originalDataUrl;
   }
 
