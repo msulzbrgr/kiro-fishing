@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { selectSwissLocation } from './helpers/location';
 import { loadStoredProfiles, loadStoredSessions } from './helpers/storage';
 
@@ -7,6 +7,10 @@ const MINIMAL_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   'base64',
 );
+
+async function expectProfileFormClosed(page: Page) {
+  await expect(page.getByTestId('profile-form')).toHaveCount(0);
+}
 
 test.describe('Profiles', () => {
   test.beforeEach(async ({ page }) => {
@@ -51,10 +55,46 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Bob');
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     expect(profiles).toHaveLength(1);
     expect((profiles[0] as { nickname: string }).nickname).toBe('Bob');
+  });
+
+  test('creating a profile requests persistent storage when available', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, '__persistCallCount', {
+        configurable: true,
+        writable: true,
+        value: 0,
+      });
+
+      if (!navigator.storage) return;
+
+      Object.defineProperty(navigator.storage, 'persisted', {
+        configurable: true,
+        value: async () => false,
+      });
+      Object.defineProperty(navigator.storage, 'persist', {
+        configurable: true,
+        value: async () => {
+          (window as Window & { __persistCallCount: number }).__persistCallCount += 1;
+          return true;
+        },
+      });
+    });
+
+    await page.goto('/');
+    await page.getByTestId('nav-profiles').click();
+    await page.getByTestId('new-profile-btn').click();
+    await page.getByTestId('profile-nickname-input').fill('Persistent');
+    await page.getByTestId('save-profile-btn').click();
+
+    await page.waitForFunction(
+      () => (window as Window & { __persistCallCount: number }).__persistCallCount === 1,
+      { timeout: 5000 },
+    );
   });
 
   test('can create a profile with a photo', async ({ page }) => {
@@ -92,6 +132,7 @@ test.describe('Profiles', () => {
     await expect(page.getByTestId('profile-add-photo-btn')).toBeVisible();
 
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
     const profiles = await loadStoredProfiles(page);
     expect((profiles[0] as { photoBlob?: unknown }).photoBlob).toBeFalsy();
   });
@@ -117,6 +158,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -138,6 +180,7 @@ test.describe('Profiles', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('ToDelete');
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -201,6 +244,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Empty');
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -214,6 +258,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;
@@ -230,6 +275,7 @@ test.describe('Profile detail view', () => {
     await page.getByTestId('new-profile-btn').click();
     await page.getByTestId('profile-nickname-input').fill('Alice');
     await page.getByTestId('save-profile-btn').click();
+    await expectProfileFormClosed(page);
 
     const profiles = await loadStoredProfiles(page);
     const profileId = (profiles[0] as { id: string }).id;

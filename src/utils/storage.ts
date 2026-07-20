@@ -2,11 +2,13 @@ import JSZip from 'jszip';
 import type { Catch, FishingSession, Profile } from '../types';
 import { CURRENT_SESSION_SCHEMA_VERSION } from '../types';
 import { getDb, LEGACY_STORAGE_KEY, type PhotoRecord, type ProfileRecord } from './indexedDb';
+import { optimizeImageDataUrlForStorage } from './imageCompression';
 import { migrateSession } from './sessionVersioning';
 
 const EXPORT_FORMAT_VERSION_V2 = '2.0';
 const LEGACY_MIGRATION_META_KEY = 'legacy_localstorage_migration_v1_done';
 let idFallbackCounter = 0;
+let persistentStorageRequest: Promise<boolean> | null = null;
 
 export interface ExportPayloadV1 {
   version: string;
@@ -150,14 +152,24 @@ async function buildStoredSession(
     if (inputPhotos.length > 0) {
       for (const photo of inputPhotos) {
         if (!isDataUrl(photo)) continue;
+        const optimizedPhoto = await optimizeImageDataUrlForStorage(photo).catch((err) => {
+          const errorType = err instanceof Error ? err.name : typeof err;
+          console.warn(
+            'Failed to optimize catch photo before storage',
+            { catchId: catchEntry.id, errorType },
+            err,
+          );
+          return photo;
+        });
+        const blob = dataUrlToBlob(optimizedPhoto);
         const id = generateId();
         currentPhotoIds.push(id);
         newPhotoRecords.push({
           id,
           sessionId: next.id,
           catchId: catchEntry.id,
-          blob: dataUrlToBlob(photo),
-          mimeType: getMimeFromDataUrl(photo),
+          blob,
+          mimeType: blob.type || getMimeFromDataUrl(optimizedPhoto),
           createdAt: new Date().toISOString(),
         });
       }
@@ -234,6 +246,49 @@ async function ensureLegacyMigration(): Promise<void> {
   await setMetaValue(LEGACY_MIGRATION_META_KEY, true);
 }
 
+async function ensureBestEffortPersistentStorage(): Promise<boolean> {
+  return runPersistentStorageRequest();
+}
+
+/**
+ * Reuses the in-flight or successful persistence request to avoid duplicate navigator.storage.persist() calls.
+ * Failed attempts are cleared so a later forced/manual retry can run again, while force=true still waits for any
+ * currently pending request before deciding whether a new browser persistence request is needed.
+ */
+async function runPersistentStorageRequest(force = false): Promise<boolean> {
+  if (!('storage' in navigator) || !navigator.storage?.persist) {
+    return false;
+  }
+
+  if (persistentStorageRequest) {
+    const pending = await persistentStorageRequest;
+    if (!force || pending === true) {
+      return pending;
+    }
+  }
+
+  persistentStorageRequest = (async () => {
+    try {
+      const alreadyPersistent = navigator.storage.persisted
+        ? await navigator.storage.persisted()
+        : false;
+      if (alreadyPersistent) {
+        return true;
+      }
+
+      return await navigator.storage.persist();
+    } catch {
+      return false;
+    }
+  })();
+
+  const result = await persistentStorageRequest;
+  if (!result) {
+    persistentStorageRequest = null;
+  }
+  return result;
+}
+
 async function replaceAllSessions(sessions: FishingSession[]): Promise<void> {
   const db = await getDb();
   const tx = db.transaction(['sessions', 'photos'], 'readwrite');
@@ -263,11 +318,13 @@ export async function loadSessions(): Promise<FishingSession[]> {
 }
 
 export async function saveSessions(sessions: FishingSession[]): Promise<void> {
+  await ensureBestEffortPersistentStorage();
   await replaceAllSessions(sessions);
 }
 
 export async function saveSession(session: FishingSession): Promise<FishingSession> {
   await ensureLegacyMigration();
+  await ensureBestEffortPersistentStorage();
   const db = await getDb();
   const existing = await db.get('sessions', session.id);
   const previous = existing ? migrateSession(existing) : undefined;
@@ -491,6 +548,7 @@ async function importV2Zip(file: File): Promise<number> {
     }
   }
 
+  await ensureBestEffortPersistentStorage();
   const db = await getDb();
   const tx = db.transaction(['sessions', 'photos', 'profiles'], 'readwrite');
   const clearOps: Promise<void>[] = [
@@ -596,15 +654,7 @@ export async function getStorageHealth(): Promise<StorageHealth> {
 }
 
 export async function requestPersistentStorage(): Promise<boolean> {
-  if (!('storage' in navigator) || !navigator.storage?.persist) {
-    return false;
-  }
-
-  try {
-    return await navigator.storage.persist();
-  } catch {
-    return false;
-  }
+  return runPersistentStorageRequest(true);
 }
 
 // ===== Profile CRUD =====
@@ -628,6 +678,7 @@ export async function loadProfiles(): Promise<Profile[]> {
 }
 
 export async function saveProfile(profile: Profile, photoDataUrl?: string | null): Promise<Profile> {
+  await ensureBestEffortPersistentStorage();
   const db = await getDb();
   const existing = await db.get('profiles', profile.id);
 
