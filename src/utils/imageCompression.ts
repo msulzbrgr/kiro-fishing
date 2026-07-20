@@ -97,7 +97,7 @@ async function optimizeDataUrlForStorage(
   options: OptimizeImageOptions = {},
 ): Promise<string> {
   // GIFs can be animated and SVGs are vector assets, so re-encoding them would be lossy or unnecessary.
-  if (!inputType.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.some((type) => type === inputType)) {
+  if (!inputType.startsWith('image/') || UNCOMPRESSED_IMAGE_TYPES.includes(inputType)) {
     return originalDataUrl;
   }
 
