@@ -5,8 +5,10 @@ import { loadStoredSessions } from './helpers/storage';
 type StoredCatch = {
   id: string;
   species: string;
+  time?: string;
   notes?: string;
   released: boolean;
+  photoIds?: string[];
   recognition?: unknown;
 };
 
@@ -275,9 +277,9 @@ test.describe('Catch Log', () => {
       buffer: MINIMAL_PNG,
     });
 
-    // Preview thumbnail should appear and the add-photo button should disappear
+    // Preview thumbnail should appear and the add-photo button should remain available
     await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
-    await expect(page.getByTestId('add-photo-btn')).toHaveCount(0);
+    await expect(page.getByTestId('add-photo-btn')).toBeVisible();
 
     // Remove photo button should be available
     await expect(page.getByTestId('remove-all-photos-btn')).toBeVisible();
@@ -423,6 +425,47 @@ test.describe('Catch Log', () => {
     expect(catchEntry.released).toBe(false);
   });
 
+  test('can edit catch time and photos', async ({ page }) => {
+    await page.getByTestId('log-catch-btn').click();
+    await page.getByTestId('species-select').selectOption({ index: 1 });
+    await page.getByTestId('catch-time-input').fill('06:45');
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'first-fish.png',
+      mimeType: 'image/png',
+      buffer: MINIMAL_PNG,
+    });
+    await expect(page.getByTestId('catch-photo-preview')).toBeVisible();
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.locator('.catch-item')).toHaveCount(1);
+
+    const storedSessions = await loadStoredSessions(page);
+    const catchId = (storedSessions[0] as StoredSession).catches[0].id;
+
+    await page.getByTestId(`edit-catch-btn-${catchId}`).click();
+    await expect(page.getByTestId('catch-time-input')).toHaveValue('06:45');
+    await page.getByTestId('catch-time-input').fill('08:15');
+    await page.getByTestId('remove-photo-btn-0').click();
+    await expect(page.locator('[data-testid^="remove-photo-btn-"]')).toHaveCount(0);
+    await page.getByTestId('add-photo-btn').click();
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'second-fish.png',
+      mimeType: 'image/png',
+      buffer: MINIMAL_PNG,
+    });
+    await expect(page.locator('[data-testid^="remove-photo-btn-"]')).toHaveCount(1);
+    await page.getByTestId('add-catch-btn').click();
+    await expect(page.getByTestId('catch-time-input')).toHaveCount(0);
+
+    await page.locator('.catch-item .catch-header').click();
+    await expect(page.locator('.catch-meta')).toContainText('08:15');
+    await expect(page.getByTestId('catch-photo-full')).toBeVisible();
+
+    const updatedSessions = await loadStoredSessions(page);
+    const catchEntry = (updatedSessions[0] as StoredSession).catches[0];
+    expect(catchEntry.time).toBe('08:15');
+    expect(catchEntry.photoIds).toHaveLength(1);
+  });
+
   test('catch location picker button is visible in catch form', async ({ page }) => {
     await page.getByTestId('log-catch-btn').click();
     await expect(page.getByTestId('catch-pick-location-btn')).toBeVisible();
@@ -556,6 +599,8 @@ test.describe('Edit Session', () => {
 
   test('edit button is visible in session footer', async ({ page }) => {
     await expect(page.getByTestId('edit-session-btn')).toBeVisible();
+    await expect(page.getByTestId('edit-session-btn')).toHaveText('');
+    await expect(page.getByTestId('delete-session-btn')).toHaveText('');
   });
 
   test('clicking edit shows the edit form', async ({ page }) => {

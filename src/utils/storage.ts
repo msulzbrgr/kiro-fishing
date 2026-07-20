@@ -147,7 +147,7 @@ async function buildStoredSession(
     const currentPhotoIds = [...(catchEntry.photoIds ?? [])];
     const inputPhotos = catchEntry.photos ?? [];
 
-    if (currentPhotoIds.length === 0 && inputPhotos.length > 0) {
+    if (inputPhotos.length > 0) {
       for (const photo of inputPhotos) {
         if (!isDataUrl(photo)) continue;
         const id = generateId();

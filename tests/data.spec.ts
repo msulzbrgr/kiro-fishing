@@ -9,6 +9,7 @@ import { loadStoredSessions } from './helpers/storage';
 type StoredCatch = {
   id: string;
   species: string;
+  time?: string;
   notes?: string;
   released: boolean;
   photoIds?: string[];
@@ -234,6 +235,13 @@ test.describe('Export / Import Data', () => {
 
     await page.getByTestId(`edit-catch-btn-${catchId}`).click();
     await page.getByTestId('species-select').selectOption({ index: 2 });
+    await page.getByTestId('catch-time-input').fill('09:10');
+    await page.getByTestId('remove-photo-btn-0').click();
+    await page.getByTestId('catch-photo-input').setInputFiles({
+      name: 'fish-2.png',
+      mimeType: 'image/png',
+      buffer: MINIMAL_PNG,
+    });
     await page.locator('.catch-form textarea').fill('updated export note');
     await page.locator('.catch-form input[type="checkbox"]').uncheck();
     await page.getByTestId('add-catch-btn').click();
@@ -259,6 +267,7 @@ test.describe('Export / Import Data', () => {
     expect(manifest.sessions).toHaveLength(1);
     expect(manifest.sessions?.[0].catches?.[0].notes).toBe('updated export note');
     expect(manifest.sessions?.[0].catches?.[0].released).toBe(false);
+    expect(manifest.sessions?.[0].catches?.[0].time).toBe('09:10');
     expect(manifest.sessions?.[0].catches?.[0].photoIds).toHaveLength(1);
     expect(manifest.photos).toHaveLength(1);
 
@@ -276,6 +285,7 @@ test.describe('Export / Import Data', () => {
     const importedCatch = (importedSessions[0] as StoredSession).catches[0];
     expect(importedCatch.notes).toBe('updated export note');
     expect(importedCatch.released).toBe(false);
+    expect(importedCatch.time).toBe('09:10');
     expect(importedCatch.photoIds).toHaveLength(1);
     fs.unlinkSync(tmpFile);
   });
